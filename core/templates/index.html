@@ -1,1 +1,20 @@
 <h3>Hospital Finder</h3>
+<table class="table table-dark table-striped">
+    <thead>
+      <tr>
+        <th>State</th>
+        <th>Number of Hospitals Better</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- jinja2 Technique -->
+    {% if d %}  
+    {% for i in d %}
+      <tr>
+        <td>{{i.State}}</td>
+        <td>{{i.Number_of_Hospitals_Same}}</td>
+      </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+  </table>

@@ -1,22 +1,27 @@
-<h3>Hospital Finder</h3>
+<h3>Hospital Finder {{sort_string}}</h3>
+
 <table class="table table-dark table-striped">
     <thead>
       <tr>
-        <th><a href="{% url "index" %}?sort=hospital">Hospital|</a></th>
-        <th>30 Day Heart Attack Mortality|</th>
-        <th>30 Day Chronic Obstructive Pulminary Disorder Mortality|</th>
+        {% if not sort_string or "-" not in sort_string %}
+          <th><a href="{% url "index" %}?sort=hospital">Hospital|</a></th>
+          <th><a href="{% url "index" %}?sort=mort_30_ami">30 Day Heart Attack Mortality|</a></th>
+          <th><a href="{% url "index" %}?sort=mort_30_copd">30 Day Chronic Obstructive Pulminary Disorder Mortality</a></th>
+        {% else %}
+          <th><a href="{% url "index" %}?sort=-hospital">Hospital|</a></th>
+          <th><a href="{% url "index" %}?sort=-mort_30_ami">30 Day Heart Attack Mortality|</a></th>
+          <th><a href="{% url "index" %}?sort=-mort_30_copd">30 Day Chronic Obstructive Pulminary Disorder Mortality</a></th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
     <!-- jinja2 Technique -->
-    {% if d %}  
-    {% for i in d %}
+    {% for i in hospital_data %}
       <tr>
         <td>{{i.hospital}}</td>
         <td>{{i.mort_30_ami}}</td>
         <td>{{i.mort_30_copd}}</td>
       </tr>
     {% endfor %}
-    {% endif %}
     </tbody>
   </table>

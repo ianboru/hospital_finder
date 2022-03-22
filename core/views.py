@@ -16,17 +16,22 @@ def index(request, path=None):
 
     sort_string = request.GET.get("sort")
     if sort_string and "-" in sort_string:
-        sort_string.replace("-","")
-        unplanned_visits = unplanned_visits.sort_values(by=[sort_string], ascending=False)
+        unplanned_visits = unplanned_visits.sort_values(by=[sort_string.replace("-","")], ascending=False)
     elif sort_string and  "-" not in sort_string:
-        sort_string.replace("-","")
         unplanned_visits = unplanned_visits.sort_values(by=[sort_string], ascending=True)
        
-    print(unplanned_visits, sort_string)
+    print("SORT STRING",sort_string)
     
-    print(unplanned_visits)
     json_records = unplanned_visits.reset_index().to_json(orient ='records')
-    data = []
-    data = json.loads(json_records)
-    context = {'d': data}
+    hospital_data = json.loads(json_records)
+    if sort_string and "-" in sort_string:
+        sort_string = sort_string.replace("-","")
+    elif sort_string and  "-" not in sort_string:
+        sort_string = f"-{sort_string}"
+    else:
+        sort_string = ""
+    context = {
+        'hospital_data': hospital_data,
+        'sort_string' : sort_string
+    }
     return render(request, "index.html", context)

@@ -1,0 +1,80 @@
+.search-input-form {
+    position: relative;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .search-input-form button {
+    background: transparent;
+    border: none;
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    left: 5px;
+    top: 5px;
+  }
+  
+  .search-input-form button svg {
+    fill: blue;
+    stroke: blue;
+    color: blue;
+  }
+  
+  .search-input-form input {
+    background-color: white;
+    border-radius: 20px;
+    border: 1px solid #C9E2FF;
+    height: 35px;
+    font-size: 16px;
+    padding-left: 35px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .search-input-form input::-webkit-input-placeholder {
+     color: #aaa;
+  }
+  .search-input-form input:-moz-placeholder { /* Firefox 18- */
+     color: #aaa;
+  }
+  .search-input-form input::-moz-placeholder {  /* Firefox 19+ */
+     color: #aaa;
+     opacity: 1;
+  }
+  .search-input-form input:-ms-input-placeholder {
+     color: #aaa;
+  }
+
+  .search-header {
+    margin-right: 0;
+  }
+  
+  .search-form-wrapper {
+    text-align: center;
+  }
+  
+  .search-form-wrapper .row.search-justify {
+    justify-content: center;
+  }
+
+  
+.search-justify {
+    justify-content: flex-start;
+  }
+  
+  .search-header {
+    display: flex;
+    margin-bottom: 0px;
+    margin-right: 15px;
+  }
+  
+  button[type="submit"] {
+    cursor: pointer;
+  }
+  
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }

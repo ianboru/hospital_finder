@@ -1,0 +1,17 @@
+{% load static %}
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
+
+
+<div class="row search-justify">
+    <div>{% static "" %}</div>
+    <div class="search-header">
+        <form class="search-input-form" id="search-form">
+            <input name="search" placeholder="Search" value="{{ request.GET.search }}" />
+            <button type="submit">
+                <img src="{% static "/icons/search_icon.svg" %}"/>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="{% static "searchForm.js" %}"></script>

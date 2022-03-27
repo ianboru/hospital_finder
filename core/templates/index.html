@@ -21,7 +21,7 @@
     <!-- jinja2 Technique -->
     {% for i in hospital_data %}
       <tr>
-        <td>{{i.hospital}}</td>
+        <td>{{i.hospital|title}}</td>
         <td>{{i.mort_30_ami}}</td>
         <td>{{i.mort_30_copd}}</td>
       </tr>

@@ -1,3 +1,23 @@
+body{
+  background-color: rgb(245, 225, 208)
+}
+.main-title {
+  text-align: center;
+  font-size: 32px;
+}
+
+th a {color:#0044ff;}         /* Unvisited link  */
+th a:visited {color:#0044ff;} /* Visited link    */
+th a:hover {color:#0044ff;}   /* Mouse over link */
+th a:active {color:#0044ff;}
+
+.sub-title{
+  text-align: center;
+  font-size: 24px;
+  font-weight: normal;
+  color : gray;
+}
+
 .search-input-form {
     position: relative;
     margin-top: 15px;

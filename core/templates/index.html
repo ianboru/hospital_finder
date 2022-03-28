@@ -1,14 +1,15 @@
 {% load static %}
 <link href="{% static "/css/index.css" %}" rel="stylesheet" type="text/css">
 
-<h3>Hospital Finder {{sort_string}}</h3>
+<h1 class="main-title">Hospital Quality Rankings</h3>
+<h3 class="sub-title">Find out how well your local hospitals are performing</h3>
 {% include "search_form.html" %}
 <table class="table table-dark table-striped">
     <thead>
       <tr>
         {% if not sort_string or "-" not in sort_string %}
-          <th><a href="{% url "index" %}?sort=hospital">Hospital|</a></th>
-          <th><a href="{% url "index" %}?sort=mort_30_ami">30 Day Heart Attack Mortality|</a></th>
+          <th><a href="{% url "index" %}?sort=hospital">Hospital</a></th>
+          <th><a href="{% url "index" %}?sort=mort_30_ami">30 Day Heart Attack Mortality</a></th>
           <th><a href="{% url "index" %}?sort=mort_30_copd">30 Day Chronic Obstructive Pulminary Disorder Mortality</a></th>
         {% else %}
           <th><a href="{% url "index" %}?sort=-hospital">Hospital|</a></th>

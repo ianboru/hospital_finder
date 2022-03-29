@@ -44,3 +44,6 @@ def index(request, path=None):
         'sort_string' : sort_string
     }
     return render(request, "index.html", context)
+
+def graph(request, path=None):
+    return render(request, "graph.html")

@@ -1,8 +1,7 @@
 {% load static %}
 <link href="{% static "/css/index.css" %}" rel="stylesheet" type="text/css">
 
-<h1 class="main-title">Hospital Quality Rankings</h3>
-<h3 class="sub-title">Find out how well your local hospitals are performing</h3>
+{% include "header.html" %}
 <div class="search-title">Hospital Search</div>
 {% include "search_form.html" %}
 <table class="table table-dark table-striped">

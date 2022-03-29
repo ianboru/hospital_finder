@@ -103,4 +103,17 @@ th a:active {color:#0044ff;}
     justify-content: space-between;
   }
 
-  
+  .nav-tab-container{
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .nav-tab-container a{
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  .nav-tab-container img{
+    height: 40px;
+    width: 40px;
+  }

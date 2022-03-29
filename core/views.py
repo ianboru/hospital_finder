@@ -1,20 +1,12 @@
 from django.shortcuts import render
-from numpy import sort
-import pandas as pd
-import os
-from hospital_finder.settings import BASE_DIR
 import json
 import re
-data_path = os.path.join(BASE_DIR, './data/hvbp_clinical_outcomes.csv')
+import plotly.graph_objects as go
+import plotly
+from . import utils
 # Create your views here.
 def index(request, path=None):
-    print("SETTINGS", BASE_DIR)
-    unplanned_visits = pd.read_csv(data_path)
-    unplanned_visits.rename(columns={
-        "Facility Name" : "hospital",
-        "MORT-30-AMI Performance Rate" : "mort_30_ami",
-        "MORT-30-COPD Performance Rate" : "mort_30_copd",
-    }, inplace=True)
+    unplanned_visits = utils.load_hospital_data()
     #sort dataframe based on query param
     search_string = request.GET.get("search")
     if search_string:
@@ -45,5 +37,20 @@ def index(request, path=None):
     }
     return render(request, "index.html", context)
 
+
 def graph(request, path=None):
-    return render(request, "graph.html")
+    unplanned_visits = utils.load_hospital_data()
+    ## columns for reference  "hospital","mort_30_ami","mort_30_copd"
+    fig = go.Figure(
+        data=[go.Bar(
+            x=unplanned_visits["hospital"],
+            y=unplanned_visits["mort_30_ami"]
+        )],
+        layout_title_text="A Figure Displayed with fig.show()"
+    )
+    graph_div = fig.to_html()
+    context = {
+        "graph_div": graph_div
+    }
+    print(graph_div)
+    return render(request, "graph.html",context)

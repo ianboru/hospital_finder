@@ -4,6 +4,7 @@ body{
 .main-title {
   text-align: center;
   font-size: 32px;
+  margin-bottom: 10px;
 }
 
 th a {color:#0044ff;}         /* Unvisited link  */
@@ -16,13 +17,14 @@ th a:active {color:#0044ff;}
   font-size: 24px;
   font-weight: normal;
   color : gray;
+  margin-top: 0;
 }
 
 .search-input-form {
     position: relative;
-    margin-top: 15px;
     width: 100%;
     max-width: 250px;
+    margin-bottom: 5px;
   }
   
   .search-input-form button {
@@ -78,17 +80,19 @@ th a:active {color:#0044ff;}
     justify-content: center;
   }
 
-  
-.search-justify {
-    justify-content: flex-start;
-  }
-  
   .search-header {
     display: flex;
     margin-bottom: 0px;
+    margin-top: 0px;
     margin-right: 15px;
   }
   
+  .search-title { 
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color : rgb(68, 64, 64);
+  }
   button[type="submit"] {
     cursor: pointer;
   }
@@ -98,3 +102,5 @@ th a:active {color:#0044ff;}
     align-items: center;
     justify-content: space-between;
   }
+
+  

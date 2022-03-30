@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import json
 import re
+
 import plotly.graph_objects as go
 import plotly
 from . import utils
@@ -39,15 +40,30 @@ def index(request, path=None):
 
 
 def graph(request, path=None):
-    unplanned_visits = utils.load_hospital_data()
+    hospital_data = utils.load_hospital_data()
     ## columns for reference  "hospital","mort_30_ami","mort_30_copd"
+    layout = go.Layout(
+        paper_bgcolor='rgba(255,255,255,1)',
+        plot_bgcolor='rgba(255,255,255,1)'
+    )
     fig = go.Figure(
         data=[go.Bar(
-            x=unplanned_visits["hospital"],
-            y=unplanned_visits["mort_30_ami"]
+            name="mort_30_ami",
+            x=hospital_data["hospital"],
+            y=hospital_data["mort_30_ami"],
+            marker = dict(color = "red")
+        ),
+        go.Bar(
+            name="mort_30_copd",
+            x=hospital_data["hospital"],
+            y=hospital_data["mort_30_copd"],
+            marker = dict(color = "green")
         )],
-        layout_title_text="A Figure Displayed with fig.show()"
+        layout_title_text="Hospital Quality Metrics",
+        layout=layout
     )
+
+    
     graph_div = fig.to_html()
     context = {
         "graph_div": graph_div

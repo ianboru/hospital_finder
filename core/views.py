@@ -42,23 +42,28 @@ def index(request, path=None):
 def graph(request, path=None):
     hospital_data = utils.load_hospital_data()
     ## columns for reference  "hospital","mort_30_ami","mort_30_copd"
+    '''
+        
+    '''
     layout = go.Layout(
         paper_bgcolor='rgba(255,255,255,1)',
         plot_bgcolor='rgba(255,255,255,1)'
     )
     fig = go.Figure(
-        data=[go.Bar(
-            name="mort_30_ami",
-            x=hospital_data["hospital"],
-            y=hospital_data["mort_30_ami"],
-            marker = dict(color = "red")
-        ),
-        go.Bar(
-            name="mort_30_copd",
-            x=hospital_data["hospital"],
-            y=hospital_data["mort_30_copd"],
-            marker = dict(color = "green")
-        )],
+        data=[  
+            go.Bar(
+                name="mort_30_copd",
+                x=hospital_data["hospital"],
+                y=hospital_data["mort_30_copd"],
+                marker = dict(color = "green")
+            ),
+            go.Bar(
+                name="mort_30_ami",
+                x=hospital_data["hospital"],
+                y=hospital_data["mort_30_ami"],
+                marker = dict(color = "red")
+            )
+        ],
         layout_title_text="Hospital Quality Metrics",
         layout=layout
     )

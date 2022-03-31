@@ -1,7 +1,9 @@
+from http.client import HTTPResponse
 from django.shortcuts import render
 import json
 import re
-
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 import plotly.graph_objects as go
 import plotly
 from . import utils
@@ -75,3 +77,15 @@ def graph(request, path=None):
     }
     print(graph_div)
     return render(request, "graph.html",context)
+
+from django.views.decorators.csrf import csrf_exempt
+
+
+@require_POST
+@csrf_exempt
+def favorite(request):
+    request_data = json.loads(request.body)
+    hospital_name = request_data.get("hospital_name")
+    print(request_data)
+    print("hospital",hospital_name)
+    return JsonResponse({"success": True})

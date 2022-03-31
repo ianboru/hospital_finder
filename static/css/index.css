@@ -117,3 +117,7 @@ th a:active {color:#0044ff;}
     height: 40px;
     width: 40px;
   }
+
+  .star { 
+    cursor:pointer
+  }

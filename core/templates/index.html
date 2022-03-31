@@ -1,5 +1,7 @@
 {% load static %}
 <link href="{% static "/css/index.css" %}" rel="stylesheet" type="text/css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
 
 {% include "header.html" %}
 <div class="search-title">Hospital Search</div>
@@ -25,7 +27,18 @@
         <td>{{i.hospital|title}}</td>
         <td>{{i.mort_30_ami}}</td>
         <td>{{i.mort_30_copd}}</td>
+        <td>
+          {% if i.starred %}
+            <img name="{{i.hospital}}" class="star star-active" src="{% static "/icons/star_active_icon.png" %}"/>
+          {% else %}
+            <img name="{{i.hospital}}" class="star star-inactive" src="{% static "/icons/star_inactive_icon.png" %}"/>
+          {% endif %}
+        </td>
+        
       </tr>
     {% endfor %}
     </tbody>
   </table>
+
+
+  <script src="{% static "star.js" %}"></script>

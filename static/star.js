@@ -1,3 +1,4 @@
+const user_id = JSON.parse(document.getElementById('user_id').textContent);
 const updateStarred = (hospital_name, was_active) => {
     $.ajax({
         type: "POST",
@@ -5,7 +6,8 @@ const updateStarred = (hospital_name, was_active) => {
         dataType: "json",
         data: JSON.stringify({
           "hospital_name" : hospital_name,
-          "was_active" : was_active
+          "was_active" : was_active,
+          "user_id" : user_id
         }),
         success: () => {
         },

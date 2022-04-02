@@ -7,7 +7,15 @@ from django.http import JsonResponse
 import plotly.graph_objects as go
 import plotly
 from . import utils
-# Create your views here.
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.views import generic
+#https://learndjango.com/tutorials/django-signup-tutorial   
+class SignUpView(generic.CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy("login")
+    template_name = "registration/signup.html"
+    
 def index(request, path=None):
     unplanned_visits = utils.load_hospital_data()
     #sort dataframe based on query param
@@ -89,3 +97,4 @@ def favorite(request):
     print(request_data)
     print("hospital",hospital_name)
     return JsonResponse({"success": True})
+

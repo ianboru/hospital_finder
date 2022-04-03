@@ -48,9 +48,13 @@ def index(request, path=None):
         sort_string = f"-{sort_string}"
     else:
         sort_string = ""
+
+    favorites = Favorite.objects.filter(user=request.user).values_list('hospital',flat=True)
+    print(favorites)
     context = {
         'hospital_data': hospital_data,
-        'sort_string' : sort_string
+        'sort_string' : sort_string,
+        'favorites' : favorites
     }
     return render(request, "index.html", context)
 
@@ -106,7 +110,8 @@ def favorite(request):
     print(user_id)  
     user_id = int(user_id)
     user = User.objects.get(id=user_id)
-    
-    Favorite.objects.create(user=user, hospital=hospital_name)
+    favorite_instance, created = Favorite.objects.get_or_create(user=user, hospital=hospital_name)
+    if not created:
+        favorite_instance.delete()
     return JsonResponse({"success": True})
 

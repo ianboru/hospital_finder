@@ -29,7 +29,7 @@
         <td>{{i.mort_30_ami}}</td>
         <td>{{i.mort_30_copd}}</td>
         <td>
-          {% if i.starred %}
+          {% if i.hospital in favorites %}
             <img name="{{i.hospital}}" class="star star-active" src="{% static "/icons/star_active_icon.png" %}"/>
           {% else %}
             <img name="{{i.hospital}}" class="star star-inactive" src="{% static "/icons/star_inactive_icon.png" %}"/>

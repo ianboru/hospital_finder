@@ -1,5 +1,6 @@
-const user_id = JSON.parse(document.getElementById('user_id').textContent);
 const updateStarred = (hospital_name, was_active) => {
+  const user_id  = JSON.parse(document.getElementById('user_id').textContent);
+
     $.ajax({
         type: "POST",
         url: `/favorite`,

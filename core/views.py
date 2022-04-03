@@ -10,6 +10,12 @@ from . import utils
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
+from django.contrib.auth.models import User
+
+from core.models import (
+    Favorite,
+)
+
 #https://learndjango.com/tutorials/django-signup-tutorial   
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -94,8 +100,13 @@ from django.views.decorators.csrf import csrf_exempt
 def favorite(request):
     request_data = json.loads(request.body)
     hospital_name = request_data.get("hospital_name")
-    
     print(request_data)
     print("hospital",hospital_name)
+    user_id = request_data.get("user_id")
+    print(user_id)  
+    user_id = int(user_id)
+    user = User.objects.get(id=user_id)
+    
+    Favorite.objects.create(user=user, hospital=hospital_name)
     return JsonResponse({"success": True})
 

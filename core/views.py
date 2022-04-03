@@ -49,7 +49,10 @@ def index(request, path=None):
     else:
         sort_string = ""
 
-    favorites = Favorite.objects.filter(user=request.user).values_list('hospital',flat=True)
+    if request.user.is_authenticated:
+        favorites = Favorite.objects.filter(user=request.user).values_list('hospital',flat=True)
+    else:
+        favorites = []
     print(favorites)
     context = {
         'hospital_data': hospital_data,

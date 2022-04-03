@@ -7,10 +7,10 @@ body{
   margin-bottom: 10px;
 }
 
-th a {color:#0044ff;}         /* Unvisited link  */
-th a:visited {color:#0044ff;} /* Visited link    */
-th a:hover {color:#0044ff;}   /* Mouse over link */
-th a:active {color:#0044ff;}
+a {color:#0044ff;}         /* Unvisited link  */
+a:visited {color:#0044ff;} /* Visited link    */
+a:hover {color:#0044ff;}   /* Mouse over link */
+a:active {color:#0044ff;}
 
 .sub-title{
   text-align: center;
@@ -118,6 +118,15 @@ th a:active {color:#0044ff;}
     width: 40px;
   }
 
+
   .star { 
+    cursor:pointer
+  }
+
+  .top-nav-item{
+    margin-right: 10px;
+  }
+
+  .top-nav-item a{
     cursor:pointer
   }

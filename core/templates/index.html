@@ -7,39 +7,11 @@
 <div class="search-title">Hospital Search</div>
 {% include "search_form.html" %}
 
-<table class="table table-dark table-striped">
-    <thead>
-      <tr>
-        {% if not sort_string or "-" not in sort_string %}
-          <th><a href="{% url "index" %}?sort=hospital">Hospital</a></th>
-          <th><a href="{% url "index" %}?sort=mort_30_ami">30 Day Heart Attack Mortality</a></th>
-          <th><a href="{% url "index" %}?sort=mort_30_copd">30 Day Chronic Obstructive Pulminary Disorder Mortality</a></th>
-        {% else %}
-          <th><a href="{% url "index" %}?sort=-hospital">Hospital|</a></th>
-          <th><a href="{% url "index" %}?sort=-mort_30_ami">30 Day Heart Attack Mortality|</a></th>
-          <th><a href="{% url "index" %}?sort=-mort_30_copd">30 Day Chronic Obstructive Pulminary Disorder Mortality</a></th>
-        {% endif %}
-      </tr>
-    </thead>
-    <tbody>
-    <!-- jinja2 Technique -->
-    {% for i in hospital_data %}
-      <tr>
-        <td>{{i.hospital|title}}</td>
-        <td>{{i.mort_30_ami}}</td>
-        <td>{{i.mort_30_copd}}</td>
-        <td>
-          {% if i.hospital in favorites %}
-            <img name="{{i.hospital}}" class="star star-active" src="{% static "/icons/star_active_icon.png" %}"/>
-          {% else %}
-            <img name="{{i.hospital}}" class="star star-inactive" src="{% static "/icons/star_inactive_icon.png" %}"/>
-          {% endif %}
-        </td>
-        
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<!--passing places data to be available in react-->
+{{ google_places_data | json_script:'google_places_data' }}
+<script type="module" src="{% static "App.js" %}"></script>
+
+<div id="root"></div>  
 
   {{ request.user.id|json_script:"user_id" }}
   <script src="{% static "star.js" %}"></script>

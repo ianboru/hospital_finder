@@ -15,6 +15,8 @@ from django.contrib.auth.models import User
 from core.models import (
     Favorite,
 )
+import googlemaps
+from datetime import datetime
 
 #https://learndjango.com/tutorials/django-signup-tutorial   
 class SignUpView(generic.CreateView):
@@ -23,25 +25,36 @@ class SignUpView(generic.CreateView):
     template_name = "registration/signup.html"
 
 def index(request, path=None):
-    unplanned_visits = utils.load_hospital_data()
+    hospital_quality_metrics = utils.load_hospital_data()
     #sort dataframe based on query param
     search_string = request.GET.get("search")
     if search_string:
-        unplanned_visits = unplanned_visits[
-            unplanned_visits["hospital"].str.contains(search_string, regex=True, flags=re.IGNORECASE)
-        ]
+        #find hospitals matching string
+        search_hit_indexes = hospital_quality_metrics["hospital"].str.contains(search_string, regex=True, flags=re.IGNORECASE)
+        #trim dataframe to matching subset
+        hospital_quality_metrics = hospital_quality_metrics[search_hit_indexes]
+    else:
+        search_string = ''
+    gmaps = googlemaps.Client(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
+    print("search string", search_string)
+    places_result = []
+    if search_string:    
+        places_result = gmaps.places(query=search_string)
+    print("places result", places_result)
     #sort dataframe based on query param
     sort_string = request.GET.get("sort")
     if sort_string and "-" in sort_string:
-        unplanned_visits = unplanned_visits.sort_values(by=[sort_string.replace("-","")], ascending=False)
+        hospital_quality_metrics = hospital_quality_metrics.sort_values(by=[sort_string.replace("-","")], ascending=False)
     elif sort_string and  "-" not in sort_string:
-        unplanned_visits = unplanned_visits.sort_values(by=[sort_string], ascending=True)
+        hospital_quality_metrics = hospital_quality_metrics.sort_values(by=[sort_string], ascending=True)
            
     #convert dataframe to json
-    json_records = unplanned_visits.reset_index().to_json(orient ='records')
+    #data needs to be sent to front end as json 
+    json_records = hospital_quality_metrics.reset_index().to_json(orient ='records')
     hospital_data = json.loads(json_records)
 
     #set href sort string for sorting in opposite direction
+    #this needs to be sent to the front end for the sort state
     if sort_string and "-" in sort_string:
         sort_string = sort_string.replace("-","")
     elif sort_string and  "-" not in sort_string:
@@ -55,6 +68,7 @@ def index(request, path=None):
         favorites = []
     print(favorites)
     context = {
+        'google_places_data' : places_result,
         'hospital_data': hospital_data,
         'sort_string' : sort_string,
         'favorites' : favorites

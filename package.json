@@ -1,0 +1,43 @@
+{
+  "name": "tribe-health",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:TribeHealthDev/tribe-platform"
+  },
+  "scripts": {
+    "start": "webpack --watch --mode development --config webpack.config.dev.js",
+    "build": "webpack --mode production --config webpack.config.js",
+    "test": "cd tests && ./node_modules/.bin/cypress open",
+    "test-headless": "cd tests && ./node_modules/.bin/cypress run --headless"
+  },
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "16.12.0",
+    "react-dropzone": "11.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "7.7.4",
+    "@babel/plugin-proposal-class-properties": "7.7.4",
+    "@babel/plugin-proposal-decorators": "7.7.4",
+    "@babel/plugin-proposal-object-rest-spread": "7.7.4",
+    "@babel/preset-env": "7.7.4",
+    "@babel/preset-react": "7.7.4",
+    "babel-loader": "8.0.6",
+    "babel-plugin-styled-components": "1.10.6",
+    "copy-webpack-plugin": "5.0.5",
+    "css-loader": "1.0.1",
+    "json-loader": "0.5.7",
+    "node-sass": "9.0.0",
+    "postcss-loader": "3.0.0",
+    "postcss-plugin": "1.0.0",
+    "postcss-sass": "0.3.5",
+    "postcss-syntax": "0.34.0",
+    "react-svg-loader": "3.0.3",
+    "sass-loader": "7.1.0",
+    "style-loader": "0.23.1",
+    "webpack": "4.41.2",
+    "webpack-cli": "3.3.10",
+    "webpack-glob-entries-plugin": "0.3.2",
+    "webpack-livereload-plugin": "2.2.0"
+  }
+}

@@ -1,11 +1,12 @@
 {% load static %}
 <link href="{% static "/css/index.css" %}" rel="stylesheet" type="text/css">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-
-
 {% include "header.html" %}
 <div class="search-title">Hospital Search</div>
 {% include "search_form.html" %}
+
+<!--scripts for google maps!-->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"></script>
 
 <!--passing places data to be available in react-->
 {{ google_places_data | json_script:'google_places_data' }}
@@ -14,4 +15,3 @@
 <div id="root"></div>  
 
   {{ request.user.id|json_script:"user_id" }}
-  <script src="{% static "star.js" %}"></script>

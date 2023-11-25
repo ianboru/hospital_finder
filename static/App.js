@@ -7,13 +7,20 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
+  const [selectedPlace, setSelectedPlace] = React.useState({})
 
-  const renderPlaceResults = () => {
-    return placesData.results.map((place)=>{
+  const PlaceResults = () => {
+    const placeTiles = placesData.results.map((place)=>{
       return (
-        <div>Name: {place.name}</div>
+        <div>{place.name}</div>
       )
     })
+
+    return (
+      <div style={{width : "200px"}}>
+        {placeTiles}
+      </div>
+    )
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -23,11 +30,14 @@ function App() {
   const Map = () => {
     
     const firstLocation = placesData.results[0].geometry.location
-    const markers = placesData.results.map((place)=>{
+    const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       return (
-        <Marker position={latLng} />
+        <Marker 
+          position={latLng} 
+          onClick={()=>{setSelectedPlace(place)}}
+        />
       )
     })
     
@@ -40,7 +50,7 @@ function App() {
       height: '400px'
     };
     const [map, setMap] = React.useState(null)
-  
+
     const onLoad = React.useCallback(function callback(map) {
       // This is just an example of getting and using the map instance!!! don't just blindly copy!
       
@@ -53,7 +63,6 @@ function App() {
     }, [])
 
     
-    console.log("first local", firstLocation)
     const center = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
     return isLoaded ? (
         <GoogleMap
@@ -68,13 +77,28 @@ function App() {
         </GoogleMap>
     ) : <></>
   }
-
+  const styles = {
+    display : "flex",
+  }
+  console.log(selectedPlace)
   return (
     <div className="App">
-      <h1>Map results</h1>
-      <Map/>// Map with a Marker
-
-      {renderPlaceResults()}
+      
+      
+      <div style={styles}>
+        <div>
+          <h1>Map results</h1>
+          <PlaceResults style={{"margin-right" : 15}}/>
+        </div>
+        <div style={{border : 2, width : 150}}>
+          <h3>Current Selection</h3>
+          <div>{selectedPlace.name}</div>
+          <div>{selectedPlace.formatted_address}</div>
+        </div>
+        <Map/>
+        
+      </div>
+      
     </div>
   );
 }

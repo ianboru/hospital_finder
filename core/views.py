@@ -43,7 +43,7 @@ def index(request, path=None):
     if search_string:    
         places_result = gmaps.places(query=search_string)
         for result in places_result['results']:
-            facility_filtered_result = mrsa_hospital_metrics[mrsa_hospital_metrics['Facility_Name'] == search_string]
+            facility_filtered_result = mrsa_hospital_metrics[mrsa_hospital_metrics['Facility_Name'] == result['name']]
             print('facility_filtered_result - ',facility_filtered_result)
             if not facility_filtered_result.empty: 
                 hospital_name_matching_row = facility_filtered_result.iloc[0]

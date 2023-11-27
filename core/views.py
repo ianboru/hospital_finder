@@ -49,10 +49,10 @@ def index(request, path=None):
             if not facility_filtered_result.empty: 
                 hospital_name_matching_row = facility_filtered_result.iloc[0]
                 print("hospital_name_matching_row", hospital_name_matching_row)
-                result['SIR_2015'] = hospital_name_matching_row['SIR_2015']
-                print("result after adding SIR_2015", result)
+                result['MRSA_SIR_2015'] = hospital_name_matching_row['SIR_2015']
+                print("result after adding MRSA_SIR_2015", result)
             else:
-                result['SIR_2015'] = ""
+                result['MRSA_SIR_2015'] = ""
             
     #sort dataframe based on query param
     sort_string = request.GET.get("sort")

@@ -20,7 +20,7 @@ function App() {
           <tr>
           <td>{place.name}</td>
           {
-            place.SIR_2015 ? <td>MRSA SIR - {place.SIR_2015}</td> : <></>
+            place.MRSA_SIR_2015 ? <td>MRSA SIR - {place.MRSA_SIR_2015}</td> : <></>
           }
           </tr>
         </table>
@@ -106,6 +106,9 @@ function App() {
           <h3>Current Selection</h3>
           <div>{selectedPlace.name}</div>
           <div>{selectedPlace.formatted_address}</div>
+          {
+            selectedPlace.MRSA_SIR_2015 ? <div>{selectedPlace.MRSA_SIR_2015}</div> : <></>
+          }
         </div>
         <Map/>
         

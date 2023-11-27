@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.models import User
+import pandas as pd
 
 from core.models import (
     Favorite,
@@ -26,6 +27,7 @@ class SignUpView(generic.CreateView):
 
 def index(request, path=None):
     hospital_quality_metrics = utils.load_hospital_data()
+    mrsa_hospital_metrics = utils.load_mrsa_data()
     #sort dataframe based on query param
     search_string = request.GET.get("search")
     if search_string:
@@ -36,11 +38,19 @@ def index(request, path=None):
     else:
         search_string = ''
     gmaps = googlemaps.Client(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
-    print("search string", search_string)
+    
     places_result = []
     if search_string:    
         places_result = gmaps.places(query=search_string)
-    print("places result", places_result)
+        for result in places_result['results']:
+            facility_filtered_result = mrsa_hospital_metrics[mrsa_hospital_metrics['Facility_Name'] == search_string]
+            print('facility_filtered_result - ',facility_filtered_result)
+            if not facility_filtered_result.empty: 
+                hospital_name_matching_row = facility_filtered_result.iloc[0]
+                print("hospital_name_matching_row", hospital_name_matching_row)
+                result['SIR_2015'] = hospital_name_matching_row['SIR_2015']
+                print("result after adding SIR_2015", result)
+            
     #sort dataframe based on query param
     sort_string = request.GET.get("sort")
     if sort_string and "-" in sort_string:
@@ -67,6 +77,7 @@ def index(request, path=None):
     else:
         favorites = []
     print(favorites)
+    print('places_result before sending to front end', places_result)
     context = {
         'google_places_data' : places_result,
         'hospital_data': hospital_data,

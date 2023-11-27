@@ -8,12 +8,24 @@ function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const [selectedPlace, setSelectedPlace] = React.useState({})
-
+  console.log('places', placesData.results.map((place, index) => {
+    console.log('place Tiles place outside',place, index)
+  }))
   const PlaceResults = () => {
-    const placeTiles = placesData.results.map((place)=>{
+    console.log('placesData', placesData)
+    const placeTiles = placesData.results.map((place, i)=>{
+      console.log('place Tiles place',place, i)
       return (
-        <div>{place.name}</div>
+        <table>
+          <tr>
+          <td>{place.name}</td>
+          {
+            place.SIR_2015 ? <td>MRSA SIR - {place.SIR_2015}</td> : <></>
+          }
+          </tr>
+        </table>
       )
+      //how am i structuring the data from the backend so i can do lookup by name on the FE
     })
 
     return (
@@ -80,7 +92,7 @@ function App() {
   const styles = {
     display : "flex",
   }
-  console.log(selectedPlace)
+  console.log('selectedPlace', selectedPlace)
   return (
     <div className="App">
       

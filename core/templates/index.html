@@ -6,10 +6,11 @@
 
 <!--scripts for google maps!-->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o&callback=Function.prototype"></script>
 
 <!--passing places data to be available in react-->
 {{ google_places_data | json_script:'google_places_data' }}
+{{ msrsa_data | json_script:'msrsa_data' }}
 <script type="module" src="{% static "App.js" %}"></script>
 
 <div id="root"></div>  

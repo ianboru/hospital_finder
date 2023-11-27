@@ -44,15 +44,13 @@ def index(request, path=None):
         places_result = gmaps.places(query=search_string)
         for result in places_result['results']:
             facility_filtered_result = mrsa_hospital_metrics[mrsa_hospital_metrics['Facility_Name'] == result['name']]
-            facility_filtered_result = facility_filtered_result[facility_filtered_result['SIR_2015'].notna()]
-            print('facility_filtered_result - ',facility_filtered_result)
+            facility_filtered_result = facility_filtered_result[facility_filtered_result['SIR'].notna()]
             if not facility_filtered_result.empty: 
                 hospital_name_matching_row = facility_filtered_result.iloc[0]
-                print("hospital_name_matching_row", hospital_name_matching_row)
-                result['MRSA_SIR_2015'] = hospital_name_matching_row['SIR_2015']
-                print("result after adding MRSA_SIR_2015", result)
+                result['MRSA_SIR'] = hospital_name_matching_row['SIR']
+                print("result after adding MRSA_SIR", result)
             else:
-                result['MRSA_SIR_2015'] = ""
+                result['MRSA_SIR'] = ""
             
     #sort dataframe based on query param
     sort_string = request.GET.get("sort")

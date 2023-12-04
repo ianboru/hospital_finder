@@ -94,21 +94,22 @@ function App() {
   console.log('selectedPlace', selectedPlace)
   return (
     <div className="App">
-      
-      
       <div style={outerStyles}>
         <div>
           <h1>Map results</h1>
           <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
         </div>
-        <div style={{border : 2, width : 150, marginRight : 15}}>
+        {
+          selectedPlace ?
+          <div style={{border : 2, width : 150, marginRight : 15}}>
           <h3>Current Selection</h3>
-          <div>{selectedPlace ? selectedPlace.name : null}</div>
-          <div>{selectedPlace ? selectedPlace.formatted_address : null}</div>
+          <div>{selectedPlace.name}</div>
+          <div>{selectedPlace.formatted_address}</div>
           {
-            selectedPlace && selectedPlace.MRSA_SIR ? <div><b>MRSA SIR - {selectedPlace.MRSA_SIR}</b></div> : <></>
+            selectedPlace.MRSA_SIR ? <div><b>MRSA SIR - {selectedPlace.MRSA_SIR}</b></div> : <></>
           }
-        </div>
+        </div> : null
+        }
         <Map/>
         
       </div>

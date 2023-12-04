@@ -8,15 +8,20 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
-  const [selectedPlace, setSelectedPlace] = React.useState({})
+  const [selectedPlace, setSelectedPlace] = React.useState(null)
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
   })
   const Map = () => {
-    
     const firstLocation = placesData.results[0].geometry.location
+    const selectedPlaceCenter = {
+      lat : selectedPlace ? selectedPlace.geometry.location.lat : null,
+      lng : selectedPlace ? selectedPlace.geometry.location.lng : null
+    }
+    const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
+
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
@@ -41,12 +46,14 @@ function App() {
               strokeColor: 'white'
             }));
           }}
-          position={latLng} 
-          onClick={()=>{setSelectedPlace(place)}}
+          position={latLng}
+          onClick={()=>{
+            setSelectedPlace(place)
+          }}
         />
       )
     })
-    
+
     const { isLoaded } = useJsApiLoader({
       id: 'google-map-script',
       googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
@@ -59,7 +66,6 @@ function App() {
 
     const onLoad = React.useCallback(function callback(map) {
       // This is just an example of getting and using the map instance!!! don't just blindly copy!
-      
       map.setZoom(10)
       setMap(map)
     }, [])
@@ -68,12 +74,10 @@ function App() {
       setMap(null)
     }, [])
 
-    
-    const center = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
     return isLoaded ? (
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center}
+          center={selectedPlace ? selectedPlaceCenter : firstLocationCenter}
           zoom={.75}
           onLoad={onLoad}
           onUnmount={onUnmount}
@@ -99,10 +103,10 @@ function App() {
         </div>
         <div style={{border : 2, width : 150, marginRight : 15}}>
           <h3>Current Selection</h3>
-          <div>{selectedPlace.name}</div>
-          <div>{selectedPlace.formatted_address}</div>
+          <div>{selectedPlace ? selectedPlace.name : null}</div>
+          <div>{selectedPlace ? selectedPlace.formatted_address : null}</div>
           {
-            selectedPlace.MRSA_SIR ? <div><b>MRSA SIR - {selectedPlace.MRSA_SIR}</b></div> : <></>
+            selectedPlace && selectedPlace.MRSA_SIR ? <div><b>MRSA SIR - {selectedPlace.MRSA_SIR}</b></div> : <></>
           }
         </div>
         <Map/>

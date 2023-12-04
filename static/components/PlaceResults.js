@@ -1,10 +1,13 @@
-// import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log('placesData', placesData)
     const placeTileStyles = {
       "border" : "1px solid gray",
       "height" : "40px"
+    }
+    if(!selectedPlace){
+        selectedPlace = {}
     }
     const placeTiles = placesData.results.map((place, i)=>{
       const curPlaceStyle = {...placeTileStyles} 

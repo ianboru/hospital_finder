@@ -18,7 +18,7 @@ from core.models import (
 )
 import googlemaps
 from datetime import datetime
-
+import pprint
 #https://learndjango.com/tutorials/django-signup-tutorial   
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -43,12 +43,16 @@ def index(request, path=None):
     if search_string:    
         places_result = gmaps.places(query=search_string)
         for result in places_result['results']:
+            place_detail = gmaps.place(place_id=result["reference"])
+            pprint.pprint(place_detail["result"].keys())
+            place_detail = place_detail["result"]
+            if "formatted_phone_number" in place_detail:
+                result["phone_number"] = place_detail["formatted_phone_number"]
             facility_filtered_result = mrsa_hospital_metrics[mrsa_hospital_metrics['Facility_Name'] == result['name']]
             facility_filtered_result = facility_filtered_result[facility_filtered_result['SIR'].notna()]
             if not facility_filtered_result.empty: 
                 hospital_name_matching_row = facility_filtered_result.iloc[0]
                 result['MRSA_SIR'] = hospital_name_matching_row['SIR']
-                print("result after adding MRSA_SIR", result)
             else:
                 result['MRSA_SIR'] = ""
             
@@ -77,8 +81,6 @@ def index(request, path=None):
         favorites = Favorite.objects.filter(user=request.user).values_list('hospital',flat=True)
     else:
         favorites = []
-    print(favorites)
-    print('places_result before sending to front end', places_result)
     context = {
         'google_places_data' : places_result,
         'hospital_data': hospital_data,

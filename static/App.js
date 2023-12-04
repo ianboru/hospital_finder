@@ -1,49 +1,27 @@
 import ReactDOM from "react-dom"
 import React, { Component } from 'react'
 import { numberToRGB } from "./colorUtils";
+import PlaceResults from "./components/PlaceResults";
 
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
-  const [selectedPlace, setSelectedPlace] = React.useState({})
-  const PlaceResults = () => {
-    console.log('placesData', placesData)
-    const placeTileStyles = {
-      "border" : "1px solid gray",
-      "height" : "40px"
-    }
-    const placeTiles = placesData.results.map((place, i)=>{
-      const curPlaceStyle = {...placeTileStyles} 
-      if(place.name == selectedPlace.name){
-        curPlaceStyle.border = "2px solid black"
-      }
-      return (
-        <div style={curPlaceStyle}> 
-            <div>{place.name}</div>
-            {
-              place.MRSA_SIR ? <div><b>MRSA SIR - {place.MRSA_SIR}</b></div> : <></>
-            }
-        </div>
-      )
-      //how am i structuring the data from the backend so i can do lookup by name on the FE
-    })
-
-    return (
-      <div style={{width : "250px", marginRight : "15px"}}>
-        {placeTiles}
-      </div>
-    )
-  }
+  const [selectedPlace, setSelectedPlace] = React.useState(null)
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
   })
   const Map = () => {
-    
     const firstLocation = placesData.results[0].geometry.location
+    const selectedPlaceCenter = {
+      lat : selectedPlace ? selectedPlace.geometry.location.lat : null,
+      lng : selectedPlace ? selectedPlace.geometry.location.lng : null
+    }
+    const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
+
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
@@ -68,12 +46,14 @@ function App() {
               strokeColor: 'white'
             }));
           }}
-          position={latLng} 
-          onClick={()=>{setSelectedPlace(place)}}
+          position={latLng}
+          onClick={()=>{
+            setSelectedPlace(place)
+          }}
         />
       )
     })
-    
+
     const { isLoaded } = useJsApiLoader({
       id: 'google-map-script',
       googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
@@ -86,7 +66,6 @@ function App() {
 
     const onLoad = React.useCallback(function callback(map) {
       // This is just an example of getting and using the map instance!!! don't just blindly copy!
-      
       map.setZoom(10)
       setMap(map)
     }, [])
@@ -95,12 +74,10 @@ function App() {
       setMap(null)
     }, [])
 
-    
-    const center = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
     return isLoaded ? (
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center}
+          center={selectedPlace ? selectedPlaceCenter : firstLocationCenter}
           zoom={.75}
           onLoad={onLoad}
           onUnmount={onUnmount}
@@ -117,21 +94,22 @@ function App() {
   console.log('selectedPlace', selectedPlace)
   return (
     <div className="App">
-      
-      
       <div style={outerStyles}>
         <div>
           <h1>Map results</h1>
-          <PlaceResults style={{"margin-right" : 15}}/>
+          <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
         </div>
-        <div style={{border : 2, width : 150, marginRight : 15}}>
+        {
+          selectedPlace ?
+          <div style={{border : 2, width : 150, marginRight : 15}}>
           <h3>Current Selection</h3>
           <div>{selectedPlace.name}</div>
           <div>{selectedPlace.formatted_address}</div>
           {
             selectedPlace.MRSA_SIR ? <div><b>MRSA SIR - {selectedPlace.MRSA_SIR}</b></div> : <></>
           }
-        </div>
+        </div> : null
+        }
         <Map/>
         
       </div>

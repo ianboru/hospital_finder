@@ -4,19 +4,24 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log('placesData', placesData)
     const placeTileStyles = {
       "border" : "1px solid gray",
-      "height" : "40px"
+      "height" : "100px",
+      "color" : "gray",
+      "padding" : 10,
+      "width" : "200px"
     }
     if(!selectedPlace){
         selectedPlace = {}
     }
     const placeTiles = placesData.results.map((place, i)=>{
-      const curPlaceStyle = {...placeTileStyles} 
+      const selectedPlaceStyle = {...placeTileStyles} 
       if(place.name == selectedPlace.name){
-        curPlaceStyle.border = "2px solid black"
+        selectedPlaceStyle.border = "2px solid black"
       }
       return (
-        <div style={curPlaceStyle} onClick={() => setSelectedPlace(place)}> 
-            <div>{place.name}</div>
+        <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}> 
+            <div style={{color : "black"}}><b>{place.name}</b></div>
+            <div>{place.formatted_address}</div>
+            <div>{place.phone_number}</div>
             {
               place.MRSA_SIR ? <div><b>MRSA SIR - {place.MRSA_SIR}</b></div> : <></>
             }

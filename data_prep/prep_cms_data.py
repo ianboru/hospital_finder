@@ -15,10 +15,13 @@ def load_hcahps_data():
              ]]
     
     hcahps_df = hcahps_df[hcahps_df['HCAHPS Question'].str.contains('mean', na = False)]
-    print(hcahps_df[hcahps_df['HCAHPS Linear Mean Value'].apply(lambda x: isinstance(x, str))])
+    hcahps_df = hcahps_df[~hcahps_df['HCAHPS Linear Mean Value'].str.contains('Not Available', na = False)]
+    hcahps_df['HCAHPS Linear Mean Value'] = hcahps_df['HCAHPS Linear Mean Value'].astype(int)
+
+    #print(hcahps_df[hcahps_df['HCAHPS Linear Mean Value'].apply(lambda x: isinstance(x, int))])
     
-    # hcahps_mean_df = hcahps_df[['Facility Name', 'HCAHPS Linear Mean Value']].groupby('Facility Name').mean()
-    # print(hcahps_mean_df)
+    hcahps_mean_df = hcahps_df[['Facility Name', 'HCAHPS Linear Mean Value']].groupby('Facility Name').mean()
+    print(hcahps_mean_df)
     # hai_path = os.path.join(BASE_DIR, './data/Healthcare_Associated_Infections-Hospital.csv')
 
     

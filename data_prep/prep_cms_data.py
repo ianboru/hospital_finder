@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 
 def load_hcahps_data():
     cwd = os.getcwd()
@@ -21,7 +22,8 @@ def load_hcahps_data():
     #print(hcahps_df[hcahps_df['HCAHPS Linear Mean Value'].apply(lambda x: isinstance(x, int))])
     
     hcahps_mean_df = hcahps_df[['Facility Name', 'HCAHPS Linear Mean Value']].groupby('Facility Name').mean()
-    print(hcahps_mean_df)
+    hcahps_mean_df.rename(columns={"HCAHPS Linear Mean Value":"summary score"}, inplace=True)
+    hcahps_mean_df['relative mean'] = hcahps_mean_df["summary score"] - hcahps_mean_df["summary score"].mean()
     # hai_path = os.path.join(BASE_DIR, './data/Healthcare_Associated_Infections-Hospital.csv')
 
     

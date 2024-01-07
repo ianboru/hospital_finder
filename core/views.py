@@ -26,69 +26,41 @@ class SignUpView(generic.CreateView):
     template_name = "registration/signup.html"
 
 def index(request, path=None):
-    hospital_quality_metrics = utils.load_hospital_data()
-    mrsa_hospital_metrics = utils.load_mrsa_data()
+    hai_summary_metrics = utils.load_summary_metric('hai')
+    hcahps_summary_metrics = utils.load_summary_metric('hcahps')
+    
     #sort dataframe based on query param
     search_string = request.GET.get("search")
-    if search_string:
-        #find hospitals matching string
-        search_hit_indexes = hospital_quality_metrics["hospital"].str.contains(search_string, regex=True, flags=re.IGNORECASE)
-        #trim dataframe to matching subset
-        hospital_quality_metrics = hospital_quality_metrics[search_hit_indexes]
-    else:
-        search_string = ''
+    
     gmaps = googlemaps.Client(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
     
-    places_result = []
+    places_results = []
     if search_string:    
-        places_result = gmaps.places(query=search_string)
-        for result in places_result['results']:
-            place_detail = gmaps.place(place_id=result["reference"])
+        places_results = gmaps.places(query=search_string)
+        for place_result in places_results['results']:
+            place_detail = gmaps.place(place_id=place_result["reference"])
             pprint.pprint(place_detail["result"].keys())
             place_detail = place_detail["result"]
             if "formatted_phone_number" in place_detail:
-                result["phone_number"] = place_detail["formatted_phone_number"]
-            facility_filtered_result = mrsa_hospital_metrics[mrsa_hospital_metrics['Facility_Name'] == result['name']]
-            facility_filtered_result = facility_filtered_result[facility_filtered_result['SIR'].notna()]
-            if not facility_filtered_result.empty: 
-                hospital_name_matching_row = facility_filtered_result.iloc[0]
-                result['MRSA_SIR'] = hospital_name_matching_row['SIR']
-            else:
-                result['MRSA_SIR'] = ""
+                place_result["phone_number"] = place_detail["formatted_phone_number"]
+                
+            place_result = add_metric_to_place_result('hai', hai_summary_metrics, place_result)
+            place_result = add_metric_to_place_result('hcahps', hcahps_summary_metrics, place_result)
             
-    #sort dataframe based on query param
-    sort_string = request.GET.get("sort")
-    if sort_string and "-" in sort_string:
-        hospital_quality_metrics = hospital_quality_metrics.sort_values(by=[sort_string.replace("-","")], ascending=False)
-    elif sort_string and  "-" not in sort_string:
-        hospital_quality_metrics = hospital_quality_metrics.sort_values(by=[sort_string], ascending=True)
-           
-    #convert dataframe to json
-    #data needs to be sent to front end as json 
-    json_records = hospital_quality_metrics.reset_index().to_json(orient ='records')
-    hospital_data = json.loads(json_records)
-
-    #set href sort string for sorting in opposite direction
-    #this needs to be sent to the front end for the sort state
-    if sort_string and "-" in sort_string:
-        sort_string = sort_string.replace("-","")
-    elif sort_string and  "-" not in sort_string:
-        sort_string = f"-{sort_string}"
-    else:
-        sort_string = ""
-
-    if request.user.is_authenticated:
-        favorites = Favorite.objects.filter(user=request.user).values_list('hospital',flat=True)
-    else:
-        favorites = []
     context = {
-        'google_places_data' : places_result,
-        'hospital_data': hospital_data,
-        'sort_string' : sort_string,
-        'favorites' : favorites
+        'google_places_data' : places_results,
     }
     return render(request, "index.html", context)
 
+def add_metric_to_place_result(metric_name, metric_df, place_result):
+    facility_filtered_result = metric_df[metric_df['Facility Name'] == place_result['name']]
+    facility_filtered_result = facility_filtered_result[facility_filtered_result['relative mean'].notna()]
+    if not facility_filtered_result.empty: 
+        facility_filtered_result = facility_filtered_result.iloc[0]
+        place_result[f'{metric_name} relative mean'] = facility_filtered_result['relative mean']
+    else:
+        place_result[f'{metric_name} relative mean'] = ""
+    return place_result
 
 def graph(request, path=None):
     hospital_data = utils.load_hospital_data()

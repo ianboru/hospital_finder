@@ -9,7 +9,7 @@ function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const [selectedPlace, setSelectedPlace] = React.useState(null)
-
+  
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
@@ -25,9 +25,11 @@ function App() {
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      console.log("place ?", place)
+      console.log("place?", place)
       console.log("between")
-      console.log("mrsa", place.name, place.MRSA_SIR, numberToRGB(place.MRSA_SIR/3.5))
+      if(place['hai relative mean'] || place['hcahps relative mean']) {
+        console.log(place)
+      }
       return (
         <Marker 
           onLoad={(marker) => {

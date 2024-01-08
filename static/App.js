@@ -25,18 +25,15 @@ function App() {
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      console.log("place?", place)
-      console.log("between")
       if(place['hai relative mean'] || place['hcahps relative mean']) {
-        console.log(place)
+        console.log("place",place)
       }
       return (
         <Marker 
           onLoad={(marker) => {
-            console.log("loading ", place)
             const customIcon = (opts) => Object.assign({
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: place && place.MRSA_SIR ? numberToRGB(place.MRSA_SIR/3.5) : "rgb(128,128,128)",
+              fillColor: place && place['hai relative mean'] ? numberToRGB(place['hai relative mean'],1,3) : "rgb(128,128,128)",
               fillOpacity: 1,
               strokeColor: '#000',
               strokeWeight: 1,
@@ -44,7 +41,7 @@ function App() {
             }, opts);
 
             marker.setIcon(customIcon({
-              fillColor: place && place.MRSA_SIR ? numberToRGB(place.MRSA_SIR/3.5) : "rgb(128,128,128)",
+              fillColor: place && place['hai relative mean'] ? numberToRGB(place['hai relative mean'],1,3) : "rgb(128,128,128)",
               strokeColor: 'white'
             }));
           }}
@@ -61,8 +58,8 @@ function App() {
       googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
     })
     const containerStyle = {
-      width: '400px',
-      height: '400px'
+      width: '500px',
+      height: '500px'
     };
     const [map, setMap] = React.useState(null)
 
@@ -97,7 +94,7 @@ function App() {
   return (
     <div className="App">
       <div style={outerStyles}>
-        <div>
+        <div style={{maxHeight : '500px', overflowY : 'scroll'}}>
           <h1>Map results</h1>
           <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
         </div>
@@ -108,8 +105,11 @@ function App() {
           <div>{selectedPlace.name}</div>
           <div>{selectedPlace.formatted_address}</div>
           {
-            selectedPlace.MRSA_SIR ? <div><b>MRSA SIR - {selectedPlace.MRSA_SIR}</b></div> : <></>
-          }
+              selectedPlace['hai relative mean'] ? <div><b>Safety: {selectedPlace['hai relative mean']}</b></div> : <></>
+            }
+            {
+              selectedPlace['hai relative mean'] ? <div><b>Experience: {selectedPlace['hcahps relative mean']}</b></div> : <></>
+            }
         </div> : null
         }
         <Map/>

@@ -4,7 +4,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log('placesData', placesData)
     const placeTileStyles = {
       "border" : "1px solid gray",
-      "height" : "100px",
+      "height" : "150px",
       "color" : "gray",
       "padding" : 10,
       "width" : "200px"
@@ -23,7 +23,10 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             <div>{place.formatted_address}</div>
             <div>{place.phone_number}</div>
             {
-              place.MRSA_SIR ? <div><b>MRSA SIR - {place.MRSA_SIR}</b></div> : <></>
+              place['hai relative mean'] ? <div><b>Safety: {place['hai relative mean']}</b></div> : <></>
+            }
+            {
+              place['hai relative mean'] ? <div><b>Experience: {place['hcahps relative mean']}</b></div> : <></>
             }
         </div>
       )

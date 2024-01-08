@@ -53,13 +53,14 @@ def index(request, path=None):
     return render(request, "index.html", context)
 
 def add_metric_to_place_result(metric_name, metric_df, place_result):
-    facility_filtered_result = metric_df[metric_df['Facility Name'] == place_result['name']]
+    facility_filtered_result = metric_df[metric_df['Facility Name'].str.contains(place_result['name'],case=False)]
     facility_filtered_result = facility_filtered_result[facility_filtered_result['relative mean'].notna()]
     if not facility_filtered_result.empty: 
         facility_filtered_result = facility_filtered_result.iloc[0]
-        place_result[f'{metric_name} relative mean'] = facility_filtered_result['relative mean']
+        place_result[f'{metric_name} relative mean'] = round(facility_filtered_result['relative mean'],1)
     else:
         place_result[f'{metric_name} relative mean'] = ""
+    print(place_result,facility_filtered_result)
     return place_result
 
 def graph(request, path=None):

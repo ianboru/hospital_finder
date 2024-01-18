@@ -33,21 +33,24 @@ def load_hai_data(export_path):
     hai_path = os.path.join(cwd, "data/Healthcare_Associated_Infections-Hospital.csv")
     hai_df = pd.read_csv(hai_path)
     hai_df = hai_df[[
+             'Address',
              'Facility ID', 
              'Facility Name', 
              'ZIP Code', 
              'Measure ID',
              'Measure Name',
-             'Compared to National'
+             'Compared to National',
              ]]
+    address_df = hai_df[['Facility Name', 'Address']]
     hai_df = hai_df[hai_df['Measure ID'].str.contains('SIR', na = False)]
     hai_df = hai_df[~hai_df['Compared to National'].str.contains('Not Available', na = False)]
     hai_df['Compared to National']  = hai_df[['Compared to National']].apply(lambda col:pd.Categorical(col).codes)
     hai_mean_df = hai_df[['Facility Name', 'Compared to National']].groupby('Facility Name').mean()
     hai_mean_df['relative mean'] = hai_mean_df["Compared to National"] - hai_mean_df["Compared to National"].mean()
+    merged_df = hai_mean_df.merge(address_df, on='Facility Name')
     hai_export_path = os.path.join(export_path,'hai_summary_metrics.csv')
-    hai_mean_df.to_csv(hai_export_path) 
+    merged_df.to_csv(hai_export_path) 
 
 export_path =  os.path.join(cwd, "data")
-load_hcahps_data(export_path)
+# load_hcahps_data(export_path)
 load_hai_data(export_path)

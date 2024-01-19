@@ -44,13 +44,17 @@ def load_hai_data(export_path):
              'Measure Name',
              'Compared to National',
              ]]
-    address_df = hai_df[['Facility Name', 'Address']]
+    pd.set_option('display.max_columns', None)
+    #Drop dupes for unique facility address combo
+    address_df = hai_df[['Facility Name', 'Address']].drop_duplicates()
     hai_df = hai_df[hai_df['Measure ID'].str.contains('SIR', na = False)]
     hai_df = hai_df[~hai_df['Compared to National'].str.contains('Not Available', na = False)]
-    hai_df['Compared to National']  = hai_df[['Compared to National']].apply(lambda col:pd.Categorical(col).codes)
+    category_map = {"Worse than the National Benchmark":1, "No Different than National Benchmark":2, "Better than the National Benchmark":3}
+    #map hai compared to national to numeric index for relative metric
+    hai_df['Compared to National'] = hai_df['Compared to National'].map(category_map)
     hai_mean_df = hai_df[['Facility Name', 'Compared to National']].groupby('Facility Name').mean()
     hai_mean_df['relative mean'] = hai_mean_df["Compared to National"] - hai_mean_df["Compared to National"].mean()
-    merged_df = hai_mean_df.merge(address_df, on='Facility Name')
+    merged_df = hai_mean_df.merge(address_df, on='Facility Name', how="left")
     hai_export_path = os.path.join(export_path,'hai_summary_metrics.csv')
     merged_df.to_csv(hai_export_path) 
 

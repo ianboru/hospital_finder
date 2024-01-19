@@ -27,9 +27,9 @@ def load_hcahps_data(export_path):
     hcahps_mean_df.rename(columns={"HCAHPS Linear Mean Value":"summary score"}, inplace=True)
     hcahps_mean_df['relative mean'] = hcahps_mean_df["summary score"] - hcahps_mean_df["summary score"].mean()
     
-    merged_df = hcahps_mean_df.merge(address_df, on='Facility Name')
+    hcahps_final_df = hcahps_mean_df.merge(address_df, on='Facility Name')
     hcahps_export_path = os.path.join(export_path,'hcahps_summary_metrics.csv')
-    merged_df.to_csv(hcahps_export_path) 
+    hcahps_final_df.to_csv(hcahps_export_path) 
     # hai_path = os.path.join(BASE_DIR, './data/Healthcare_Associated_Infections-Hospital.csv')
 
 def load_hai_data(export_path):
@@ -50,9 +50,9 @@ def load_hai_data(export_path):
     hai_df['Compared to National']  = hai_df[['Compared to National']].apply(lambda col:pd.Categorical(col).codes)
     hai_mean_df = hai_df[['Facility Name', 'Compared to National']].groupby('Facility Name').mean()
     hai_mean_df['relative mean'] = hai_mean_df["Compared to National"] - hai_mean_df["Compared to National"].mean()
-    merged_df = hai_mean_df.merge(address_df, on='Facility Name')
+    hai_final_df = hai_mean_df.merge(address_df, on='Facility Name')
     hai_export_path = os.path.join(export_path,'hai_summary_metrics.csv')
-    merged_df.to_csv(hai_export_path) 
+    hai_final_df.to_csv(hai_export_path) 
 
 export_path =  os.path.join(cwd, "data")
 load_hcahps_data(export_path)

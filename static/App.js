@@ -4,6 +4,7 @@ import { numberToRGB } from "./colorUtils";
 import PlaceResults from "./components/PlaceResults";
 
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { getHaiStars } from './utils';
 
 function App() {
 
@@ -105,7 +106,7 @@ function App() {
           <div>{selectedPlace.name}</div>
           <div>{selectedPlace.formatted_address}</div>
           {
-              selectedPlace['hai relative mean'] ? <div><b>Safety: {selectedPlace['hai relative mean']}</b></div> : <></>
+              selectedPlace['hai relative mean'] ? <div><b>Safety: {getHaiStars(selectedPlace['hai relative mean'])}</b></div> : <></>
             }
             {
               selectedPlace['hai relative mean'] ? <div><b>Experience: {selectedPlace['hcahps relative mean']}</b></div> : <></>

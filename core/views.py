@@ -39,6 +39,20 @@ def index(request, path=None):
         places_results = gmaps.places(query=search_string)
         for place_result in places_results['results']:
             place_detail = gmaps.place(place_id=place_result["reference"])
+            
+            place_address = place_result["formatted_address"]
+            place_name = place_detail['result']['name']
+            
+            hai_partial_name_match = is_name_match(hai_summary_metrics, place_name)
+            hcahps_partial_name_match = is_name_match(hcahps_summary_metrics, place_name)
+            print('hai name match please', hai_partial_name_match)
+            print("hcaphs name match please", hcahps_partial_name_match)
+            
+            hai_partial_address_match = is_address_match(hai_summary_metrics, place_address)
+            hcaphps_partial_address_match = is_address_match(hcahps_summary_metrics, place_address)
+            
+            print('hai address matching ', hai_partial_address_match)
+            print('hcaphs address matching,', hcaphps_partial_address_match)
             pprint.pprint(place_detail["result"].keys())
             place_detail = place_detail["result"]
             if "formatted_phone_number" in place_detail:
@@ -60,8 +74,17 @@ def add_metric_to_place_result(metric_name, metric_df, place_result):
         place_result[f'{metric_name} relative mean'] = round(facility_filtered_result['relative mean'],1)
     else:
         place_result[f'{metric_name} relative mean'] = ""
-    print(place_result,facility_filtered_result)
     return place_result
+
+def is_address_match(metric_df, place_address): 
+    address_metric_df = metric_df['Address']
+    for address in address_metric_df:
+        return address in place_address
+
+def is_name_match(metric_df, place_name): 
+    facility_name_metric_df = metric_df['Facility Name']
+    for facility_name in facility_name_metric_df:
+        return facility_name.lower() in place_name.lower() or place_name.lower() in facility_name.lower()
 
 def graph(request, path=None):
     hospital_data = utils.load_hospital_data()

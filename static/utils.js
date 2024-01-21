@@ -1,3 +1,5 @@
+const filledStarUnicode = "\u2605"
+const empyStarUnicode = "\u2606"
 const getHaiStars = (relativeMeanHai) => {
     let starCount = 0
     switch (true){
@@ -17,10 +19,15 @@ const getHaiStars = (relativeMeanHai) => {
         starCount = 5
         break
     }
-    const starUnicode = "\u2605"
-    return starUnicode.repeat(starCount)
-  }
+    
+    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(5 - starCount)
+}
+const getHCAHPSStars = (starCount) => {
+    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(5 - starCount)
+}
+
 
 export {
-    getHaiStars
+    getHaiStars,
+    getHCAHPSStars
 }

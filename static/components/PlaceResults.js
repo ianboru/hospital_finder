@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { getHaiStars } from '../utils';
+import { getHaiStars, getHCAHPSStars } from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log('placesData', placesData)
     const placeTileStyles = {
@@ -12,13 +12,16 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     if(!selectedPlace){
         selectedPlace = {}
     }
+    console.log("places data", placesData)
     const placeTiles = placesData.results.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles} 
       if(place.name == selectedPlace.name){
         selectedPlaceStyle.border = "2px solid black"
       }
-
+    
       const haiStars = getHaiStars(place['hai relative mean'])
+      const hcahpsStars = getHCAHPSStars(place['hcahps relative mean'])
+
       return (
         <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}> 
             <div style={{color : "black"}}><b>{place.name}</b></div>
@@ -28,7 +31,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
               place['hai relative mean'] ? <div><b>Safety: {haiStars}</b></div> : <></>
             }
             {
-              place['hai relative mean'] ? <div><b>Experience: {place['hcahps relative mean']}</b></div> : <></>
+              place['hai relative mean'] ? <div><b>Experience: {hcahpsStars}</b></div> : <></>
             }
         </div>
       )

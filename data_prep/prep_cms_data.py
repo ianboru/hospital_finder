@@ -11,25 +11,19 @@ def load_hcahps_data(export_path):
              'Facility ID', 
              'Facility Name', 
              'ZIP Code', 
+             'Patient Survey Star Rating',
              'HCAHPS Measure ID',
              'HCAHPS Question',
-             'HCAHPS Linear Mean Value'
              ]]
     
-    address_df = hcahps_df[['Facility Name', 'Address']]
-    hcahps_df = hcahps_df[hcahps_df['HCAHPS Question'].str.contains('mean', na = False)]
-    hcahps_df = hcahps_df[~hcahps_df['HCAHPS Linear Mean Value'].str.contains('Not Available', na = False)]
-    hcahps_df['HCAHPS Linear Mean Value'] = hcahps_df['HCAHPS Linear Mean Value'].astype(int)
-
-    #print(hcahps_df[hcahps_df['HCAHPS Linear Mean Value'].apply(lambda x: isinstance(x, int))])
+    hcahps_df = hcahps_df[hcahps_df['HCAHPS Question'].str.contains('Summary star rating', na = False)]
+    hcahps_df = hcahps_df[~hcahps_df['Patient Survey Star Rating'].str.contains('Not Available', na = False)]
+    hcahps_df['Patient Survey Star Rating'] = hcahps_df['Patient Survey Star Rating'].astype(int)
+    print(hcahps_df.head)
+    hcahps_df.rename(columns={"Patient Survey Star Rating":"relative mean"}, inplace=True)
     
-    hcahps_mean_df = hcahps_df[['Facility Name', 'HCAHPS Linear Mean Value']].groupby('Facility Name').mean()
-    hcahps_mean_df.rename(columns={"HCAHPS Linear Mean Value":"summary score"}, inplace=True)
-    hcahps_mean_df['relative mean'] = hcahps_mean_df["summary score"] - hcahps_mean_df["summary score"].mean()
-    
-    hcahps_final_df = hcahps_mean_df.merge(address_df, on='Facility Name')
     hcahps_export_path = os.path.join(export_path,'hcahps_summary_metrics.csv')
-    hcahps_final_df.to_csv(hcahps_export_path) 
+    hcahps_df.to_csv(hcahps_export_path) 
     # hai_path = os.path.join(BASE_DIR, './data/Healthcare_Associated_Infections-Hospital.csv')
 
 def load_hai_data(export_path):
@@ -56,6 +50,9 @@ def load_hai_data(export_path):
     hai_mean_df['relative mean'] = hai_mean_df["Compared to National"] - hai_mean_df["Compared to National"].mean()
 
     hai_final_df = hai_mean_df.merge(address_df, on='Facility Name')
+    #uncomment to show histogram of data
+    #hai_final_df[['Facility Name', 'relative mean']].hist()
+    #plt.show()
     hai_export_path = os.path.join(export_path,'hai_summary_metrics.csv')
     hai_final_df.to_csv(hai_export_path) 
 

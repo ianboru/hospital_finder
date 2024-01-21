@@ -13,7 +13,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         selectedPlace = {}
     }
     console.log("places data", placesData)
-    const placeTiles = placesData.results.map((place, i)=>{
+    const placeTiles = placesData.results ? placesData.results.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles} 
       if(place.name == selectedPlace.name){
         selectedPlaceStyle.border = "2px solid black"
@@ -36,7 +36,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         </div>
       )
       //how am i structuring the data from the backend so i can do lookup by name on the FE
-    })
+    }) : <></>
 
     return (
       <div style={{width : "250px", marginRight : "15px"}}>

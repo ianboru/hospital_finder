@@ -45,15 +45,14 @@ def index(request, path=None):
             
             hai_partial_name_match = is_name_match(hai_summary_metrics, place_name)
             hcahps_partial_name_match = is_name_match(hcahps_summary_metrics, place_name)
-            print('hai name match please', hai_partial_name_match)
-            print("hcaphs name match please", hcahps_partial_name_match)
+            #print('hai name match please', hai_partial_name_match)
+            #print("hcaphs name match please", hcahps_partial_name_match)
             
             hai_partial_address_match = is_address_match(hai_summary_metrics, place_address)
             hcaphps_partial_address_match = is_address_match(hcahps_summary_metrics, place_address)
             
-            print('hai address matching ', hai_partial_address_match)
-            print('hcaphs address matching,', hcaphps_partial_address_match)
-            pprint.pprint(place_detail["result"].keys())
+            #print('hai address matching ', hai_partial_address_match)
+            #print('hcaphs address matching,', hcaphps_partial_address_match)
             place_detail = place_detail["result"]
             if "formatted_phone_number" in place_detail:
                 place_result["phone_number"] = place_detail["formatted_phone_number"]
@@ -71,7 +70,12 @@ def add_metric_to_place_result(metric_name, metric_df, place_result):
     facility_filtered_result = facility_filtered_result[facility_filtered_result['relative mean'].notna()]
     if not facility_filtered_result.empty: 
         facility_filtered_result = facility_filtered_result.iloc[0]
-        place_result[f'{metric_name} relative mean'] = round(facility_filtered_result['relative mean'],1)
+        print("matched")
+        print(facility_filtered_result, metric_name)
+        if metric_name == "hai":
+            place_result[f'{metric_name} relative mean'] = round(facility_filtered_result['relative mean'],1)
+        else:
+            place_result[f'{metric_name} relative mean'] = int(facility_filtered_result['relative mean'])
     else:
         place_result[f'{metric_name} relative mean'] = ""
     return place_result

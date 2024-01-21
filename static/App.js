@@ -10,18 +10,32 @@ function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const [selectedPlace, setSelectedPlace] = React.useState(null)
-  
+  const [searchTerm, setSearchTerm] = React.useState("")
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
   })
+  const onSearchInputChange = (e) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const onSearchSubmit = () => {
+    let url = new URL(window.location.origin + window.location.pathname)
+    url.searchParams.set("search", searchTerm)
+    console.log("searching", searchTerm)
+    const urlParams = new URLSearchParams(window.location.search)
+    window.location.href = url
+  }
+
   const Map = () => {
+    console.log("loading map", placesData)
     const firstLocation = placesData.results[0].geometry.location
+    const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
+
     const selectedPlaceCenter = {
       lat : selectedPlace ? selectedPlace.geometry.location.lat : null,
       lng : selectedPlace ? selectedPlace.geometry.location.lng : null
     }
-    const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
@@ -58,9 +72,10 @@ function App() {
       id: 'google-map-script',
       googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
     })
-    const containerStyle = {
-      width: '500px',
-      height: '500px'
+    const mapContainerStyle = {
+      margin : "auto",
+      width: "100%",
+      height: "100%"
     };
     const [map, setMap] = React.useState(null)
 
@@ -75,45 +90,56 @@ function App() {
     }, [])
 
     return isLoaded ? (
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={selectedPlace ? selectedPlaceCenter : firstLocationCenter}
-          zoom={.75}
-          onLoad={onLoad}
-          onUnmount={onUnmount}
-        >
-          { markers }
-          <></>
-        </GoogleMap>
+        <div style={{width : "1000px", height : "1000px"}}>
+            <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={selectedPlace ? selectedPlaceCenter : firstLocationCenter}
+            zoom={.75}
+            onLoad={onLoad}
+            onUnmount={onUnmount}
+          >
+            { markers }
+            <></>
+          </GoogleMap>
+        </div>
     ) : <></>
   }
   const outerStyles = {
     display : "flex",
     alignContent : "flex-start"
   }
-  console.log('selectedPlace', selectedPlace)
+  console.log('searched', searchTerm)
   return (
     <div className="App">
+      <div>
+        <input value={searchTerm} onChange={onSearchInputChange} />
+        <button onClick={onSearchSubmit}>Search</button>
+      </div>
       <div style={outerStyles}>
-        <div style={{maxHeight : '500px', overflowY : 'scroll'}}>
-          <h1>Map results</h1>
-          <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
-        </div>
+        {
+          placesData ? <div style={{maxHeight : '500px', overflowY : 'scroll'}}>
+            <h1>Map results</h1>
+            <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
+          </div> : <></>
+        }
+        
         {
           selectedPlace ?
-          <div style={{border : 2, width : 150, marginRight : 15}}>
-          <h3>Current Selection</h3>
-          <div>{selectedPlace.name}</div>
-          <div>{selectedPlace.formatted_address}</div>
-          {
-              selectedPlace['hai relative mean'] ? <div><b>Safety: {getHaiStars(selectedPlace['hai relative mean'])}</b></div> : <></>
-            }
+          <div style={{border : 2, width : 150, marginRight : 15, marginLeft : 15}}>
+            <h3>Current Selection</h3>
+            <div>{selectedPlace.name}</div>
+            <div>{selectedPlace.formatted_address}</div>
             {
-              selectedPlace['hai relative mean'] ? <div><b>Experience: {getHCAHPSStars(selectedPlace['hcahps relative mean'])}</b></div> : <></>
-            }
-        </div> : null
+                selectedPlace['hai relative mean'] ? <div><b>Safety: {getHaiStars(selectedPlace['hai relative mean'])}</b></div> : <></>
+              }
+              {
+                selectedPlace['hai relative mean'] ? <div><b>Experience: {getHCAHPSStars(selectedPlace['hcahps relative mean'])}</b></div> : <></>
+              }
+          </div> : null
         }
-        <Map/>
+        {
+          placesData ? <Map/> : <></>
+        }
         
       </div>
       

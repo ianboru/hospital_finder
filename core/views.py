@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.models import User
+from number_parser import parse_ordinal
 
 import pandas as pd
 pd.set_option('display.max_rows', None,)
@@ -39,7 +40,7 @@ def index(request, path=None):
     places_results = []
     if search_string:    
         places_results = gmaps.places(query=search_string)
-        print(hai_summary_metrics['Address'])
+        print(hai_summary_metrics[['Address', 'Facility Name']], )
         for place_result in places_results['results']:
             place_detail = gmaps.place(place_id=place_result["reference"])
             
@@ -90,9 +91,9 @@ def is_address_match(cms_metric_df, place_address):
     '''
     cms_metric_df['Address'] = cms_metric_df['Address'].str.lower()
     place_address = place_address.lower()
-    place_address = place_address.replace(' ave,', ' avenue,')
-    place_address = place_address.replace(' rd,', ' road,')
-    place_address = place_address.replace(' st,', ' street,')
+    
+    place_address = expand_address_abbreviations(place_address)
+    
     # print('cms address ', cms_metric_df['Address'])
     print('checking for match with google address = ', place_address)
     for cms_address in cms_metric_df['Address']:
@@ -104,6 +105,31 @@ def is_name_match(metric_df, place_name):
     facility_name_metric_df = metric_df['Facility Name']
     for facility_name in facility_name_metric_df:
         return facility_name.lower() in place_name.lower() or place_name.lower() in facility_name.lower()
+
+def expand_address_abbreviations(place_address):
+    place_address = place_address.replace(' ave,', ' avenue,')
+    place_address = place_address.replace(' rd,', ' road,')
+    place_address = place_address.replace(' st,', ' street,')
+    place_address = place_address.replace(' dr,', ' drive,')
+    place_address = place_address.replace(' ct,', ' court,')
+    
+    split_address = place_address.split(" ")
+    final_address = []
+    for word in split_address:
+        n = parse_ordinal(word)
+        if n and not word.isnumeric():
+            word = ordinal(n)
+        final_address.append(word)
+        
+    place_address = " ".join(final_address)
+    return place_address
+    
+def ordinal(n: int):
+    if 11 <= (n % 100) <= 13:
+        suffix = 'th'
+    else:
+        suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    return str(n) + suffix
 
 def graph(request, path=None):
     hospital_data = utils.load_hospital_data()

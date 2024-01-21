@@ -11,7 +11,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.models import User
+
 import pandas as pd
+pd.set_option('display.max_rows', None,)
 
 from core.models import (
     Favorite,
@@ -37,6 +39,7 @@ def index(request, path=None):
     places_results = []
     if search_string:    
         places_results = gmaps.places(query=search_string)
+        print(hai_summary_metrics['Address'])
         for place_result in places_results['results']:
             place_detail = gmaps.place(place_id=place_result["reference"])
             
@@ -47,9 +50,9 @@ def index(request, path=None):
             hcahps_partial_name_match = is_name_match(hcahps_summary_metrics, place_name)
             #print('hai name match please', hai_partial_name_match)
             #print("hcaphs name match please", hcahps_partial_name_match)
-            
             hai_partial_address_match = is_address_match(hai_summary_metrics, place_address)
-            hcaphps_partial_address_match = is_address_match(hcahps_summary_metrics, place_address)
+            # print('hcaphps address match')
+            # hcaphps_partial_address_match = is_address_match(hcahps_summary_metrics, place_address)
             
             #print('hai address matching ', hai_partial_address_match)
             #print('hcaphs address matching,', hcaphps_partial_address_match)
@@ -70,8 +73,7 @@ def add_metric_to_place_result(metric_name, metric_df, place_result):
     facility_filtered_result = facility_filtered_result[facility_filtered_result['relative mean'].notna()]
     if not facility_filtered_result.empty: 
         facility_filtered_result = facility_filtered_result.iloc[0]
-        print("matched")
-        print(facility_filtered_result, metric_name)
+        
         if metric_name == "hai":
             place_result[f'{metric_name} relative mean'] = round(facility_filtered_result['relative mean'],1)
         else:
@@ -80,10 +82,23 @@ def add_metric_to_place_result(metric_name, metric_df, place_result):
         place_result[f'{metric_name} relative mean'] = ""
     return place_result
 
-def is_address_match(metric_df, place_address): 
-    address_metric_df = metric_df['Address']
-    for address in address_metric_df:
-        return address in place_address
+
+def is_address_match(cms_metric_df, place_address): 
+    '''
+        need to convert ave to avenue in place_address
+        make the letter either upper or lower cases
+    '''
+    cms_metric_df['Address'] = cms_metric_df['Address'].str.lower()
+    place_address = place_address.lower()
+    place_address = place_address.replace(' ave,', ' avenue,')
+    place_address = place_address.replace(' rd,', ' road,')
+    place_address = place_address.replace(' st,', ' street,')
+    # print('cms address ', cms_metric_df['Address'])
+    print('checking for match with google address = ', place_address)
+    for cms_address in cms_metric_df['Address']:
+        if cms_address in place_address:
+            print('cms_address ', cms_address)
+            print('got match')
 
 def is_name_match(metric_df, place_name): 
     facility_name_metric_df = metric_df['Facility Name']

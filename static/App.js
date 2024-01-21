@@ -108,7 +108,8 @@ function App() {
     display : "flex",
     alignContent : "flex-start"
   }
-  console.log('searched', searchTerm)
+  console.log('places ', placesData)
+  const hasPlaceResults = placesData.results && placesData.results.length > 0
   return (
     <div className="App">
       <div>
@@ -117,7 +118,7 @@ function App() {
       </div>
       <div style={outerStyles}>
         {
-          placesData ? <div style={{maxHeight : '500px', overflowY : 'scroll'}}>
+          hasPlaceResults ? <div style={{maxHeight : '500px', overflowY : 'scroll'}}>
             <h1>Map results</h1>
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
           </div> : <></>
@@ -138,7 +139,7 @@ function App() {
           </div> : null
         }
         {
-          placesData ? <Map/> : <></>
+          hasPlaceResults ? <Map/> : <></>
         }
         
       </div>

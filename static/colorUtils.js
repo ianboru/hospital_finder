@@ -60,6 +60,7 @@ const numberToRGB = (i, min, max) => {
     // as the function expects a value between 0 and 1, and red = 0° and green = 120°
     // we convert the input to the appropriate hue value
     var hue = ratio * 1.2 / 3.60;
+    console.log("to rgb", i, min, max, ratio)
     //if (minMaxFactor!=1) hue /= minMaxFactor;
     //console.log(hue);
     

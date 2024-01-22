@@ -9,6 +9,8 @@ import { getHCAHPSStars, getHaiStars } from './utils';
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
+  const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
+
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   const [searchTerm, setSearchTerm] = React.useState("")
   const { isLoaded } = useJsApiLoader({
@@ -26,7 +28,29 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search)
     window.location.href = url
   }
+  const getMarkerColor = (place, metric_ranges) => {
+    const gray = "rgb(128,128,128)"
+    if(!place){
+      return gray
+    }
+    const has_hai_relative_mean = place['hai relative mean']||place['hai relative mean'] === 0
+    const has_hcahps_relative_mean = place['hcahps relative mean']||place['hcahps relative mean'] === 0
+    let marker_metric = null
+    const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
+    const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
+    console.log("name",place["name"])
 
+    if(has_hai_relative_mean && has_hcahps_relative_mean){
+      marker_metric = place['hai relative mean'] + place['hcahps relative mean']
+      return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
+    }else if(has_hai_relative_mean){
+      return numberToRGB(place['hai relative mean'],metric_ranges['min_hai'],metric_ranges['max_hai'])
+    }else if(has_hcahps_relative_mean){
+      return numberToRGB(place['hcahps relative mean'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
+    }else{
+      return gray
+    }
+  }
   const Map = () => {
     console.log("loading map", placesData)
     const firstLocation = placesData.results[0].geometry.location
@@ -40,13 +64,14 @@ function App() {
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-
+      const markerColor = getMarkerColor(place, metricRanges)
+      console.log(markerColor)
       return (
         <Marker 
           onLoad={(marker) => {
             const customIcon = (opts) => Object.assign({
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: place && place['hai relative mean'] ? numberToRGB(place['hai relative mean'],1,3) : "rgb(128,128,128)",
+              fillColor: markerColor,
               fillOpacity: 1,
               strokeColor: '#000',
               strokeWeight: 1,
@@ -54,7 +79,7 @@ function App() {
             }, opts);
 
             marker.setIcon(customIcon({
-              fillColor: place && place['hai relative mean'] ? numberToRGB(place['hai relative mean'],1,3) : "rgb(128,128,128)",
+              fillColor: markerColor,
               strokeColor: 'white'
             }));
           }}

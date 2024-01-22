@@ -52,12 +52,18 @@ def index(request, path=None):
             place_detail = place_detail["result"]
             if "formatted_phone_number" in place_detail:
                 place_result["phone_number"] = place_detail["formatted_phone_number"]
-            print("google result ", place_result["name"], place_result["formatted_address"])
             place_result = add_metric_to_place_result('hai', hai_summary_metrics, place_result)
             place_result = add_metric_to_place_result('hcahps', hcahps_summary_metrics, place_result)
     context = {
         'google_places_data' : places_results,
+        'metric_ranges' : {
+            'max_hai' : float(hai_summary_metrics["relative mean"].max()),
+            'min_hai' :float(hai_summary_metrics["relative mean"].min()),
+            'max_hcahps' : float(hcahps_summary_metrics["relative mean"].max()),
+            'min_hcahps' : float(hcahps_summary_metrics["relative mean"].min())
+        }
     }
+    print(context['metric_ranges'])
     return render(request, "index.html", context)
 
 def add_metric_to_place_result(metric_name, metric_df, place_result):

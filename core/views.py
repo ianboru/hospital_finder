@@ -28,91 +28,90 @@ class SignUpView(generic.CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
 
+def standardize_cms_name(cms_name_df):
+    cms_name_df = cms_name_df.str.lower()
+    cms_name_df = cms_name_df.str.replace('-', " ")
+    cms_name_df = cms_name_df.str.replace('/', " ")
+    return cms_name_df
+
 def index(request, path=None):
     hai_summary_metrics = utils.load_summary_metric('hai')
+    hai_summary_metrics["Address"] = hai_summary_metrics["Address"].str.lower()
+    hai_summary_metrics["Facility Name"] = standardize_cms_name(hai_summary_metrics["Facility Name"])
     hcahps_summary_metrics = utils.load_summary_metric('hcahps')
-    
-    #sort dataframe based on query param
+    hcahps_summary_metrics["Facility Name"] = standardize_cms_name(hcahps_summary_metrics["Facility Name"])
+    hcahps_summary_metrics["Address"] = hcahps_summary_metrics["Address"].str.lower()
     search_string = request.GET.get("search")
     
     gmaps = googlemaps.Client(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
-    
     places_results = []
     if search_string:    
         places_results = gmaps.places(query=search_string)
-        print(hai_summary_metrics[['Address', 'Facility Name']], )
         for place_result in places_results['results']:
             place_detail = gmaps.place(place_id=place_result["reference"])
-            
-            place_address = place_result["formatted_address"]
-            place_name = place_detail['result']['name']
-            
-            hai_partial_name_match = is_name_match(hai_summary_metrics, place_name)
-            hcahps_partial_name_match = is_name_match(hcahps_summary_metrics, place_name)
-            #print('hai name match please', hai_partial_name_match)
-            #print("hcaphs name match please", hcahps_partial_name_match)
-            hai_partial_address_match = is_address_match(hai_summary_metrics, place_address)
-            # print('hcaphps address match')
-            # hcaphps_partial_address_match = is_address_match(hcahps_summary_metrics, place_address)
-            
-            #print('hai address matching ', hai_partial_address_match)
-            #print('hcaphs address matching,', hcaphps_partial_address_match)
             place_detail = place_detail["result"]
             if "formatted_phone_number" in place_detail:
                 place_result["phone_number"] = place_detail["formatted_phone_number"]
-                
+            print("google result ", place_result["name"], place_result["formatted_address"])
             place_result = add_metric_to_place_result('hai', hai_summary_metrics, place_result)
             place_result = add_metric_to_place_result('hcahps', hcahps_summary_metrics, place_result)
-            
     context = {
         'google_places_data' : places_results,
     }
     return render(request, "index.html", context)
 
 def add_metric_to_place_result(metric_name, metric_df, place_result):
+    
     facility_filtered_result = metric_df[metric_df['Facility Name'].str.contains(place_result['name'],case=False)]
     facility_filtered_result = facility_filtered_result[facility_filtered_result['relative mean'].notna()]
     if not facility_filtered_result.empty: 
+        print("name match")
         facility_filtered_result = facility_filtered_result.iloc[0]
-        
         if metric_name == "hai":
+            #this is continuous value 
             place_result[f'{metric_name} relative mean'] = round(facility_filtered_result['relative mean'],1)
         else:
+            #this is star value as int
             place_result[f'{metric_name} relative mean'] = int(facility_filtered_result['relative mean'])
     else:
-        place_result[f'{metric_name} relative mean'] = ""
+        #now try to match by address
+        cms_partial_address_match = find_address_match(metric_df, place_result["formatted_address"])
+        
+        if not cms_partial_address_match.empty:
+            print("CMS address match")
+            if metric_name == "hai":
+                place_result[f'{metric_name} relative mean'] = round(cms_partial_address_match['relative mean'],1)
+            else:
+                place_result[f'{metric_name} relative mean'] = int(cms_partial_address_match['relative mean'])
+        else:
+            place_result[f'{metric_name} relative mean'] = ""
     return place_result
 
 
-def is_address_match(cms_metric_df, place_address): 
-    '''
-        need to convert ave to avenue in place_address
-        make the letter either upper or lower cases
-    '''
-    cms_metric_df['Address'] = cms_metric_df['Address'].str.lower()
+def find_address_match(cms_metric_df, place_address): 
     place_address = place_address.lower()
-    
+    place_address = place_address.replace("-", " ")
+    place_address = place_address.replace("/", " ")
     place_address = expand_address_abbreviations(place_address)
-    
-    # print('cms address ', cms_metric_df['Address'])
-    print('checking for match with google address = ', place_address)
-    for cms_address in cms_metric_df['Address']:
-        if cms_address in place_address:
-            print('cms_address ', cms_address)
-            print('got match')
-
-def is_name_match(metric_df, place_name): 
-    facility_name_metric_df = metric_df['Facility Name']
-    for facility_name in facility_name_metric_df:
-        return facility_name.lower() in place_name.lower() or place_name.lower() in facility_name.lower()
+    print("address",place_address)
+    for index, row in cms_metric_df.iterrows():
+        print(row["Address"])
+        if row["Address"] in place_address:
+            return row
+    #return empty df if no hits
+    return pd.DataFrame()
 
 def expand_address_abbreviations(place_address):
-    place_address = place_address.replace(' ave,', ' avenue,')
-    place_address = place_address.replace(' rd,', ' road,')
-    place_address = place_address.replace(' st,', ' street,')
-    place_address = place_address.replace(' dr,', ' drive,')
-    place_address = place_address.replace(' ct,', ' court,')
-    
+    place_address = place_address.replace(' ave', ' avenue')
+    place_address = place_address.replace(' rd', ' road')
+    place_address = place_address.replace(' st', ' street')
+    place_address = place_address.replace(' dr', ' drive')
+    place_address = place_address.replace(' ct', ' court')
+    place_address = place_address.replace(' e ', ' east')
+    place_address = place_address.replace(' w ', ' west')
+    place_address = place_address.replace(' n ', ' north')
+    place_address = place_address.replace(' s ', ' south')
+
     split_address = place_address.split(" ")
     final_address = []
     for word in split_address:

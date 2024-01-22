@@ -12,15 +12,13 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     if(!selectedPlace){
         selectedPlace = {}
     }
-    console.log("places data", placesData)
     const placeTiles = placesData.results ? placesData.results.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles} 
       if(place.name == selectedPlace.name){
         selectedPlaceStyle.border = "2px solid black"
       }
-    
-      const haiStars = getHaiStars(place['hai relative mean'])
-      const hcahpsStars = getHCAHPSStars(place['hcahps relative mean'])
+      console.log(place["name"])
+      console.log(place['hcahps relative mean'], place['hai relative mean'])
 
       return (
         <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}> 
@@ -28,10 +26,10 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             <div>{place.formatted_address}</div>
             <div>{place.phone_number}</div>
             {
-              place['hai relative mean'] ? <div><b>Safety: {haiStars}</b></div> : <></>
+              place['hai relative mean']||place['hai relative mean'] === 0 ? <div><b>Safety: {getHaiStars(place['hai relative mean'])}</b></div> : <></>
             }
             {
-              place['hai relative mean'] ? <div><b>Experience: {hcahpsStars}</b></div> : <></>
+              place['hcahps relative mean']||place['hcahps relative mean'] === 0 ? <div><b>Experience: {getHCAHPSStars(place['hcahps relative mean'])}</b></div> : <></>
             }
         </div>
       )

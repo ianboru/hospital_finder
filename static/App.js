@@ -40,9 +40,7 @@ function App() {
     const markers = placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      if(place['hai relative mean'] || place['hcahps relative mean']) {
-        console.log("place",place)
-      }
+
       return (
         <Marker 
           onLoad={(marker) => {
@@ -90,7 +88,7 @@ function App() {
     }, [])
 
     return isLoaded ? (
-        <div style={{width : "1000px", height : "1000px"}}>
+        <div style={{width : "800px", height : "800px"}}>
             <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={selectedPlace ? selectedPlaceCenter : firstLocationCenter}
@@ -108,7 +106,6 @@ function App() {
     display : "flex",
     alignContent : "flex-start"
   }
-  console.log('places ', placesData)
   const hasPlaceResults = placesData.results && placesData.results.length > 0
   return (
     <div className="App">
@@ -118,7 +115,7 @@ function App() {
       </div>
       <div style={outerStyles}>
         {
-          hasPlaceResults ? <div style={{maxHeight : '500px', overflowY : 'scroll'}}>
+          hasPlaceResults ? <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
             <h1>Map results</h1>
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
           </div> : <></>

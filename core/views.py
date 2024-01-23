@@ -102,7 +102,7 @@ def find_address_match(cms_metric_df, place_address):
     print("address",place_address)
     for index, row in cms_metric_df.iterrows():
         print(row["Address"])
-        if row["Address"] in place_address:
+        if row["Address"] in place_address: 
             return row
     #return empty df if no hits
     return pd.DataFrame()

@@ -19,7 +19,6 @@ def load_hcahps_data(export_path):
     hcahps_df = hcahps_df[hcahps_df['HCAHPS Question'].str.contains('Summary star rating', na = False)]
     hcahps_df = hcahps_df[~hcahps_df['Patient Survey Star Rating'].str.contains('Not Available', na = False)]
     hcahps_df['Patient Survey Star Rating'] = hcahps_df['Patient Survey Star Rating'].astype(int)
-    print(hcahps_df.head)
     hcahps_df.rename(columns={"Patient Survey Star Rating":"relative mean"}, inplace=True)
     
     hcahps_export_path = os.path.join(export_path,'hcahps_summary_metrics.csv')

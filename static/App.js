@@ -38,7 +38,6 @@ function App() {
     let marker_metric = null
     const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
     const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
-    console.log("name",place["name"])
 
     if(has_hai_relative_mean && has_hcahps_relative_mean){
       marker_metric = place['hai relative mean'] + place['hcahps relative mean']
@@ -52,7 +51,6 @@ function App() {
     }
   }
   const Map = () => {
-    console.log("loading map", placesData)
     const firstLocation = placesData.results[0].geometry.location
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
@@ -65,7 +63,6 @@ function App() {
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
-      console.log(markerColor)
       return (
         <Marker 
           onLoad={(marker) => {

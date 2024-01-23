@@ -44,30 +44,19 @@ const hslToRgb = (h, s, l) => {
  * param min (floating point, range 0 to 1, all i at and below this is red)
  * param max (floating point, range 0 to 1, all i at and above this is green)
  */
-const numberToRGB = (i, min, max) => {
-    var ratio = i;
-    if (min> 0 || max < 1) {
-        if (i < min) {
-            ratio = 0;
-        } else if (i > max) {
-            ratio = 1;
-        } else {
-            var range = max - min;
-            ratio = (i-min) / range;
-        }
+const numberToRGB = (value, min, max) => {
+    const perc = 100*value/(max-min)
+    var r, g, b = 0;
+    if(perc < 50) {
+        r = 255;
+        g = Math.round(5.1 * perc);
     }
-    
-    // as the function expects a value between 0 and 1, and red = 0° and green = 120°
-    // we convert the input to the appropriate hue value
-    var hue = ratio * 1.2 / 3.60;
-    console.log("to rgb", i, min, max, ratio)
-    //if (minMaxFactor!=1) hue /= minMaxFactor;
-    //console.log(hue);
-    
-    // we convert hsl to rgb (saturation 100%, lightness 50%)
-    var rgb = hslToRgb(hue, 1, .5);
-    // we format to css value and return
-    return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
+    else {
+        g = 255;
+        r = Math.round(510 - 5.10 * perc);
+    }
+    var h = r * 0x10000 + g * 0x100 + b * 0x1;
+    return '#' + ('000000' + h.toString(16)).slice(-6);
 }
 
 export { numberToRGB }

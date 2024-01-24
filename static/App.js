@@ -145,15 +145,20 @@ function App() {
         
         {
           selectedPlace ?
-          <div style={{border : 2, width : 150, marginRight : 15, marginLeft : 15}}>
+          <div style={{border : 2, width : 150, marginRight : 20, marginLeft : 20}}>
             <h3>Current Selection</h3>
             <div>{selectedPlace.name}</div>
             <div>{selectedPlace.formatted_address}</div>
             {
-                selectedPlace['hai relative mean'] ? <div><b>Safety: {getHaiStars(selectedPlace['hai relative mean'])}</b></div> : <></>
+                selectedPlace['hai relative mean'] ? 
+                <div>
+                  <b>Safety: <span style={{color:"#fdcc0d"}}>{getHaiStars(selectedPlace['hai relative mean'])}</span></b>
+                </div> : <></>
               }
               {
-                selectedPlace['hai relative mean'] ? <div><b>Experience: {getHCAHPSStars(selectedPlace['hcahps relative mean'])}</b></div> : <></>
+                selectedPlace['hcahps relative mean'] ? <div>
+                  <b>Safety: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
+                </div> : <></>
               }
           </div> : null
         }

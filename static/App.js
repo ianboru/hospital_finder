@@ -12,7 +12,14 @@ function App() {
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
-  const [searchTerm, setSearchTerm] = React.useState("")
+  let url = new URL(window.location)
+  const initialSearchParam = url.searchParams.get("search")
+  const initialLocationParam = url.searchParams.get("location")
+  const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
+  const initialLocation = initialLocationSplit ?  {"lng" : parseFloat(initialLocationSplit[0]), "lat" : parseFloat(initialLocationSplit[1])} : {}
+  console.log("initial",  url.searchParams, initialSearchParam)
+  const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
@@ -21,11 +28,13 @@ function App() {
     setSearchTerm(e.target.value)
   }
 
-  const onSearchSubmit = () => {
+  const onSearchSubmit = (newCenter) => {
     let url = new URL(window.location.origin + window.location.pathname)
+    console.log("valuies" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
-    console.log("searching", searchTerm)
-    const urlParams = new URLSearchParams(window.location.search)
+    if(newCenter.lng){
+      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
+    }
     window.location.href = url
   }
   const getMarkerColor = (place, metric_ranges) => {
@@ -51,7 +60,8 @@ function App() {
     }
   }
   const Map = () => {
-    const firstLocation = placesData.results[0].geometry.location
+    const firstLocation = initialLocation["lat"] ? initialLocation : placesData.results[0].geometry.location
+    console.log("first locatoin", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const selectedPlaceCenter = {
@@ -109,6 +119,11 @@ function App() {
       setMap(null)
     }, [])
 
+    const onDragEnd = () => {
+      const newCenter = map.getCenter()
+      console.log("new center target", newCenter.lng() )
+      onSearchSubmit(newCenter)
+    }
     return isLoaded ? (
         <div style={{width : "800px", height : "800px"}}>
             <GoogleMap
@@ -117,6 +132,7 @@ function App() {
             zoom={.75}
             onLoad={onLoad}
             onUnmount={onUnmount}
+            onDragEnd={onDragEnd}
           >
             { markers }
             <></>
@@ -145,7 +161,7 @@ function App() {
         
         {
           selectedPlace ?
-          <div style={{border : 2, width : 150, marginRight : 20, marginLeft : 20}}>
+          <div style={{border : 2, width : 150, marginRight : 10, marginLeft : 10}}>
             <h3>Current Selection</h3>
             <div>{selectedPlace.name}</div>
             <div>{selectedPlace.formatted_address}</div>
@@ -157,7 +173,7 @@ function App() {
               }
               {
                 selectedPlace['hcahps relative mean'] ? <div>
-                  <b>Safety: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
+                  <b>Experience: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
                 </div> : <></>
               }
           </div> : null

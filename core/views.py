@@ -42,11 +42,20 @@ def index(request, path=None):
     hcahps_summary_metrics["Facility Name"] = standardize_cms_name(hcahps_summary_metrics["Facility Name"])
     hcahps_summary_metrics["Address"] = hcahps_summary_metrics["Address"].str.lower()
     search_string = request.GET.get("search")
-    
+    location_string = request.GET.get("location")
+    gmaps_places_args = {}
+    if search_string:
+        gmaps_places_args["query"] = search_string
+    if location_string:
+        split_location_string = location_string.split(",")
+        gmaps_places_args["location"] = [float(split_location_string[1]),float(split_location_string[0])]
+    #curl -L -X GET 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=t&location=42.3675294%2C-71.186966&radius=10000&key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o'
+
     gmaps = googlemaps.Client(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
     places_results = []
     if search_string:    
-        places_results = gmaps.places(query=search_string)
+        print("search args", gmaps_places_args)
+        places_results = gmaps.places(**gmaps_places_args, radius=10000)
         for place_result in places_results['results']:
             place_detail = gmaps.place(place_id=place_result["reference"])
             place_detail = place_detail["result"]
@@ -63,7 +72,6 @@ def index(request, path=None):
             'min_hcahps' : float(hcahps_summary_metrics["relative mean"].min())
         }
     }
-    print(context['metric_ranges'])
     return render(request, "index.html", context)
 
 def add_metric_to_place_result(metric_name, metric_df, place_result):
@@ -71,7 +79,6 @@ def add_metric_to_place_result(metric_name, metric_df, place_result):
     facility_filtered_result = metric_df[metric_df['Facility Name'].str.contains(place_result['name'],case=False)]
     facility_filtered_result = facility_filtered_result[facility_filtered_result['relative mean'].notna()]
     if not facility_filtered_result.empty: 
-        print("name match")
         facility_filtered_result = facility_filtered_result.iloc[0]
         if metric_name == "hai":
             #this is continuous value 
@@ -84,7 +91,6 @@ def add_metric_to_place_result(metric_name, metric_df, place_result):
         cms_partial_address_match = find_address_match(metric_df, place_result["formatted_address"])
         
         if not cms_partial_address_match.empty:
-            print("CMS address match")
             if metric_name == "hai":
                 place_result[f'{metric_name} relative mean'] = round(cms_partial_address_match['relative mean'],1)
             else:
@@ -99,9 +105,7 @@ def find_address_match(cms_metric_df, place_address):
     place_address = place_address.replace("-", " ")
     place_address = place_address.replace("/", " ")
     place_address = expand_address_abbreviations(place_address)
-    print("address",place_address)
     for index, row in cms_metric_df.iterrows():
-        print(row["Address"])
         if row["Address"] in place_address: 
             return row
     #return empty df if no hits

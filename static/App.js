@@ -163,8 +163,8 @@ function App() {
   const hasPlaceResults = placesData.results && placesData.results.length > 0
   return (
     <div className="App">
-      <div>
-        <input value={searchTerm} onChange={onSearchInputChange} />
+      <div style={{marginBottom : 15}}>
+        <input style={{width : 300}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange} />
         <button onClick={onSearchSubmit}>Search</button>
       </div>
       <div style={outerStyles}>

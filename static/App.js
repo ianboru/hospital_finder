@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom"
-import React, { Component } from 'react'
+import React, { useEffect, Component } from 'react'
 import { numberToRGB } from "./colorUtils";
 import PlaceResults from "./components/PlaceResults";
 
@@ -13,6 +13,7 @@ function App() {
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
+  const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
   const initialSearchParam = url.searchParams.get("search")
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
@@ -20,13 +21,18 @@ function App() {
   console.log("initial",  url.searchParams, initialSearchParam)
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
 
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
-  })
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
+  
+  useEffect(()=>{
+    navigator.geolocation.getCurrentPosition((position)=>{
+      setCurrentGPSLocation({ 
+        lat: position.coords.latitude, 
+        lng: position.coords.longitude
+      })
+    })
+  }, [])
 
   const onSearchSubmit = (newCenter) => {
     let url = new URL(window.location.origin + window.location.pathname)
@@ -37,6 +43,7 @@ function App() {
     }
     window.location.href = url
   }
+
   const getMarkerColor = (place, metric_ranges) => {
     const gray = "rgb(128,128,128)"
     if(!place){
@@ -59,8 +66,11 @@ function App() {
       return gray
     }
   }
+
   const Map = () => {
-    const firstLocation = initialLocation["lat"] ? initialLocation : placesData.results[0].geometry.location
+    const firstResult = (placesData.results && placesData.results[0].geometry.location) || {}
+    //check if initial location has been loaded/is relevant else use first google place result
+    const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first locatoin", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
@@ -69,7 +79,7 @@ function App() {
       lng : selectedPlace ? selectedPlace.geometry.location.lng : null
     }
 
-    const markers = placesData.results.map((place, index)=>{
+    const markers = placesData.results && placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
@@ -124,21 +134,27 @@ function App() {
       console.log("new center target", newCenter.lng() )
       onSearchSubmit(newCenter)
     }
-    return isLoaded ? (
+    
+    //priority to center the map: selected place, first result in google maps result, current gps location
+    const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ? 
+        firstLocationCenter : currentGPSLocation 
+
+    console.log("current center", curCenter)
+    return isLoaded && curCenter ? (
         <div style={{width : "800px", height : "800px"}}>
             <GoogleMap
             mapContainerStyle={mapContainerStyle}
-            center={selectedPlace ? selectedPlaceCenter : firstLocationCenter}
-            zoom={.75}
+            center={curCenter}
+            zoom={.85}
             onLoad={onLoad}
             onUnmount={onUnmount}
             onDragEnd={onDragEnd}
           >
-            { markers }
+            { markers ? markers : <></> }
             <></>
           </GoogleMap>
         </div>
-    ) : <></>
+    ) : <div style={{fontWeight : "bold", marginTop : "15px"}}>Loading Map...</div>
   }
   const outerStyles = {
     display : "flex",
@@ -178,9 +194,7 @@ function App() {
               }
           </div> : null
         }
-        {
-          hasPlaceResults ? <Map/> : <></>
-        }
+        <Map/>
         
       </div>
       

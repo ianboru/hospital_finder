@@ -164,8 +164,8 @@ function App() {
   return (
     <div className="App">
       <div style={{marginBottom : 15}}>
-        <input style={{width : 300}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange} />
-        <button onClick={onSearchSubmit}>Search</button>
+        <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange} />
+        <button onClick={onSearchSubmit} style={{marginLeft : 10}}>Search</button>
       </div>
       <div style={outerStyles}>
         {

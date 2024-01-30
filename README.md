@@ -1,38 +1,57 @@
-Dataset catalogue
+# Hi Welcome and thanks for checking out our project!
 
-https://data.cms.gov/provider-data/search?theme=Hospitals
+The following documnet will guide you through setting up the system.
 
-Initialize django project 
+Before we get started you're gonna need a couple things.
 
-https://docs.djangoproject.com/en/4.0/intro/tutorial01/
-mkdir <project_name_env>
-cd <project_name_env>
-brew install virtualenv
-python3 -m venv ./
+## Software needed for development
+
+### Python 
+- https://www.python.org/downloads/
+
+### Virtual Env
+```
+brew install viritualenv
+```
+
+### Node
+- https://nodejs.org/en/download/
+we use version v21.2.0
+
+## Install dependencies
+Navigate to the root of the project and beging running the following commands:
+
+For the Django project run anytime you open a new terminal 
+```
+python3 -m venv env // creates vm for project
 source ./bin/activate
-./bin/python3  -m pip install django
-./bin/python3  -m pip install django-admin
-./bin/python3  -m pip install --upgrade pip
-./bin/python3  -m pip install numpy
-./bin/python3  -m pip install pandas
-./bin/python3  -m pip install plotly
-./bin/django-admin startproject hospital_finder
+```
 
-python3 -m django-admin startproject <project_name>
-./bin/python3 ./hospital_finder/manage.py runserver
+```
+python3  -m pip install django
+python3  -m pip install django-admin
+python3  -m pip install --upgrade pip
+python3  -m pip install numpy
+python3  -m pip install pandas
+python3  -m pip install plotly
 
-cd <project_name>
+```
+## Running the project
+
+```
+source ./bin/activate
+python3 manage.py runserver        
+npm start
+```
+
+the app runs on http://localhost:8000/
+
+## Intializing Data for project
+
+navigate to this link
+
+ - https://drive.google.com/drive/folders/1ifsqVr1YtBeILiAwf38hdpl8DtNlGdL1
+
 python manage.py startapp core 
 python manage.py migrate 
 python manage.py createsuperuser
-
-add .gitignore
-create remote repo
-add remote 
-
-mkdir data
-
-add "" url to hospital_finder 
-add "" url to core and point to index view which points to index html template
-add core app to settings installed app
-

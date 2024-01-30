@@ -4,7 +4,7 @@ import { numberToRGB } from "./colorUtils";
 import PlaceResults from "./components/PlaceResults";
 
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import { getHCAHPSStars, getHaiStars } from './utils';
+import PlaceDetail from "./components/PlaceDetail";
 
 function App() {
 
@@ -141,7 +141,7 @@ function App() {
 
     console.log("current center", curCenter)
     return isLoaded && curCenter ? (
-        <div style={{width : "800px", height : "800px"}}>
+        <div style={{alignSelf : 'flex-end', width : "600px", height : "800px"}}>
             <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={curCenter}
@@ -174,27 +174,10 @@ function App() {
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
           </div> : <></>
         }
-        
         {
-          selectedPlace ?
-          <div style={{border : 2, width : 150, marginRight : 10, marginLeft : 10}}>
-            <h3>Current Selection</h3>
-            <div>{selectedPlace.name}</div>
-            <div>{selectedPlace.formatted_address}</div>
-            {
-                selectedPlace['hai relative mean'] ? 
-                <div>
-                  <b>Safety: <span style={{color:"#fdcc0d"}}>{getHaiStars(selectedPlace['hai relative mean'])}</span></b>
-                </div> : <></>
-              }
-              {
-                selectedPlace['hcahps relative mean'] ? <div>
-                  <b>Experience: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
-                </div> : <></>
-              }
-          </div> : null
+          selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
         }
-        <Map/>
+        <Map> </Map>
         
       </div>
       

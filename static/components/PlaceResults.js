@@ -7,7 +7,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
       "height" : "150px",
       "color" : "gray",
       "padding" : 10,
-      "width" : "200px"
+      "width" : "300px"
     }
     if(!selectedPlace){
         selectedPlace = {}

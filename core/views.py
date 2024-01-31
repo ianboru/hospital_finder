@@ -43,6 +43,7 @@ def index(request, path=None):
     hcahps_summary_metrics["Address"] = hcahps_summary_metrics["Address"].str.lower()
     search_string = request.GET.get("search")
     location_string = request.GET.get("location")
+    radius_string = request.GET.get("radius")
     gmaps_places_args = {}
     if search_string:
         gmaps_places_args["query"] = search_string
@@ -55,7 +56,7 @@ def index(request, path=None):
     places_results = []
     if search_string:    
         print("search args", gmaps_places_args)
-        places_results = gmaps.places(**gmaps_places_args, radius=10000)
+        places_results = gmaps.places(**gmaps_places_args, radius=radius_string or 10000)
         for place_result in places_results['results']:
             place_detail = gmaps.place(place_id=place_result["reference"])
             place_detail = place_detail["result"]

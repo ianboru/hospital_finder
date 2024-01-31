@@ -5,7 +5,7 @@ import PlaceResults from "./components/PlaceResults";
 
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import PlaceDetail from "./components/PlaceDetail";
-
+import haversine from 'haversine-distance'
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
@@ -19,8 +19,10 @@ function App() {
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
   const initialLocation = initialLocationSplit ?  {"lng" : parseFloat(initialLocationSplit[0]), "lat" : parseFloat(initialLocationSplit[1])} : {}
   console.log("initial",  url.searchParams, initialSearchParam)
-  const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
+  const initialZoomRadius =  url.searchParams.get("radius")
 
+  const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
+  const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
@@ -34,12 +36,15 @@ function App() {
     })
   }, [])
 
-  const onSearchSubmit = (newCenter) => {
+  const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
     console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
     if(newCenter.lng){
       url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
+    }
+    if(newRadius){
+      url.searchParams.set("radius", `${newRadius}`)
     }
     window.location.href = url
   }
@@ -143,15 +148,29 @@ function App() {
     return isLoaded && curCenter ? (
         <div style={{alignSelf : 'flex-end', width : "600px", height : "800px"}}>
             <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            center={curCenter}
-            zoom={.85}
-            onLoad={onLoad}
-            onUnmount={onUnmount}
-            onDragEnd={onDragEnd}
-          >
+              mapContainerStyle={mapContainerStyle}
+              center={curCenter}
+              zoom={zoomRadius ? zoomRadius : .85}
+              onLoad={onLoad}
+              onUnmount={onUnmount}
+              onDragEnd={onDragEnd}
+              onZoomChanged={()=>{
+                if(map){
+                  const bounds = map.getBounds()
+                  const neCornerLatLng = bounds.getNorthEast()
+                  const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }
+                  const swCornerLatLng = bounds.getSouthWest()
+                  const swCornerLocation = {'lat': swCornerLatLng.lat(), 'lng': swCornerLatLng.lng(), }
+
+                  const windowRadius = haversine(neCornerLocation, swCornerLocation)/2
+                  setZoomRadius(windowRadius)
+                  const newCenter = map.getCenter()
+                  onSearchSubmit(newCenter, windowRadius)
+                }
+
+              }}
+            >
             { markers ? markers : <></> }
-            <></>
           </GoogleMap>
         </div>
     ) : <div style={{fontWeight : "bold", marginTop : "15px"}}>Loading Map...</div>

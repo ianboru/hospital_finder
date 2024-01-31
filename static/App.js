@@ -151,7 +151,7 @@ function App() {
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
               center={curCenter}
-              zoom={zoomRadius ? zoomRadius : .85}
+              zoom={.85}
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}

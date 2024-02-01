@@ -9,6 +9,7 @@ import haversine from 'haversine-distance'
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
+  console.log("places data", placesData)
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
@@ -27,8 +28,11 @@ function App() {
     setSearchTerm(e.target.value)
   }
 
+
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
+      setCurrentGPSLocation({
+        lat: position.coords.latitude,
       setCurrentGPSLocation({
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -38,6 +42,7 @@ function App() {
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
+    console.log("values" , newCenter, initialSearchParam, searchTerm)
     console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
     if(newCenter.lng){
@@ -56,13 +61,21 @@ function App() {
     }
     const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
     const has_patient_summary = place['Summary']||place['Summary'] === 0
+    const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
+    const has_patient_summary = place['Summary']||place['Summary'] === 0
     let marker_metric = null
     const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
     const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
 
     if(has_infection_rating && has_patient_summary){
       marker_metric = place['Infection Rating'] + place['Summary']
+    if(has_infection_rating && has_patient_summary){
+      marker_metric = place['Infection Rating'] + place['Summary']
       return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
+    }else if(has_infection_rating){
+      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
+    }else if(has_patient_summary){
+      return numberToRGB(place['Summary'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
     }else if(has_infection_rating){
       return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
     }else if(has_patient_summary){
@@ -89,6 +102,7 @@ function App() {
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
       return (
+        <Marker
         <Marker
           onLoad={(marker) => {
             const customIcon = (opts) => Object.assign({
@@ -130,6 +144,7 @@ function App() {
       setMap(map)
     }, [])
 
+
     const onUnmount = React.useCallback(function callback(map) {
       setMap(null)
     }, [])
@@ -139,8 +154,9 @@ function App() {
       console.log("new center target", newCenter.lng() )
       onSearchSubmit(newCenter)
     }
-
     //priority to center the map: selected place, first result in google maps result, current gps location
+    const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
+        firstLocationCenter : currentGPSLocation
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
         firstLocationCenter : currentGPSLocation
 
@@ -167,6 +183,7 @@ function App() {
                   const newCenter = map.getCenter()
                   onSearchSubmit(newCenter, windowRadius)
                 }
+
 
               }}
             >
@@ -198,7 +215,9 @@ function App() {
         }
         <Map> </Map>
 
+
       </div>
+
 
     </div>
   );

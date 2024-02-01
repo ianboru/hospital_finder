@@ -23,23 +23,21 @@ const PlaceDetail = (props) => {
             <div>{selectedPlace.name}</div>
             <div>{selectedPlace.formatted_address}</div>
             {
-                selectedPlace['hcahps relative mean'] ?
+                selectedPlace['Infection Rating'] ?
                 <div>
                   <div>
-                    <b>Experience:</b> <span style={{color:"#fdcc0d",}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span>
+                    <b>Patient Summary:</b> <span style={{color:"#fdcc0d",}}>{getHCAHPSStars(selectedPlace['Summary'])}</span>
                   </div>
                   <div style={{marginLeft : 15}}>
                     {detailedExperienceMetricStars}
                   </div>
                 </div> : <></>
               }
-            {
-              selectedPlace['hai relative mean'] ?
-              <div>
-                <b>Safety: <span style={{color:"#fdcc0d"}}>{getHaiStars(selectedPlace['hai relative mean'])}</span></b>
-              </div> : <></>
-            }
-
+              {
+                selectedPlace['hcahps relative mean'] ? <div>
+                  <b>Experience: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
+                </div> : <></>
+              }
           </div>
     )
 }

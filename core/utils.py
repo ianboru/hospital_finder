@@ -2,7 +2,6 @@ import pandas as pd
 import os
 from functools import wraps
 from time import time
-import numpy as np
 from hospital_finder.settings import DATA_DIR
 
 
@@ -20,15 +19,27 @@ def load_hospital_data():
 def load_mrsa_data():
     #need to rename this variable
     data_path_mrsa_file = os.path.join(DATA_DIR, 'mrsa_bsi_odp_2022.csv')
+    data_path_mrsa_file = os.path.join(DATA_DIR, 'mrsa_bsi_odp_2022.csv')
     mrsa_metrics = pd.read_csv(data_path_mrsa_file, encoding='latin1')
     mrsa_metrics = mrsa_metrics.drop_duplicates(subset=['Facility_Name'])
     return mrsa_metrics
 
 def load_summary_metric(metric_name):
     data_path = os.path.join(DATA_DIR, f'{metric_name}_summary_metrics.csv')
-    metric = pd.read_csv(data_path).replace(np.nan,None)
+    metric = pd.read_csv(data_path)
     return metric
 
+def timeit(f, print_=True):
+    """ Decorator to time a function"""
+    @wraps(f)
+    def wrap(*args, **kw):
+        ts = time()
+        result = f(*args, **kw)
+        te = time()
+        if print_:
+            print(f'{f.__name__}: {te-ts:2.4f} sec')
+        return result
+    return wrap
 def timeit(f, print_=True):
     """ Decorator to time a function"""
     @wraps(f)

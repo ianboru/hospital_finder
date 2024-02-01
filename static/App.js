@@ -9,7 +9,6 @@ import PlaceDetail from "./components/PlaceDetail";
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
-  console.log("places data", placesData)
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)

@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from functools import wraps
 from time import time
+import numpy as np
 from hospital_finder.settings import DATA_DIR
 
 
@@ -25,7 +26,7 @@ def load_mrsa_data():
 
 def load_summary_metric(metric_name):
     data_path = os.path.join(DATA_DIR, f'{metric_name}_summary_metrics.csv')
-    metric = pd.read_csv(data_path)
+    metric = pd.read_csv(data_path).replace(np.nan,None)
     return metric
 
 def timeit(f, print_=True):

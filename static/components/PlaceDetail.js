@@ -4,14 +4,18 @@ import { getHCAHPSStars, getHaiStars } from '../utils';
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
     const detailedExperienceMetrics = {
-      "Nurse commication" : 5,
-      "Durse commication" : 5,
+      "Nurse communication" : 5,
+      "Doctor communication" : 5,
       "Staff Responsiveness" : 3,
-      "Medicine Communication" : 1,
-      "Discharge Information" : 2
+      "Communication about medicines" : 1,
+      "Discharge information" : 2,
+      "Care transition" : 4,
+      "Cleanliness" : 5,
+      "Quietness" : 3,
     }
+
     const detailedExperienceMetricStars = Object.keys(detailedExperienceMetrics).map((metricName)=>{
-      const metricValue = detailedExperienceMetrics[metricName]
+      const metricValue = selectedPlace[metricName]
       return(
         <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricName}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHCAHPSStars(metricValue)}</span> </div>
       )
@@ -23,21 +27,28 @@ const PlaceDetail = (props) => {
             <div>{selectedPlace.name}</div>
             <div>{selectedPlace.formatted_address}</div>
             {
-                selectedPlace['Infection Rating'] ?
+              selectedPlace['Summary'] ?
+              <div>
                 <div>
-                  <div>
-                    <b>Patient Summary:</b> <span style={{color:"#fdcc0d",}}>{getHCAHPSStars(selectedPlace['Summary'])}</span>
-                  </div>
-                  <div style={{marginLeft : 15}}>
-                    {detailedExperienceMetricStars}
-                  </div>
-                </div> : <></>
-              }
-              {
-                selectedPlace['hcahps relative mean'] ? <div>
-                  <b>Experience: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
-                </div> : <></>
-              }
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary'])}</span></b>
+                </div>
+                <div style={{marginLeft : 15}}>
+                  {detailedExperienceMetricStars}
+                </div>
+              </div> : <></>
+            }
+            {
+              selectedPlace['Infection Rating'] ?
+              <div>
+                <div>
+                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiStars(selectedPlace['Infection Rating'])}</span>
+                </div>
+                <div style={{marginLeft : 15}}>
+                  {/* Put infection details here */}
+                </div>
+              </div> : <></>
+            }
+
           </div>
     )
 }

@@ -13,33 +13,33 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         selectedPlace = {}
     }
     if ( placesData && placesData.results){
-      //sort by existence of cms metrics 
+      //sort by existence of cms metrics
       placesData.results = placesData.results.sort(function(left, right) {
-        const leftHasCMSMetric = left['hai relative mean']||left['hai relative mean'] === 0||left['hcahps relative mean']||left['hcahps relative mean'] === 0
-        const rightHasCMSMetric = right['hai relative mean']||right['hai relative mean'] === 0||right['hcahps relative mean']||right['hcahps relative mean'] === 0
+        const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary']||left['Summary'] === 0
+        const rightHasCMSMetric = right['Infection Rating']||right['Infection Rating'] === 0||right['Summary']||right['Summary'] === 0
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
     const placeTiles = placesData.results ? placesData.results.map((place, i)=>{
-      const selectedPlaceStyle = {...placeTileStyles} 
+      const selectedPlaceStyle = {...placeTileStyles}
       if(place.name == selectedPlace.name){
         selectedPlaceStyle.border = "2px solid black"
       }
       return (
-        <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}> 
+        <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
             <div style={{color : "black"}}><b>{place.name}</b></div>
             <div>{place.formatted_address}</div>
             <div>{place.phone_number}</div>
             {
-              place['hai relative mean']||place['hai relative mean'] === 0 ? 
+              place['Infection Rating']||place['Infection Rating'] === 0 ?
                 <div>
-                  <b>Safety: <span style={{color:"#fdcc0d"}}>{getHaiStars(place['hai relative mean'])}</span></b>
+                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiStars(place['Infection Rating'])}</span></b>
                 </div> : <></>
             }
             {
-              place['hcahps relative mean']||place['hcahps relative mean'] === 0 ? 
+              place['Summary']||place['Summary'] === 0 ?
                 <div>
-                  <b>Experience: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['hcahps relative mean'])}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary'])}</span></b>
                 </div> : <></>
             }
         </div>

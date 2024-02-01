@@ -9,18 +9,18 @@ const PlaceDetail = (props) => {
             <div>{selectedPlace.name}</div>
             <div>{selectedPlace.formatted_address}</div>
             {
-                selectedPlace['hai relative mean'] ? 
+                selectedPlace['Infection Rating'] ?
                 <div>
-                  <b>Safety: <span style={{color:"#fdcc0d"}}>{getHaiStars(selectedPlace['hai relative mean'])}</span></b>
+                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiStars(selectedPlace['Infection Rating'])}</span></b>
                 </div> : <></>
               }
               {
-                selectedPlace['hcahps relative mean'] ? <div>
-                  <b>Experience: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['hcahps relative mean'])}</span></b>
+                selectedPlace['Summary'] ? <div>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary'])}</span></b>
                 </div> : <></>
               }
-          </div> 
+          </div>
     )
-} 
+}
 
 export default PlaceDetail

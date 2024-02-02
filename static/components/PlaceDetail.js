@@ -71,7 +71,7 @@ const PlaceDetail = (props) => {
                 </div>
               </div> : <></>
             }
-          </div>
+       </div>
     )
 }
 

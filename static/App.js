@@ -144,6 +144,7 @@ function App() {
       console.log("new center target", newCenter.lng() )
       onSearchSubmit(newCenter)
     }
+
     //priority to center the map: selected place, first result in google maps result, current gps location
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
         firstLocationCenter : currentGPSLocation

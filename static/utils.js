@@ -1,6 +1,6 @@
 const filledStarUnicode = "\u2605"
 const empyStarUnicode = "\u2606"
-const getHaiStars = (relativeMeanHai) => {
+const getHaiStars = (relativeMeanHai,maxCount=5) => {
     let starCount = 0
     // switch (true){
     //   case relativeMeanHai < -.5:
@@ -24,13 +24,13 @@ const getHaiStars = (relativeMeanHai) => {
     if (starCount === null){
         // TODO: Handle null values
     }
-    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(5 - starCount)
+    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
 }
-const getHCAHPSStars = (starCount) => {
+const getHCAHPSStars = (starCount, maxCount=5) => {
     if (starCount === null){
         // TODO: Handle null values
     }
-    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(5 - starCount)
+    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
 }
 
 

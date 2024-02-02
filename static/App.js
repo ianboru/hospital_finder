@@ -9,7 +9,6 @@ import haversine from 'haversine-distance'
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
-  console.log("places data", placesData)
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
@@ -28,7 +27,6 @@ function App() {
     setSearchTerm(e.target.value)
   }
 
-
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
       setCurrentGPSLocation({
@@ -40,7 +38,6 @@ function App() {
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
-    console.log("values" , newCenter, initialSearchParam, searchTerm)
     console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
     if(newCenter.lng){
@@ -83,7 +80,7 @@ function App() {
     const firstResult = (placesData.results && placesData.results[0].geometry.location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
-    console.log("first locatoin", firstLocation)
+    console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const selectedPlaceCenter = {
@@ -174,8 +171,6 @@ function App() {
                   const newCenter = map.getCenter()
                   onSearchSubmit(newCenter, windowRadius)
                 }
-
-
               }}
             >
             { markers ? markers : <></> }
@@ -206,9 +201,7 @@ function App() {
         }
         <Map> </Map>
 
-
       </div>
-
 
     </div>
   );

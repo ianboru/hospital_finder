@@ -6,7 +6,7 @@ Before we get started you're gonna need a couple things.
 
 ## Software needed for development
 
-### Python 
+### Python (3.11+)
 - https://www.python.org/downloads/
 
 ### Virtual Env
@@ -18,29 +18,36 @@ brew install viritualenv
 - https://nodejs.org/en/download/
 we use version v21.2.0
 
+Check the node version is v21.2.0, and install packages
+```
+node --version
+npm install
+```
+
+On linux if you get SSL errors you may need to enable legacy OpenSSL
+
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
 ## Install dependencies
 Navigate to the root of the project and beging running the following commands:
 
-For the Django project run anytime you open a new terminal 
+For the Django project run anytime you open a new terminal
 ```
 python3 -m venv env // creates vm for project
-source ./bin/activate
+source env/bin/activate
 ```
 
+Inside the virtual environment (env), install dependancies
 ```
-python3  -m pip install django
-python3  -m pip install django-admin
-python3  -m pip install --upgrade pip
-python3  -m pip install numpy
-python3  -m pip install pandas
-python3  -m pip install plotly
-
+pip install -r requirements.txt
 ```
 ## Running the project
 
 ```
-source ./bin/activate
-python3 manage.py runserver        
+source env/bin/activate
+python3 manage.py runserver
+# In a seperate terminal run npm start
 npm start
 ```
 
@@ -48,10 +55,10 @@ the app runs on http://localhost:8000/
 
 ## Intializing Data for project
 
-navigate to this link
+navigate to this link, copy the csvs to the data directory
 
  - https://drive.google.com/drive/folders/1ifsqVr1YtBeILiAwf38hdpl8DtNlGdL1
 
-python manage.py startapp core 
-python manage.py migrate 
-python manage.py createsuperuser
+```
+python manage.py migrate
+```

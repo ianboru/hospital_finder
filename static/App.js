@@ -26,11 +26,11 @@ function App() {
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
-  
+
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
-      setCurrentGPSLocation({ 
-        lat: position.coords.latitude, 
+      setCurrentGPSLocation({
+        lat: position.coords.latitude,
         lng: position.coords.longitude
       })
     })
@@ -38,7 +38,7 @@ function App() {
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
-    console.log("valuies" , newCenter, initialSearchParam, searchTerm)
+    console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
     if(newCenter.lng){
       url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
@@ -54,19 +54,23 @@ function App() {
     if(!place){
       return gray
     }
-    const has_hai_relative_mean = place['hai relative mean']||place['hai relative mean'] === 0
-    const has_hcahps_relative_mean = place['hcahps relative mean']||place['hcahps relative mean'] === 0
+    const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
+    const has_patient_summary = place['Summary star rating']||place['Summary star rating'] === 0
     let marker_metric = null
     const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
     const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
 
-    if(has_hai_relative_mean && has_hcahps_relative_mean){
-      marker_metric = place['hai relative mean'] + place['hcahps relative mean']
+    if(has_infection_rating && has_patient_summary){
+      marker_metric = place['Infection Rating'] + place['Summary star rating']
       return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
-    }else if(has_hai_relative_mean){
-      return numberToRGB(place['hai relative mean'],metric_ranges['min_hai'],metric_ranges['max_hai'])
-    }else if(has_hcahps_relative_mean){
-      return numberToRGB(place['hcahps relative mean'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
+    }else if(has_infection_rating){
+      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
+    }else if(has_patient_summary){
+      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
+    }else if(has_infection_rating){
+      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
+    }else if(has_patient_summary){
+      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
     }else{
       return gray
     }
@@ -76,7 +80,7 @@ function App() {
     const firstResult = (placesData.results && placesData.results[0].geometry.location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
-    console.log("first locatoin", firstLocation)
+    console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const selectedPlaceCenter = {
@@ -89,7 +93,7 @@ function App() {
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
       return (
-        <Marker 
+        <Marker
           onLoad={(marker) => {
             const customIcon = (opts) => Object.assign({
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
@@ -129,7 +133,8 @@ function App() {
       map.setZoom(10)
       setMap(map)
     }, [])
-  
+
+
     const onUnmount = React.useCallback(function callback(map) {
       setMap(null)
     }, [])
@@ -140,10 +145,9 @@ function App() {
       onSearchSubmit(newCenter)
     }
 
-    
     //priority to center the map: selected place, first result in google maps result, current gps location
-    const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ? 
-        firstLocationCenter : currentGPSLocation 
+    const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
+        firstLocationCenter : currentGPSLocation
 
     console.log("current center", curCenter)
     return isLoaded && curCenter ? (
@@ -168,7 +172,6 @@ function App() {
                   const newCenter = map.getCenter()
                   onSearchSubmit(newCenter, windowRadius)
                 }
-               
               }}
             >
             { markers ? markers : <></> }
@@ -198,9 +201,9 @@ function App() {
           selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
         }
         <Map> </Map>
-        
+
       </div>
-      
+
     </div>
   );
 }

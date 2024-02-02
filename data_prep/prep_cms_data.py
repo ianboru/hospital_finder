@@ -36,7 +36,7 @@ def load_hcahps_data(export_path, **kwargs):
                     base_df = df[df['HCAHPS Question'] == q].drop(columns=['HCAHPS Question','Patient Survey Star Rating'])
                 df_ratings = df[df['HCAHPS Question'] == q]['Patient Survey Star Rating']
                 # Summary statistics
-                q = q.replace('star rating',"").replace('-','').strip()
+                # q = q.replace('star rating',"").replace('-','').strip()
                 questions_with_star_ratings.append((
                     q,
                     df_ratings.mean(),

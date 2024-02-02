@@ -1,4 +1,4 @@
-Facility ID,Address,Facility Name,Nurse communication,Doctor communication,Staff responsiveness,Communication about medicines,Discharge information,Care transition,Cleanliness,Quietness,Overall hospital rating,Recommend hospital,Summary
+Facility ID,Address,Facility Name,Nurse communication - star rating,Doctor communication - star rating,Staff responsiveness - star rating,Communication about medicines - star rating,Discharge information - star rating,Care transition - star rating,Cleanliness - star rating,Quietness - star rating,Overall hospital rating - star rating,Recommend hospital - star rating,Summary star rating
 010001,"1108 ROSS CLARK CIRCLE, DOTHAN, AL 36301",SOUTHEAST HEALTH MEDICAL CENTER,3,3,2,4,4,4,3,3,4,4,3
 010005,"2505 U S HIGHWAY 431 NORTH, BOAZ, AL 35957",MARSHALL MEDICAL CENTERS,3,4,1,3,4,3,2,4,3,3,3
 010006,"1701 VETERANS DRIVE, FLORENCE, AL 35630",NORTH ALABAMA MEDICAL CENTER,3,3,2,2,3,2,1,4,2,2,2

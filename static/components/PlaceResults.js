@@ -15,8 +15,8 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     if ( placesData && placesData.results){
       //sort by existence of cms metrics
       placesData.results = placesData.results.sort(function(left, right) {
-        const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary']||left['Summary'] === 0
-        const rightHasCMSMetric = right['Infection Rating']||right['Infection Rating'] === 0||right['Summary']||right['Summary'] === 0
+        const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary star rating']||left['Summary star rating'] === 0
+        const rightHasCMSMetric = right['Infection Rating']||right['Infection Rating'] === 0||right['Summary star rating']||right['Summary star rating'] === 0
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
@@ -37,9 +37,9 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
                 </div> : <></>
             }
             {
-              place['Summary']||place['Summary'] === 0 ?
+              place['Summary star rating']||place['Summary star rating'] === 0 ?
                 <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary'])}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'])}</span></b>
                 </div> : <></>
             }
         </div>

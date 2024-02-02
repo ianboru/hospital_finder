@@ -32,14 +32,14 @@ def standardize_cms_name(cms_name_df):
     return cms_name_df.str.lower().replace('-', " ").replace('/', " ")
 
 @timeit
-def load_data():
+def load_summary_metrics():
     """ Initialize the data for the app"""
     all_metrics = load_summary_metric('all')
     all_metrics["Facility Name"] = standardize_cms_name(all_metrics["Facility Name"])
     all_metrics["Address"] = all_metrics["Address"].str.lower()
     return all_metrics
 
-summary_metrics = load_data()
+summary_metrics = load_summary_metrics()
 
 @timeit
 def index(request, path=None):
@@ -94,6 +94,7 @@ def add_metrics_to_place(metric_df, place_result):
 
 @timeit
 def find_name_match(df, name):
+    """ Tries to find matching data for a place by facility name """
     name = name.lower().strip()
     res = df[df['Facility Name'].str.contains(name,case=False)]
     if not res.empty:
@@ -101,7 +102,7 @@ def find_name_match(df, name):
         print(f"name match: '{name}' with '{match_['Facility Name']}'")
         return match_
     else:
-        # Try closest match
+        # Try to find a close match if there was no exact match
         names = dict(zip(df['Facility Name'].values,df['Facility Name'].index))
         matches = get_close_matches(name, names.keys(), n=1, cutoff=0.9)
         if matches:
@@ -112,7 +113,7 @@ def find_name_match(df, name):
 
 @timeit
 def find_address_match(cms_metric_df, place_address):
-
+    """ Tries to find matching data for a place by address """
     place_address = format_address(place_address)
 
     # Dict look ups are faster than iterating through the df
@@ -123,8 +124,8 @@ def find_address_match(cms_metric_df, place_address):
         print(f"address match: '{place_address}' with '{match_['Address']}'")
         return match_
     else:
-        # Try closest match
-        matches = get_close_matches(place_address, addresses.keys(), n=1, cutoff=0.8)
+        # Try to find a close match if there was no exact match
+        matches = get_close_matches(place_address, addresses.keys(), n=1, cutoff=0.9)
         if matches:
             match_ = cms_metric_df.loc[addresses[matches[0]],:]
             print(f"address match: '{place_address}' with '{match_['Address']}'")
@@ -136,6 +137,7 @@ def find_address_match(cms_metric_df, place_address):
 @timeit
 def format_address(place_address):
     print("place_address preformat: ", place_address)
+    # Google map returns addresses with abbreviations, the data set has full names
     place_address = place_address.lower().replace("-", " ").replace("/", " ")
     place_address = place_address.replace(' ave ', ' avenue ')
     place_address = place_address.replace(' rd ', ' road ')
@@ -157,7 +159,6 @@ def format_address(place_address):
     place_address = place_address.replace(' hwy ', ' highway ')
     place_address = place_address.strip()
     place_address = place_address.replace(", united states", "")
-
 
     split_address = place_address.split(" ")
     final_address = []

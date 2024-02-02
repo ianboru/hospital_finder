@@ -27,10 +27,10 @@ const PlaceDetail = (props) => {
             <div>{selectedPlace.name}</div>
             <div>{selectedPlace.formatted_address}</div>
             {
-              selectedPlace['Summary'] ?
+              selectedPlace['Summary star rating star rating'] ?
               <div>
                 <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary'])}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary star rating star rating'])}</span></b>
                 </div>
                 <div style={{marginLeft : 15}}>
                   {detailedExperienceMetricStars}

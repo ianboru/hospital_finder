@@ -33,8 +33,6 @@ function App() {
     navigator.geolocation.getCurrentPosition((position)=>{
       setCurrentGPSLocation({
         lat: position.coords.latitude,
-      setCurrentGPSLocation({
-        lat: position.coords.latitude,
         lng: position.coords.longitude
       })
     })
@@ -60,26 +58,22 @@ function App() {
       return gray
     }
     const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
-    const has_patient_summary = place['Summary']||place['Summary'] === 0
-    const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
-    const has_patient_summary = place['Summary']||place['Summary'] === 0
+    const has_patient_summary = place['Summary star rating']||place['Summary star rating'] === 0
     let marker_metric = null
     const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
     const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
 
     if(has_infection_rating && has_patient_summary){
-      marker_metric = place['Infection Rating'] + place['Summary']
-    if(has_infection_rating && has_patient_summary){
-      marker_metric = place['Infection Rating'] + place['Summary']
+      marker_metric = place['Infection Rating'] + place['Summary star rating']
       return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
     }else if(has_infection_rating){
       return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
     }else if(has_patient_summary){
-      return numberToRGB(place['Summary'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
+      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
     }else if(has_infection_rating){
       return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
     }else if(has_patient_summary){
-      return numberToRGB(place['Summary'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
+      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
     }else{
       return gray
     }
@@ -102,7 +96,6 @@ function App() {
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
       return (
-        <Marker
         <Marker
           onLoad={(marker) => {
             const customIcon = (opts) => Object.assign({
@@ -155,8 +148,6 @@ function App() {
       onSearchSubmit(newCenter)
     }
     //priority to center the map: selected place, first result in google maps result, current gps location
-    const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
-        firstLocationCenter : currentGPSLocation
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
         firstLocationCenter : currentGPSLocation
 

@@ -21,9 +21,15 @@ const getHaiStars = (relativeMeanHai) => {
     // }
     starCount = relativeMeanHai
 
+    if (starCount === null){
+        // TODO: Handle null values
+    }
     return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(5 - starCount)
 }
 const getHCAHPSStars = (starCount) => {
+    if (starCount === null){
+        // TODO: Handle null values
+    }
     return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(5 - starCount)
 }
 

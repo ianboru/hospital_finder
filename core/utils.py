@@ -3,6 +3,7 @@ import os
 from functools import wraps
 from time import time
 from hospital_finder.settings import DATA_DIR
+import numpy as np
 
 
 def load_hospital_data():
@@ -19,14 +20,13 @@ def load_hospital_data():
 def load_mrsa_data():
     #need to rename this variable
     data_path_mrsa_file = os.path.join(DATA_DIR, 'mrsa_bsi_odp_2022.csv')
-    data_path_mrsa_file = os.path.join(DATA_DIR, 'mrsa_bsi_odp_2022.csv')
     mrsa_metrics = pd.read_csv(data_path_mrsa_file, encoding='latin1')
     mrsa_metrics = mrsa_metrics.drop_duplicates(subset=['Facility_Name'])
     return mrsa_metrics
 
 def load_summary_metric(metric_name):
     data_path = os.path.join(DATA_DIR, f'{metric_name}_summary_metrics.csv')
-    metric = pd.read_csv(data_path)
+    metric = pd.read_csv(data_path).replace(np.nan, None)
     return metric
 
 def timeit(f, print_=True):

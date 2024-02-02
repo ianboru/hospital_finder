@@ -66,7 +66,7 @@ def index(request, path=None):
                 place_result["phone_number"] = place_detail["formatted_phone_number"]
             place_result = add_metrics_to_place(summary_metrics, place_result)
     context = {
-        'google_places_data' : json.dumps(places_results),
+        'google_places_data' : places_results,
         'metric_ranges' : {
             'max_hai' : 5,
             'min_hai' : 1,

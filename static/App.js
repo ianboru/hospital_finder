@@ -1,34 +1,49 @@
-import ReactDOM from "react-dom"
-import React, { useEffect, Component } from 'react'
-import { numberToRGB } from "./colorUtils";
-import PlaceResults from "./components/PlaceResults";
-
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import PlaceDetail from "./components/PlaceDetail";
 import haversine from 'haversine-distance'
-function App() {
+import React, { useEffect } from 'react'
+import ReactDOM from 'react-dom'
+import PlaceDetail from './components/PlaceDetail'
+import PlaceResults from './components/PlaceResults'
+import TitleBanner from './components/TitleBanner'
 
-  const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
-  const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
+import { numberToRGB } from './colorUtils'
+
+function App () {
+  const placesData = JSON.parse(
+    document.getElementById('google_places_data').textContent
+  )
+
+  const metricRanges = JSON.parse(
+    document.getElementById('metric_ranges').textContent
+  )
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
   const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
-  const initialSearchParam = url.searchParams.get("search")
-  const initialLocationParam = url.searchParams.get("location")
-  const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
-  const initialLocation = initialLocationSplit ?  {"lng" : parseFloat(initialLocationSplit[0]), "lat" : parseFloat(initialLocationSplit[1])} : {}
-  console.log("initial",  url.searchParams, initialSearchParam)
-  const initialZoomRadius =  url.searchParams.get("radius")
+  const initialSearchParam = url.searchParams.get('search')
+  const initialLocationParam = url.searchParams.get('location')
+  const initialLocationSplit = initialLocationParam
+    ? initialLocationParam.split(',')
+    : []
+  const initialLocation = initialLocationSplit
+    ? {
+        lng: parseFloat(initialLocationSplit[0]),
+        lat: parseFloat(initialLocationSplit[1])
+      }
+    : {}
+  console.log('initial', url.searchParams, initialSearchParam)
+  const initialZoomRadius = url.searchParams.get('radius')
 
-  const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
+  const [searchTerm, setSearchTerm] = React.useState(
+    initialSearchParam ? initialSearchParam : ''
+  )
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
-  const onSearchInputChange = (e) => {
+  const onSearchInputChange = e => {
     setSearchTerm(e.target.value)
   }
 
-  useEffect(()=>{
-    navigator.geolocation.getCurrentPosition((position)=>{
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(position => {
       setCurrentGPSLocation({
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -36,176 +51,243 @@ function App() {
     })
   }, [])
 
-  const onSearchSubmit = (newCenter, newRadius=null) => {
+  const onSearchSubmit = (newCenter, newRadius = null) => {
     let url = new URL(window.location.origin + window.location.pathname)
-    console.log("values" , newCenter, initialSearchParam, searchTerm)
-    url.searchParams.set("search", searchTerm)
-    if(newCenter.lng){
-      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
+    console.log('values', newCenter, initialSearchParam, searchTerm)
+    url.searchParams.set('search', searchTerm)
+    if (newCenter.lng) {
+      url.searchParams.set('location', `${newCenter.lng()},${newCenter.lat()}`)
     }
-    if(newRadius){
-      url.searchParams.set("radius", `${newRadius}`)
+    if (newRadius) {
+      url.searchParams.set('radius', `${newRadius}`)
     }
     window.location.href = url
   }
 
   const getMarkerColor = (place, metric_ranges) => {
-    const gray = "rgb(128,128,128)"
-    if(!place){
+    const gray = 'rgb(128,128,128)'
+    if (!place) {
       return gray
     }
-    const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
-    const has_patient_summary = place['Summary star rating']||place['Summary star rating'] === 0
+    const has_infection_rating =
+      place['Infection Rating'] || place['Infection Rating'] === 0
+    const has_patient_summary =
+      place['Summary star rating'] || place['Summary star rating'] === 0
     let marker_metric = null
-    const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
-    const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
+    const min_combined_metric =
+      metric_ranges['min_hai'] + metric_ranges['min_hcahps']
+    const max_combined_metric =
+      metric_ranges['max_hai'] + metric_ranges['max_hcahps']
 
-    if(has_infection_rating && has_patient_summary){
+    if (has_infection_rating && has_patient_summary) {
       marker_metric = place['Infection Rating'] + place['Summary star rating']
-      return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
-    }else if(has_infection_rating){
-      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
-    }else if(has_patient_summary){
-      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
-    }else if(has_infection_rating){
-      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
-    }else if(has_patient_summary){
-      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
-    }else{
+      return numberToRGB(
+        marker_metric,
+        min_combined_metric,
+        max_combined_metric
+      )
+    } else if (has_infection_rating) {
+      return numberToRGB(
+        place['Infection Rating'],
+        metric_ranges['min_hai'],
+        metric_ranges['max_hai']
+      )
+    } else if (has_patient_summary) {
+      return numberToRGB(
+        place['Summary star rating'],
+        metric_ranges['min_hcahps'],
+        metric_ranges['max_hcahps']
+      )
+    } else if (has_infection_rating) {
+      return numberToRGB(
+        place['Infection Rating'],
+        metric_ranges['min_hai'],
+        metric_ranges['max_hai']
+      )
+    } else if (has_patient_summary) {
+      return numberToRGB(
+        place['Summary star rating'],
+        metric_ranges['min_hcahps'],
+        metric_ranges['max_hcahps']
+      )
+    } else {
       return gray
     }
   }
 
   const Map = () => {
-    const firstResult = (placesData.results && placesData.results[0].geometry.location) || {}
+    const firstResult =
+      (placesData.results && placesData.results[0].geometry.location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
-    const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
-    console.log("first location", firstLocation)
-    const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
+    const firstLocation = initialLocation['lat'] ? initialLocation : firstResult
+    console.log('first location', firstLocation)
+    const firstLocationCenter = {
+      lat: firstLocation.lat,
+      lng: firstLocation.lng
+    } //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const selectedPlaceCenter = {
-      lat : selectedPlace ? selectedPlace.geometry.location.lat : null,
-      lng : selectedPlace ? selectedPlace.geometry.location.lng : null
+      lat: selectedPlace ? selectedPlace.geometry.location.lat : null,
+      lng: selectedPlace ? selectedPlace.geometry.location.lng : null
     }
 
-    const markers = placesData.results && placesData.results.map((place, index)=>{
-      const location = place.geometry.location
-      const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      const markerColor = getMarkerColor(place, metricRanges)
-      return (
-        <Marker
-          onLoad={(marker) => {
-            const customIcon = (opts) => Object.assign({
-              path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: markerColor,
-              fillOpacity: 1,
-              strokeColor: '#000',
-              strokeWeight: 1,
-              scale: 1,
-            }, opts);
+    const markers =
+      placesData.results &&
+      placesData.results.map((place, index) => {
+        const location = place.geometry.location
+        const latLng = { lat: location.lat, lng: location.lng } //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
+        const markerColor = getMarkerColor(place, metricRanges)
+        return (
+          <Marker
+            onLoad={marker => {
+              const customIcon = opts =>
+                Object.assign(
+                  {
+                    path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+                    fillColor: markerColor,
+                    fillOpacity: 1,
+                    strokeColor: '#000',
+                    strokeWeight: 1,
+                    scale: 1
+                  },
+                  opts
+                )
 
-            marker.setIcon(customIcon({
-              fillColor: markerColor,
-              strokeColor: 'white'
-            }));
-          }}
-          position={latLng}
-          onClick={()=>{
-            setSelectedPlace(place)
-          }}
-        />
-      )
-    })
+              marker.setIcon(
+                customIcon({
+                  fillColor: markerColor,
+                  strokeColor: 'white'
+                })
+              )
+            }}
+            position={latLng}
+            onClick={() => {
+              setSelectedPlace(place)
+            }}
+          />
+        )
+      })
 
     const { isLoaded } = useJsApiLoader({
       id: 'google-map-script',
-      googleMapsApiKey: "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
+      googleMapsApiKey: 'AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o'
     })
+
     const mapContainerStyle = {
-      margin : "auto",
-      width: "100%",
-      height: "100%"
-    };
+      margin: 'auto',
+      width: '100%',
+      height: '100%'
+    }
+
     const [map, setMap] = React.useState(null)
 
-    const onLoad = React.useCallback(function callback(map) {
+    const onLoad = React.useCallback(function callback (map) {
       // This is just an example of getting and using the map instance!!! don't just blindly copy!
       map.setZoom(10)
       setMap(map)
     }, [])
 
-
-    const onUnmount = React.useCallback(function callback(map) {
+    const onUnmount = React.useCallback(function callback (map) {
       setMap(null)
     }, [])
 
     const onDragEnd = () => {
       const newCenter = map.getCenter()
-      console.log("new center target", newCenter.lng() )
+      console.log('new center target', newCenter.lng())
       onSearchSubmit(newCenter)
     }
 
     //priority to center the map: selected place, first result in google maps result, current gps location
-    const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
-        firstLocationCenter : currentGPSLocation
+    const curCenter = selectedPlace
+      ? selectedPlaceCenter
+      : firstLocationCenter && firstLocationCenter.lat
+      ? firstLocationCenter
+      : currentGPSLocation
 
-    console.log("current center", curCenter)
+    console.log('current center', curCenter)
+
     return isLoaded && curCenter ? (
-        <div style={{alignSelf : 'flex-end', width : "600px", height : "800px"}}>
-            <GoogleMap
-              mapContainerStyle={mapContainerStyle}
-              center={curCenter}
-              zoom={.85}
-              onLoad={onLoad}
-              onUnmount={onUnmount}
-              onDragEnd={onDragEnd}
-              onZoomChanged={()=>{
-                if(map){
-                  const bounds = map.getBounds()
-                  const neCornerLatLng = bounds.getNorthEast()
-                  const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }
-                  const swCornerLatLng = bounds.getSouthWest()
-                  const swCornerLocation = {'lat': swCornerLatLng.lat(), 'lng': swCornerLatLng.lng(), }
+      <div style={{ alignSelf: 'flex-end', width: '600px', height: '800px' }}>
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={curCenter}
+          zoom={0.85}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+          onDragEnd={onDragEnd}
+          onZoomChanged={() => {
+            if (map) {
+              const bounds = map.getBounds()
+              const neCornerLatLng = bounds.getNorthEast()
+              const neCornerLocation = {
+                lat: neCornerLatLng.lat(),
+                lng: neCornerLatLng.lng()
+              }
+              const swCornerLatLng = bounds.getSouthWest()
+              const swCornerLocation = {
+                lat: swCornerLatLng.lat(),
+                lng: swCornerLatLng.lng()
+              }
 
-                  const windowRadius = haversine(neCornerLocation, swCornerLocation)/2
-                  setZoomRadius(windowRadius)
-                  const newCenter = map.getCenter()
-                  onSearchSubmit(newCenter, windowRadius)
-                }
-              }}
-            >
-            { markers ? markers : <></> }
-          </GoogleMap>
-        </div>
-    ) : <div style={{fontWeight : "bold", marginTop : "15px"}}>Loading Map...</div>
+              const windowRadius =
+                haversine(neCornerLocation, swCornerLocation) / 2
+              setZoomRadius(windowRadius)
+              const newCenter = map.getCenter()
+              onSearchSubmit(newCenter, windowRadius)
+            }
+          }}
+        >
+          {markers ? markers : <></>}
+        </GoogleMap>
+      </div>
+    ) : (
+      <div style={{ fontWeight: 'bold', marginTop: '15px' }}>
+        Loading Map...
+      </div>
+    )
   }
+
   const outerStyles = {
-    display : "flex",
-    alignContent : "flex-start"
+    display: 'flex',
+    alignContent: 'flex-start'
   }
+
   const hasPlaceResults = placesData.results && placesData.results.length > 0
+
   return (
-    <div className="App">
-      <div style={{marginBottom : 15}}>
-        <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange} />
-        <button onClick={onSearchSubmit} style={{marginLeft : 10}}>Search</button>
+    <div className='App'>
+      <TitleBanner />
+      <div style={{ marginBottom: 15 }}>
+        <input
+          style={{ width: 350, height: 40, borderRadius: 5, padding: 5 }}
+          placeholder={'Search care provider types e.g. hospital, clinic, etc'}
+          value={searchTerm}
+          onChange={onSearchInputChange}
+        />
+
+        <button onClick={onSearchSubmit} style={{ marginLeft: 10 }}>
+          Search
+        </button>
       </div>
+
       <div style={outerStyles}>
-        {
-          hasPlaceResults ? <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
+        {hasPlaceResults ? (
+          <div style={{ maxHeight: '800px', overflowY: 'scroll' }}>
             <h1>Map results</h1>
-            <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
-          </div> : <></>
-        }
-        {
-          selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
-        }
+            <PlaceResults
+              placesData={placesData}
+              selectedPlace={selectedPlace}
+              setSelectedPlace={setSelectedPlace}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+        {selectedPlace ? <PlaceDetail selectedPlace={selectedPlace} /> : <></>}
         <Map> </Map>
-
       </div>
-
     </div>
-  );
+  )
 }
 
-ReactDOM.render(<App />,document.getElementById("root"))
+ReactDOM.render(<App />, document.getElementById('root'))

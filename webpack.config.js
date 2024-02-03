@@ -1,60 +1,55 @@
-const webpack = require("webpack")
-const LiveReloadPlugin = require("webpack-livereload-plugin")
-const CopyPlugin = require("copy-webpack-plugin")
-const WebpackGlobEntriesPlugin = require("webpack-glob-entries-plugin")
-
+const LiveReloadPlugin = require('webpack-livereload-plugin')
+const WebpackGlobEntriesPlugin = require('webpack-glob-entries-plugin')
 
 const watcher = new WebpackGlobEntriesPlugin([
-  "./static/*.js",
-  "./static/css/*.css",
+  './static/*.js',
+  './static/css/*.css'
 ])
-
 
 module.exports = {
   entry: watcher.entries(),
   output: {
-    path: __dirname + "/dist",
+    path: __dirname + '/dist'
   },
-  stats: "minimal",
+  stats: 'minimal',
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
-        },
+          loader: 'babel-loader'
+        }
       },
       {
         test: /\.css$/,
         use: [
           {
-            loader: "style-loader",
+            loader: 'style-loader'
           },
           {
-            loader: "css-loader",
+            loader: 'css-loader'
           },
           {
-            loader: "postcss-loader",
-          },
-        ],
-      }, {
+            loader: 'postcss-loader'
+          }
+        ]
+      },
+      {
         test: /\.svg$/,
         use: [
           {
-            loader: "babel-loader",
+            loader: 'babel-loader'
           },
           {
-            loader: "react-svg-loader",
+            loader: 'react-svg-loader',
             options: {
-              jsx: true,
-            },
-          },
-        ],
-      },
-    ],
+              jsx: true
+            }
+          }
+        ]
+      }
+    ]
   },
-  plugins: [
-    new LiveReloadPlugin(),
-  ],
+  plugins: [new LiveReloadPlugin()]
 }

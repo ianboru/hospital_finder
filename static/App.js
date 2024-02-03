@@ -57,16 +57,13 @@ function App() {
     const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
     const has_patient_summary = place['Summary star rating']||place['Summary star rating'] === 0
     let marker_metric = null
-    const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
-    const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
+    // Use average of the two metrics
+    const min_combined_metric = (metric_ranges['min_hai'] + metric_ranges['min_hcahps'])/2
+    const max_combined_metric = (metric_ranges['max_hai'] + metric_ranges['max_hcahps'])/2
 
     if(has_infection_rating && has_patient_summary){
-      marker_metric = place['Infection Rating'] + place['Summary star rating']
+      marker_metric = (place['Infection Rating'] + place['Summary star rating'])/2
       return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
-    }else if(has_infection_rating){
-      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
-    }else if(has_patient_summary){
-      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
     }else if(has_infection_rating){
       return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
     }else if(has_patient_summary){

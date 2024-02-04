@@ -48,6 +48,8 @@ atlassian-ide-plugin.xml
 # Python #
 *.py[cod]
 *$py.class
+pyvenv.cfg
+bin/
 
 # Distribution / packaging
 .Python build/
@@ -68,6 +70,8 @@ wheels/
 *.egg
 *.manifest
 *.spec
+
+include/
 
 # Installer logs
 pip-log.txt

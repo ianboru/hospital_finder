@@ -6,6 +6,8 @@ import PlaceResults from "./components/PlaceResults";
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import PlaceDetail from "./components/PlaceDetail";
 import haversine from 'haversine-distance'
+import TitleBanner from './components/TitleBanner'
+
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
@@ -186,6 +188,7 @@ function App() {
   const hasPlaceResults = placesData.results && placesData.results.length > 0
   return (
     <div className="App">
+      <TitleBanner />
       <div style={{marginBottom : 15}}>
         <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange} />
         <button onClick={onSearchSubmit} style={{marginLeft : 10}}>Search</button>

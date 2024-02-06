@@ -1,30 +1,19 @@
+import React from 'react';
+
 const filledStarUnicode = "\u2605"
 const empyStarUnicode = "\u2606"
-const getHaiStars = (relativeMeanHai,maxCount=5) => {
-    let starCount = 0
-    // switch (true){
-    //   case relativeMeanHai < -.5:
-    //     starCount = 1
-    //     break
-    //   case relativeMeanHai >= -.5 && relativeMeanHai < 0:
-    //     starCount = 2
-    //     break
-    //   case relativeMeanHai == 0:
-    //     starCount = 3
-    //     break
-    //   case relativeMeanHai > 0 && relativeMeanHai < .5:
-    //     starCount = 4
-    //     break
-    //   case relativeMeanHai >= .5:
-    //     starCount = 5
-    //     break
-    // }
-    starCount = relativeMeanHai
-
-    if (starCount === null){
-        // TODO: Handle null values
+const getHaiEmoji = (starCount) => {
+    if(!starCount){
+        return ""
     }
-    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
+    switch (true){
+        case starCount < 3:
+            return (<span style={{color:"green"}}>😄 Better Than Average</span>)
+        case starCount == 3:
+            return (<span style={{color:"orange"}}>😐 Average</span>)
+        case starCount > 3:
+            return (<span style={{color:"red"}}>🤢 Worse Than Average</span>)
+    }
 }
 const getHCAHPSStars = (starCount, maxCount=5) => {
     if (starCount === null){
@@ -35,6 +24,6 @@ const getHCAHPSStars = (starCount, maxCount=5) => {
 
 
 export {
-    getHaiStars,
+    getHaiEmoji,
     getHCAHPSStars
 }

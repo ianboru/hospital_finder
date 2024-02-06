@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { getHaiStars, getHCAHPSStars } from '../utils';
+import { getHaiEmoji, getHCAHPSStars } from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log('placesData', placesData)
     const placeTileStyles = {
@@ -34,7 +34,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             {
               place['Infection Rating']||place['Infection Rating'] === 0 ?
                 <div>
-                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiStars(place['Infection Rating'])}</span></b>
+                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'])}</span></b>
                 </div> : <></>
             }
             {

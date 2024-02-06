@@ -78,7 +78,7 @@ function App() {
   }
 
   const Map = () => {
-    const firstResult = (placesData.results && placesData.results[0].geometry.location) || {}
+    const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].geometry.location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
@@ -89,7 +89,7 @@ function App() {
       lng : selectedPlace ? selectedPlace.geometry.location.lng : null
     }
 
-    const markers = placesData.results && placesData.results.map((place, index)=>{
+    const markers = placesData.results && placesData.results.length > 0 && placesData.results.map((place, index)=>{
       const location = place.geometry.location
       const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
@@ -184,7 +184,6 @@ function App() {
     display : "flex",
     alignContent : "flex-start"
   }
-  const hasPlaceResults = placesData.results && placesData.results.length > 0
   return (
     <div className="App">
       <TitleBanner />
@@ -200,12 +199,10 @@ function App() {
         </form>
       </div>
       <div style={outerStyles}>
-        {
-          hasPlaceResults ? <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
-            <h1>Map results</h1>
+          <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
+            <h1>Search results</h1>
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
-          </div> : <></>
-        }
+          </div>
         {
           selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
         }

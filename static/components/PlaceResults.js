@@ -13,7 +13,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     if(!selectedPlace){
         selectedPlace = {}
     }
-    if ( placesData && placesData.results){
+    if (placesData.results && placesData.results.length){
       //sort by existence of cms metrics
       placesData.results = placesData.results.sort(function(left, right) {
         const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary star rating']||left['Summary star rating'] === 0
@@ -21,7 +21,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
-    const placeTiles = placesData.results.length > 0 ? placesData.results.map((place, i)=>{
+    const placeTiles = (placesData.results && placesData.results.length) > 0 ? placesData.results.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles}
       if(place.name == selectedPlace.name){
         selectedPlaceStyle.border = "2px solid black"

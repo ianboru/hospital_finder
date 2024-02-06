@@ -42,6 +42,10 @@ def load_summary_metrics():
 summary_metrics = load_summary_metrics()
 
 @timeit
+def get_places(gmaps, gmaps_places_args, radius=10000):
+    return gmaps.places(**gmaps_places_args, radius=radius)
+
+@timeit
 def index(request, path=None):
     search_string = request.GET.get("search")
     location_string = request.GET.get("location")
@@ -58,13 +62,24 @@ def index(request, path=None):
     places_results = []
     if search_string:
         print("search args", gmaps_places_args)
-        places_results = gmaps.places(**gmaps_places_args, radius=radius_string or 10000)
+        places_results = get_places(gmaps, gmaps_places_args, radius=radius_string or 10000)
+        valid_results = []
         for place_result in places_results['results']:
-            place_detail = gmaps.place(place_id=place_result["reference"])
-            place_detail = place_detail["result"]
-            if "formatted_phone_number" in place_detail:
-                place_result["phone_number"] = place_detail["formatted_phone_number"]
-            place_result = add_metrics_to_place(summary_metrics, place_result)
+            valid_result = False
+            for t in set(place_result['types']):
+                if t in {"hospital", "health", "doctor", "pharmacy"}:
+                    valid_result = True
+                    break
+            if valid_result:
+                place_detail = gmaps.place(place_id=place_result["reference"])
+                place_detail = place_detail["result"]
+                if "formatted_phone_number" in place_detail:
+                    place_result["phone_number"] = place_detail["formatted_phone_number"]
+                place_result = add_metrics_to_place(summary_metrics, place_result)
+                valid_results.append(place_result)
+            else:
+                print(f"Skipping {place_result['name']} because it is not a valid type")
+        places_results['results'] = valid_results
     context = {
         'google_places_data' : places_results,
         'metric_ranges' : {

@@ -6,6 +6,8 @@ import PlaceResults from "./components/PlaceResults";
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import PlaceDetail from "./components/PlaceDetail";
 import haversine from 'haversine-distance'
+import TitleBanner from './components/TitleBanner'
+
 function App() {
 
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
@@ -40,11 +42,13 @@ function App() {
     let url = new URL(window.location.origin + window.location.pathname)
     console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
-    if(newCenter.lng){
-      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
-    }
-    if(newRadius){
-      url.searchParams.set("radius", `${newRadius}`)
+    if (newCenter !== undefined){
+      if(newCenter.lng){
+        url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
+      }
+      if(newRadius){
+        url.searchParams.set("radius", `${newRadius}`)
+      }
     }
     window.location.href = url
   }
@@ -57,16 +61,13 @@ function App() {
     const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
     const has_patient_summary = place['Summary star rating']||place['Summary star rating'] === 0
     let marker_metric = null
-    const min_combined_metric = metric_ranges['min_hai'] + metric_ranges['min_hcahps']
-    const max_combined_metric = metric_ranges['max_hai'] + metric_ranges['max_hcahps']
+    // Use average of the two metrics
+    const min_combined_metric = (metric_ranges['min_hai'] + metric_ranges['min_hcahps'])/2
+    const max_combined_metric = (metric_ranges['max_hai'] + metric_ranges['max_hcahps'])/2
 
     if(has_infection_rating && has_patient_summary){
-      marker_metric = place['Infection Rating'] + place['Summary star rating']
+      marker_metric = (place['Infection Rating'] + place['Summary star rating'])/2
       return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
-    }else if(has_infection_rating){
-      return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
-    }else if(has_patient_summary){
-      return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
     }else if(has_infection_rating){
       return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
     }else if(has_patient_summary){
@@ -186,9 +187,17 @@ function App() {
   const hasPlaceResults = placesData.results && placesData.results.length > 0
   return (
     <div className="App">
+      <TitleBanner />
       <div style={{marginBottom : 15}}>
-        <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange} />
-        <button onClick={onSearchSubmit} style={{marginLeft : 10}}>Search</button>
+        <form onSubmit={
+              (event) => {
+                event.preventDefault();
+                onSearchSubmit();
+              }}
+        >
+          <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
+          <button type="submit" style={{marginLeft : 10}}>Search</button>
+        </form>
       </div>
       <div style={outerStyles}>
         {

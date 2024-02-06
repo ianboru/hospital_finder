@@ -7,7 +7,8 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
       "height" : "150px",
       "color" : "gray",
       "padding" : 10,
-      "width" : "300px"
+      "width" : "300px",
+      cursor: 'pointer'
     }
     if(!selectedPlace){
         selectedPlace = {}

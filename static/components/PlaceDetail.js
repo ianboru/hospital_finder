@@ -1,5 +1,5 @@
 import React from 'react'
-import { getHCAHPSStars, getHaiStars } from '../utils';
+import { getHCAHPSStars, getHaiEmoji } from '../utils';
 
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
@@ -39,7 +39,7 @@ const PlaceDetail = (props) => {
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
       return(
-        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiStars(metricValue,3)}</span> </div>
+        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiEmoji(metricValue,3)}</span> </div>
       )
     })
 
@@ -64,7 +64,7 @@ const PlaceDetail = (props) => {
               selectedPlace['Infection Rating'] ?
               <div>
                 <div>
-                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiStars(selectedPlace['Infection Rating'])}</span>
+                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'])}</span>
                 </div>
                 <div style={{marginLeft : 15}}>
                   {detailedInfectionMetricStars}

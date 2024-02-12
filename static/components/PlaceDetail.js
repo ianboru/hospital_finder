@@ -11,7 +11,7 @@ const PlaceDetail = (props) => {
       "Doctor communication - star rating" : "Doctor communication",
       "Staff responsiveness - star rating" : "Staff responsiveness",
       "Communication about medicines - star rating" : "Medicine communication",
-      "Discharge information - star raing" : "Discharge information",
+      "Discharge information - star rating" : "Discharge information",
       "Care transition - star rating" : "Care transition",
       "Cleanliness - star rating" : "Cleanliness",
       "Quietness - star rating" : "Quietness",

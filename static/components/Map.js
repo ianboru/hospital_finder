@@ -7,10 +7,10 @@ const Map = (props) => {
     const placesData = props.placesData 
     const initialLocation = props.initialLocation 
     const selectedPlace = props.selectedPlace 
-    const currentGPSLocation = props.currentGPSLocation 
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius  
+    const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
 
     useEffect(()=>{
         navigator.geolocation.getCurrentPosition((position)=>{

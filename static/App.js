@@ -12,7 +12,6 @@ function App() {
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
-  const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
   const initialSearchParam = url.searchParams.get("search")
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
@@ -72,7 +71,6 @@ function App() {
           placesData={placesData}
           initialLocation={initialLocation}
           selectedPlace={selectedPlace}
-          currentGPSLocation={currentGPSLocation}
           metricRanges={metricRanges}
           onSearchSubmit={onSearchSubmit}
           setZoomRadius={setZoomRadius}

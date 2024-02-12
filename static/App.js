@@ -6,7 +6,7 @@ import TitleBanner from './components/TitleBanner'
 import Map from "./components/Map";
 
 function App() {
-
+  console.log("version 0.1.1")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
 

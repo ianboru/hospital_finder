@@ -1,5 +1,6 @@
 import React from 'react'
-import { getHCAHPSStars, getHaiEmoji } from '../utils';
+import { getHCAHPSStars, getHaiEmoji } from '../utils'
+import StarRatingStyle from './StarRatingStyle'
 
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
@@ -19,8 +20,15 @@ const PlaceDetail = (props) => {
     const detailedExperienceMetricStars = Object.keys(detailedExperienceMetricsMap).map((metricName)=>{
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedExperienceMetricsMap[metricName]
+      console.log('metricLabel', metricLabel, 'metricValue', metricValue, ) 
       return(
-        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHCAHPSStars(metricValue)}</span> </div>
+        <div style={{marginTop : 5, marginBottom: 5}}>
+          <StarRatingStyle 
+            metricLabel={metricLabel}  
+            metricRatingFunction={() => getHCAHPSStars(metricValue)}
+            bTagStyle={{alignSelf : "flex-start"}} 
+          />
+        </div>
       )
     })
     console.log("Patient stars", detailedExperienceMetricStars)
@@ -39,7 +47,13 @@ const PlaceDetail = (props) => {
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
       return(
-        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiEmoji(metricValue,3)}</span> </div>
+        <div style={{marginTop : 5, marginBottom: 5}}>
+          <StarRatingStyle 
+            metricLabel={metricLabel}  
+            metricRatingFunction={() => getHaiEmoji(metricValue,3)}
+            bTagStyle={{alignSelf : "flex-start"}} 
+          />
+        </div>
       )
     })
 
@@ -52,9 +66,10 @@ const PlaceDetail = (props) => {
             {
               selectedPlace['Summary star rating'] ?
               <div>
-                <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary star rating'])}</span></b>
-                </div>
+                <StarRatingStyle 
+                  metricLabel={'Patient Rating: '}  
+                  metricRatingFunction={() => getHCAHPSStars(selectedPlace['Summary star rating'])}
+                />
                 <div style={{marginLeft : 15}}>
                   {detailedExperienceMetricStars}
                 </div>
@@ -63,9 +78,10 @@ const PlaceDetail = (props) => {
             {
               selectedPlace['Infection Rating'] ?
               <div>
-                <div>
-                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'])}</span>
-                </div>
+                <StarRatingStyle 
+                  metricLabel={'Infection Rating: '}  
+                  metricRatingFunction={() => getHaiEmoji(selectedPlace['Infection Rating'])}
+                />
                 <div style={{marginLeft : 15}}>
                   {detailedInfectionMetricStars}
                 </div>

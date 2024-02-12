@@ -1,5 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars } from '../utils';
+import StarRatingStyle from './StarRatingStyle';
+
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log('placesData', placesData)
     const placeTileStyles = {
@@ -33,14 +35,20 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             <div>{place.phone_number}</div>
             {
               place['Infection Rating']||place['Infection Rating'] === 0 ?
-                <div>
-                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'])}</span></b>
+                <div> 
+                  <StarRatingStyle 
+                  metricLabel={'Infection Rating: '}  
+                  metricRatingFunction={() => getHaiEmoji(place['Infection Rating'])}
+                  />
                 </div> : <></>
             }
             {
               place['Summary star rating']||place['Summary star rating'] === 0 ?
-                <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'])}</span></b>
+                <div> 
+                    <StarRatingStyle 
+                    metricLabel={'Patient Rating: '}  
+                    metricRatingFunction={() => getHCAHPSStars(place['Summary star rating'])}
+                    />
                 </div> : <></>
             }
         </div>

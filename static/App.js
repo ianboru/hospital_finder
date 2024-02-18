@@ -10,6 +10,7 @@ function App() {
   console.log("version 0.1.1")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
+  const careTypes = JSON.parse(document.getElementById("care_types").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
@@ -22,15 +23,6 @@ function App() {
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
-  const [careTypeFilter, setCareTypeFilter] = useState([
-    { id: 1, name: 'Home Health' },
-    { id: 2, name: 'Hospital' },
-    { id: 3, name: 'Emergency Department (ED or ER)' },
-    { id: 4, name: 'Nursing Home' },
-    { id: 5, name: 'Dialysis' },
-    { id: 6, name: 'Long-Term Care' },
-    { id: 7, name: 'In-Patient Rehabilitation' }
-  ])
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
@@ -68,7 +60,7 @@ function App() {
           <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
           <button type="submit" style={{marginLeft : 10}}>Search</button>
         </form> 
-        <CareTypeFilter careTypeFilter={careTypeFilter} setCareTypeFilter={setCareTypeFilter}/> 
+        <CareTypeFilter careTypes={careTypes} /> 
       </div>
       <div style={outerStyles}>
           <div style={{maxHeight : '800px', overflowY : 'scroll'}}>

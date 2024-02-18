@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react'
 
 const CareTypeFilter = (props) => {
-    const careTypeFilter = props.careTypeFilter
-    const setCareTypeFilter = props.setCareTypeFilter
+    const careTypes = props.careTypes 
+    const filterCareType = (careType) => {
+        //send data to the backend
+        console.log(
+            'careType, ', careType
+        )
+    }
 
     return(
         <div>
-            <h1>Filter</h1>
+            <h5>Filter</h5>
             <ul>
             {
-            careTypeFilter.map(careType => (
-                <button onClick={} key={careType.id}>{careType.name}</button>
+            careTypes.map(careType => (
+                <button onClick={() => filterCareType(careType)} key={careType.id}>{careType.name}</button>
             ))
             }
             </ul>

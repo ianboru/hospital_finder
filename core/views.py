@@ -32,15 +32,7 @@ def index(request, path=None):
     location_string = request.GET.get("location")
     radius = request.GET.get("radius") # in meters
     
-    care_types = [
-        { 'id': 1, 'name': 'Home Health' },
-        { 'id': 2, 'name': 'Hospital' },
-        { 'id': 3, 'name': 'Emergency Department (ED or ER)' },
-        { 'id': 4, 'name': 'Nursing Home' },
-        { 'id': 5, 'name': 'Dialysis' },
-        { 'id': 6, 'name': 'Long-Term Care' },
-        { 'id': 7, 'name': 'In-Patient Rehabilitation' }
-    ]
+    
 
     # Query google maps for places
     places_data = {}
@@ -67,8 +59,7 @@ def index(request, path=None):
             'min_hai' : 1,
             'max_hcahps' : 5,
             'min_hcahps' : 1
-        },
-        'care_types': care_types
+        }
     }
     return render(request, "index.html", context)
 

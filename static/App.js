@@ -10,7 +10,6 @@ function App() {
   console.log("version 0.1.1")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
-  const careTypes = JSON.parse(document.getElementById("care_types").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
@@ -26,6 +25,15 @@ function App() {
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
+  const careTypes = [
+    { 'id': 1, 'name': 'Home Health' },
+    { 'id': 2, 'name': 'Hospital' },
+    { 'id': 3, 'name': 'Emergency Department (ED or ER)' },
+    { 'id': 4, 'name': 'Nursing Home' },
+    { 'id': 5, 'name': 'Dialysis' },
+    { 'id': 6, 'name': 'Long-Term Care' },
+    { 'id': 7, 'name': 'In-Patient Rehabilitation' }
+]
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)

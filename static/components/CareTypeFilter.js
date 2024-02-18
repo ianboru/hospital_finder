@@ -18,7 +18,7 @@ const CareTypeFilter = (props) => {
         <div>
             <h5>Filter</h5>
             <select onChange={handleChange}>
-            <option value="">Select Care Type</option>
+            <option>Select Care Type</option>
             {careTypes.map(careType => (
                 <option key={careType.id} value={careType.id}>{careType.name}</option>
             ))}

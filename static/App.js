@@ -3,7 +3,8 @@ import React, { useEffect, Component } from 'react'
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail"
 import TitleBanner from './components/TitleBanner'
-import Map from "./components/Map";
+import Map from "./components/Map"
+import CareTypeFilter from "./components/CareTypeFilter"
 
 function App() {
   console.log("version 0.1.1")
@@ -21,6 +22,15 @@ function App() {
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
+  const [careTypeFilter, setCareTypeFilter] = useState([
+    { id: 1, name: 'Home Health' },
+    { id: 2, name: 'Hospital' },
+    { id: 3, name: 'Emergency Department (ED or ER)' },
+    { id: 4, name: 'Nursing Home' },
+    { id: 5, name: 'Dialysis' },
+    { id: 6, name: 'Long-Term Care' },
+    { id: 7, name: 'In-Patient Rehabilitation' }
+  ])
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
@@ -51,13 +61,14 @@ function App() {
       <div style={{marginBottom : 15}}>
         <form onSubmit={
               (event) => {
-                event.preventDefault();
+                event.preventDefault()
                 onSearchSubmit();
               }}
         >
           <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
           <button type="submit" style={{marginLeft : 10}}>Search</button>
-        </form>
+        </form> 
+        <CareTypeFilter careTypeFilter={careTypeFilter} setCareTypeFilter={setCareTypeFilter}/> 
       </div>
       <div style={outerStyles}>
           <div style={{maxHeight : '800px', overflowY : 'scroll'}}>

@@ -31,8 +31,6 @@ def index(request, path=None):
     search_string = request.GET.get("search")
     location_string = request.GET.get("location")
     radius = request.GET.get("radius") # in meters
-    
-    
 
     # Query google maps for places
     places_data = {}

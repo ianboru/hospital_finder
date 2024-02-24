@@ -25,15 +25,7 @@ function App() {
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
-  const careTypes = [
-    { 'id': 1, 'name': 'Home Health' },
-    { 'id': 2, 'name': 'Hospital' },
-    { 'id': 3, 'name': 'Emergency Department (ED or ER)' },
-    { 'id': 4, 'name': 'Nursing Home' },
-    { 'id': 5, 'name': 'Dialysis' },
-    { 'id': 6, 'name': 'Long-Term Care' },
-    { 'id': 7, 'name': 'In-Patient Rehabilitation' }
-]
+  
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
@@ -68,7 +60,7 @@ function App() {
           <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
           <button type="submit" style={{marginLeft : 10}}>Search</button>
         </form> 
-        <CareTypeFilter careTypes={careTypes} /> 
+        <CareTypeFilter/> 
       </div>
       <div style={outerStyles}>
           <div style={{maxHeight : '800px', overflowY : 'scroll'}}>

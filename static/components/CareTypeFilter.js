@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
 const CareTypeFilter = (props) => {
-    const careTypes = props.careTypes 
+    console.log("care types", careTypes)
+    const careTypes = [
+        { 'id': 1, 'name': 'Home Health' },
+        { 'id': 2, 'name': 'Hospital' },
+        { 'id': 3, 'name': 'Emergency Department (ED or ER)' },
+        { 'id': 4, 'name': 'Nursing Home' },
+        { 'id': 5, 'name': 'Dialysis' },
+        { 'id': 6, 'name': 'Long-Term Care' },
+        { 'id': 7, 'name': 'In-Patient Rehabilitation' }
+    ]
     const filterCareType = (careType) => {
         //send data to the backend
         console.log(

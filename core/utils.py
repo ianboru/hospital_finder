@@ -191,3 +191,4 @@ def update_place_results(results: Dict, google_maps: GoogleMapsClient, metrics: 
         if "formatted_phone_number" in place_detail:
             place_result["phone_number"] = place_detail["formatted_phone_number"]
         place_result = add_metrics_to_place(metrics, place_result)
+

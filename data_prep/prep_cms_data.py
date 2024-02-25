@@ -166,9 +166,37 @@ def merge_hcahps_and_hai(hcahps_df, hai_df, export_path):
     df.to_csv(df_export_path, index=False)
     return df
 
-export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
-hcahps_df = load_hcahps_data(export_path)
-hai_df = load_hai_data(export_path)
-df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
+def load_ccn_file(facility_type, facility_id_column):
+    facility_list_path = os.path.join(export_path, f"CCN - {facility_type}.csv")
+    facility_df = pd.read_csv(facility_list_path, low_memory=False)
+    facility_df = facility_df[[
+             facility_id_column,
+             'Address',
+             'City/Town',
+             'State',
+             'ZIP Code',
+             ]]
+    facility_df['Facility Type'] = facility_type
+    return facility_df
 
+def load_provider_cms_list():
+    hospital_df = load_ccn_file("Hospital", "Facility ID")
+    ed_df = load_ccn_file("ED", "Facility ID")
+    home_health_df = load_ccn_file("Home Health", "CMS Certification Number (CCN)")
+    home_health_df.rename(columns={
+        "CMS Certification Number (CCN)" : "Facility ID",
+    }, inplace=True)
+    all_providers_df = pd.concat([hospital_df, ed_df, home_health_df], axis=0)
+    all_providers_export_path = os.path.join(export_path,'all_providers_by_CMS.csv')
+    all_providers_df.to_csv(all_providers_export_path, index=False)
+
+    print(all_providers_df)
+    return all_providers_df
+
+export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
+#hcahps_df = load_hcahps_data(export_path)
+#hai_df = load_hai_data(export_path)
+#df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
+hospital_df = load_provider_cms_list()
 # %%
+

@@ -5,11 +5,11 @@ const CareTypeFilter = (props) => {
     let setCareTypeFilter = props.setCareTypeFilter
     let selectedCareType = props.selectedCareType
 
-    useEffect(() => {
-        if (selectedCareType) {
-          selectedCareType
-        }
-      }, [careTypes])
+    // useEffect(() => {
+    //     if (selectedCareType) {
+    //       selectedCareType
+    //     }
+    //   }, [careTypes])
 
     const careTypes = [
         { 'id': 1, 'name': 'Home Health' },
@@ -37,9 +37,9 @@ const CareTypeFilter = (props) => {
             <h3>Filter</h3> 
             <text>Select Care Type </text>
             <select value={selectedCareType ? selectedCareType.id : ''} onChange={handleChange}>
-            {careTypes.map(careType => {
+            {careTypes.map(careType => (
                 <option key={careType.id} value={careType.id}>{careType.name}</option>
-            })}
+            ))}
             </select>
         </div>
     )

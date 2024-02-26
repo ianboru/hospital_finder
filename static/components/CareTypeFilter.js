@@ -32,15 +32,16 @@ const CareTypeFilter = (props) => {
         const careType = careTypes.find(value => value.id == careTypeId) 
         filterCareType(careType)
       }
-      console.log('care type in care type filter - ', careTypes, selectedCareType.id)
+      console.log('care type in care type filter - ', careTypes, selectedCareType.name)
     return(
         <div>
-            <h5>Filter</h5>
-            <select value={selectedCareType ? selectedCareType.name : ''} onChange={handleChange}>
-            <h3>Select Care Type</h3>
-            {careTypes.map(careType => (
-                <option key={careType.id} value={careType.id}>{careType.name}</option>
-            ))}
+            <h3>Filter</h3> 
+            <text>Select Care Type </text>
+            <select value={selectedCareType ? selectedCareType.id : ''} onChange={handleChange}>
+            {careTypes.map(careType => {
+                console.log('careType map ', careType.name);
+                return <option key={careType.id} value={careType.id}>{careType.name}</option>;
+            })}
             </select>
         </div>
     )

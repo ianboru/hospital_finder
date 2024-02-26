@@ -31,6 +31,8 @@ def index(request, path=None):
     search_string = request.GET.get("search")
     location_string = request.GET.get("location")
     radius = request.GET.get("radius") # in meters
+    careType = request.GET.get("careType")
+    print('careType backend', careType)
 
     # Query google maps for places
     places_data = {}

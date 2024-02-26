@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-const CareTypeFilter = (props) => {
-    console.log("care types", careTypes)
+const CareTypeFilter = (props) => { 
+    let setCareTypeFilter = props.setCareTypeFilter
+    let selectedCareType = props.selectedCareType
     const careTypes = [
         { 'id': 1, 'name': 'Home Health' },
         { 'id': 2, 'name': 'Hospital' },
@@ -12,12 +13,13 @@ const CareTypeFilter = (props) => {
         { 'id': 7, 'name': 'In-Patient Rehabilitation' }
     ]
     const filterCareType = (careType) => {
-        //send data to the backend
         console.log(
             'careType, ', careType
         )
+        setCareTypeFilter(careType.name)
     }
     const handleChange = (event) => {
+        console.log('event handlechange', event)
         const careTypeId = event.target.value 
         const careType = careTypes.find(value => value.id == careTypeId) 
         filterCareType(careType)
@@ -29,7 +31,7 @@ const CareTypeFilter = (props) => {
             <select onChange={handleChange}>
             <option>Select Care Type</option>
             {careTypes.map(careType => (
-                <option key={careType.id} value={careType.id}>{careType.name}</option>
+                <option key={careType.id} value={careType.id}>{selectedCareType ? selectedCareType : careType.name}</option>
             ))}
             </select>
         </div>

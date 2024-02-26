@@ -27,8 +27,7 @@ function App() {
   const [selectedCareType, setCareTypeFilter] = React.useState(initialCareType ? initialCareType: "")
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
-  }
-  console.log('app careType', selectedCareType)
+  } 
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)

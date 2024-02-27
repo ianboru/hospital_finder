@@ -11,7 +11,7 @@ from googlemaps import Client as GoogleMapsClient
 import pandas as pd
 import plotly.graph_objects as go
 from core.models import Favorite
-from core.utils import timeit, load_summary_metrics, load_hospital_data, get_places, filter_place_results, update_place_results
+from core.utils import timeit, load_summary_metrics, load_hospital_list, load_hospital_data, get_places, filter_place_results, update_place_results
 pd.set_option('display.max_rows', None,)
 
 #https://learndjango.com/tutorials/django-signup-tutorial
@@ -23,6 +23,7 @@ class SignUpView(generic.CreateView):
 # Initialize the data for the app
 gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 summary_metrics = load_summary_metrics()
+hospital_list = load_hospital_list()
 
 @timeit
 def index(request, path=None):

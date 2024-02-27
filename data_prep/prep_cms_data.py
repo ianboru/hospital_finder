@@ -166,9 +166,21 @@ def merge_hcahps_and_hai(hcahps_df, hai_df, export_path):
     df.to_csv(df_export_path, index=False)
     return df
 
+from geopy.geocoders import GoogleV3
+geolocator = GoogleV3(api_key="AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o")
+def add_lat_long_to_row(row):
+    location = geolocator.geocode(f"{row['Address']} {row['State']}")
+    index = row.name 
+    print(f"geocoding {index}/{row['num_ccn']}")
+    lat = location.latitude if location else None
+    long = location.longitude if location else None
+    return pd.Series([lat, long])
+
 def load_ccn_file(facility_type, facility_id_column):
     facility_list_path = os.path.join(export_path, f"CCN - {facility_type}.csv")
     facility_df = pd.read_csv(facility_list_path, low_memory=False)
+    facility_df = facility_df.drop_duplicates(subset=[facility_id_column]).reset_index()
+    #facility_df = facility_df[1:5]
     facility_df = facility_df[[
              facility_id_column,
              'Address',
@@ -177,6 +189,9 @@ def load_ccn_file(facility_type, facility_id_column):
              'ZIP Code',
              ]]
     facility_df['Facility Type'] = facility_type
+    facility_df['num_ccn'] = len(facility_df)
+    print("file length",len(facility_df))
+    facility_df[['latitude','longitude']] = facility_df.apply(add_lat_long_to_row, axis=1)
     return facility_df
 
 def load_provider_cms_list():
@@ -189,7 +204,6 @@ def load_provider_cms_list():
     all_providers_df = pd.concat([hospital_df, ed_df, home_health_df], axis=0)
     all_providers_export_path = os.path.join(export_path,'all_providers_by_CMS.csv')
     all_providers_df.to_csv(all_providers_export_path, index=False)
-
     print(all_providers_df)
     return all_providers_df
 

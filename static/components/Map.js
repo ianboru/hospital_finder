@@ -10,16 +10,7 @@ const Map = (props) => {
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius  
-    const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
 
-    useEffect(()=>{
-        navigator.geolocation.getCurrentPosition((position)=>{
-          setCurrentGPSLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          })
-        })
-      }, [])
 
     const getMarkerColor = (place, metric_ranges) => {
         const gray = "rgb(128,128,128)"
@@ -44,8 +35,8 @@ const Map = (props) => {
           return gray
         }
     }
-
-    const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].geometry.location) || {}
+    console.log("places", placesData)
+    const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
@@ -57,15 +48,17 @@ const Map = (props) => {
     }
 
     const markers = placesData.results && placesData.results.length > 0 && placesData.results.map((place, index)=>{
-      const location = place.geometry.location
-      const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
+      console.log("result place",place)
+      const location = place.location
+      const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
+      console.log(latLng)
       return (
         <Marker
           onLoad={(marker) => {
             const customIcon = (opts) => Object.assign({
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: markerColor,
+              fillColor: "green",
               fillOpacity: 1,
               strokeColor: '#000',
               strokeWeight: 1,
@@ -117,7 +110,7 @@ const Map = (props) => {
 
     //priority to center the map: selected place, first result in google maps result, current gps location
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
-        firstLocationCenter : currentGPSLocation
+        firstLocationCenter : props.currentGPSLocation
 
     console.log("current center", curCenter)
     return isLoaded && curCenter ? (

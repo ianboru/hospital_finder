@@ -180,7 +180,7 @@ def load_ccn_file(facility_type, facility_id_column):
     facility_list_path = os.path.join(export_path, f"CCN - {facility_type}.csv")
     facility_df = pd.read_csv(facility_list_path, low_memory=False)
     facility_df = facility_df.drop_duplicates(subset=[facility_id_column]).reset_index()
-    #facility_df = facility_df[1:5]
+    facility_df = facility_df[1:5]
     facility_df = facility_df[[
              facility_id_column,
              'Address',

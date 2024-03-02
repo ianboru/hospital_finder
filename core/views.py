@@ -11,9 +11,9 @@ from googlemaps import Client as GoogleMapsClient
 import pandas as pd
 import plotly.graph_objects as go
 from core.models import Favorite
-from core.utils import timeit, load_summary_metrics, load_hospital_list, load_hospital_data, get_places, filter_place_results, update_place_results
+from core.utils import timeit, load_summary_metrics, load_provider_list, get_places, filter_place_results, update_place_results
 pd.set_option('display.max_rows', None,)
-
+from geopy import distance
 #https://learndjango.com/tutorials/django-signup-tutorial
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -23,8 +23,28 @@ class SignUpView(generic.CreateView):
 # Initialize the data for the app
 gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 summary_metrics = load_summary_metrics()
-hospital_list = load_hospital_list()
+provider_list = load_provider_list()
 
+def find_providers_in_radius(search_location, radius, provider_list):
+    search_location_tuple = (search_location[0], search_location[1])
+    print(provider_list.columns)
+    print("search loca ", search_location)
+    filtered_provider_list = []
+    for index,row in provider_list[1:10].iterrows():
+        
+        provider_location_tuple = (row['latitude'],row['longitude'])
+        print("provider loc", provider_location_tuple)
+        provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
+        print(provider_distance)
+        if provider_distance.km < radius:
+            print(row)
+            filtered_provider_list.append({
+                "location" : {
+                    "latitude" : row['latitude'],
+                    "longitude" : row['longitude'],
+                }
+            })
+    return filtered_provider_list
 @timeit
 def index(request, path=None):
     """ The main landing route for the app"""
@@ -32,23 +52,19 @@ def index(request, path=None):
     search_string = request.GET.get("search")
     location_string = request.GET.get("location")
     radius = request.GET.get("radius") # in meters
-
+    print("current location",location_string)
     # Query google maps for places
     places_data = {}
     if search_string:
-        # Google maps query args
-        # Example query: curl -L -X GET 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=t&location=42.3675294%2C-71.186966&radius=10000&key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o'
-        gmaps_places_args = {}
-        gmaps_places_args["query"] = search_string.strip()
-        if location_string:
-            split_location_string = location_string.strip().split(",")
-            gmaps_places_args["location"] = [float(split_location_string[1]),float(split_location_string[0])]
-
-        print("search args", gmaps_places_args)
-        places_data = get_places(gmaps, gmaps_places_args, radius= int(float(radius)) if radius else 10000)
-        valid_results = filter_place_results(places_data["results"]) # Query args only support 1 type filter, so we filter results aftwards
-        update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
-        places_data['results'] = valid_results
+        if 'Na' in location_string:
+            location_string = "32.7853263,-117.2407347"
+        if not radius:
+            radius = 10000
+        split_location_string = location_string.strip().split(",")
+        filtered_providers = find_providers_in_radius(split_location_string, radius, provider_list)
+        #valid_results = filter_place_results(places_data["results"]) # Query args only support 1 type filter, so we filter results aftwards
+        #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
+        places_data['results'] = filtered_providers
 
     # Context for the front end
     context = {

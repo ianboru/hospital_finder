@@ -21,21 +21,32 @@ function App() {
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
+  const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
+  useEffect(()=>{
+    navigator.geolocation.getCurrentPosition((position)=>{
+      console.log("updating current position", position.coords)
+      setCurrentGPSLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      })
+    })
+  }, [])
+
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   }
-
+  
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
     console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
     if (newCenter !== undefined){
-      if(newCenter.lng){
-        url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
-      }
+      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
       if(newRadius){
         url.searchParams.set("radius", `${newRadius}`)
       }
+    }else{
+      url.searchParams.set("location", `${initialLocation.lng},${initialLocation.lat}`)
     }
     window.location.href = url
   }
@@ -74,6 +85,7 @@ function App() {
           metricRanges={metricRanges}
           onSearchSubmit={onSearchSubmit}
           setZoomRadius={setZoomRadius}
+          currentGPSLocation={currentGPSLocation}
         />
 
       </div>

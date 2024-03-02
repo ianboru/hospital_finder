@@ -19,18 +19,21 @@ function App() {
   const initialLocation = initialLocationSplit ?  {"lng" : parseFloat(initialLocationSplit[0]), "lat" : parseFloat(initialLocationSplit[1])} : {}
   console.log("initial",  url.searchParams, initialSearchParam)
   const initialZoomRadius =  url.searchParams.get("radius")
+  const initialCareType =  url.searchParams.get("careType")
+
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
+  const [selectedCareType, setCareTypeFilter] = React.useState(initialCareType ? initialCareType: "")
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
-  }
-  
+  } 
 
   const onSearchSubmit = (newCenter, newRadius=null) => {
     let url = new URL(window.location.origin + window.location.pathname)
     console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
+    url.searchParams.set("careType", selectedCareType)
     if (newCenter !== undefined){
       if(newCenter.lng){
         url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
@@ -54,13 +57,13 @@ function App() {
         <form onSubmit={
               (event) => {
                 event.preventDefault()
-                onSearchSubmit();
+                onSearchSubmit()
               }}
         >
           <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
           <button type="submit" style={{marginLeft : 10}}>Search</button>
         </form> 
-        <CareTypeFilter/> 
+        <CareTypeFilter selectedCareType={selectedCareType} setCareTypeFilter={setCareTypeFilter}/> 
       </div>
       <div style={outerStyles}>
           <div style={{maxHeight : '800px', overflowY : 'scroll'}}>

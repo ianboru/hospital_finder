@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
-const CareTypeFilter = (props) => {
-    console.log("care types", careTypes)
+const CareTypeFilter = (props) => { 
+
+    let setCareTypeFilter = props.setCareTypeFilter
+    let selectedCareType = props.selectedCareType
+
+    // useEffect(() => {
+    //     if (selectedCareType) {
+    //       selectedCareType
+    //     }
+    //   }, [careTypes])
+
     const careTypes = [
         { 'id': 1, 'name': 'Home Health' },
         { 'id': 2, 'name': 'Hospital' },
@@ -12,12 +21,12 @@ const CareTypeFilter = (props) => {
         { 'id': 7, 'name': 'In-Patient Rehabilitation' }
     ]
     const filterCareType = (careType) => {
-        //send data to the backend
         console.log(
             'careType, ', careType
         )
+        setCareTypeFilter(careType)
     }
-    const handleChange = (event) => {
+    const handleChange = (event) => { 
         const careTypeId = event.target.value 
         const careType = careTypes.find(value => value.id == careTypeId) 
         filterCareType(careType)
@@ -25,9 +34,9 @@ const CareTypeFilter = (props) => {
 
     return(
         <div>
-            <h5>Filter</h5>
-            <select onChange={handleChange}>
-            <option>Select Care Type</option>
+            <h3>Filter</h3> 
+            <text>Select Care Type </text>
+            <select value={selectedCareType ? selectedCareType.id : ''} onChange={handleChange}>
             {careTypes.map(careType => (
                 <option key={careType.id} value={careType.id}>{careType.name}</option>
             ))}

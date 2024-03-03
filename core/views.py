@@ -11,7 +11,7 @@ from googlemaps import Client as GoogleMapsClient
 import pandas as pd
 import plotly.graph_objects as go
 from core.models import Favorite
-from core.utils import timeit, load_summary_metrics, load_provider_list, get_places, filter_place_results, update_place_results
+from core.utils import timeit, load_summary_metrics, load_provider_list, get_places, filter_place_results, update_place_results, add_metric_to_provider
 pd.set_option('display.max_rows', None,)
 from geopy import distance
 #https://learndjango.com/tutorials/django-signup-tutorial
@@ -27,14 +27,22 @@ provider_list = load_provider_list()
 
 def find_providers_in_radius(search_location, radius, care_type, provider_list):
     search_location_tuple = (search_location[0], search_location[1])
-    print(provider_list.columns)
+    
+    # provider_list = provider_list.merge(summary_metrics, left_on="Facility ID", right_on="Facility ID")
+    provider_list = provider_list.merge(summary_metrics, left_on="Facility ID", right_on="Facility ID",
+                 how='outer', suffixes=('', '_y'))
+
+    provider_list.drop(provider_list.filter(regex='_y$').columns, axis=1, inplace=True)
+    provider_list.dropna(inplace=True)
+    # print('provider_list.rows ', provider_list[""])
+    
     print("search loca ", search_location, radius, care_type)
     filtered_provider_list = []
     if care_type and care_type != "All":
         provider_list = provider_list[provider_list["Facility Type"] == care_type]
     for index,row in provider_list.iterrows():
-        
         provider_location_tuple = (row['latitude'],row['longitude'])
+        print('provider row ', row)
         provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         if provider_distance.km < radius:
             filtered_provider_list.append({
@@ -64,8 +72,12 @@ def index(request, path=None):
     if not radius:
         radius = 100
     split_location_string = location_string.strip().split(",")
+    # print('provider_list ', provider_list)
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
+    # print('filtered_providers, ', filtered_providers)
     #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
+    filtered_providers = add_metric_to_provider(provider_list, summary_metrics)
+    
     places_data['results'] = filtered_providers
 
     # Context for the front end

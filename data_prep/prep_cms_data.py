@@ -176,23 +176,55 @@ def add_lat_long_to_row(row):
     long = location.longitude if location else None
     return pd.Series([lat, long])
 
-def load_ccn_file(facility_type, facility_id_column):
+def load_ccn_file(facility_type, facility_id_column, add_location=False):
     facility_list_path = os.path.join(export_path, f"CCN - {facility_type}.csv")
     facility_df = pd.read_csv(facility_list_path, low_memory=False)
     facility_df = facility_df.drop_duplicates(subset=[facility_id_column]).reset_index()
-    facility_df = facility_df[1:5]
+    name_column = facility_df.columns[facility_df.columns.str.contains('Name')].values[0]
     facility_df = facility_df[[
              facility_id_column,
              'Address',
              'City/Town',
              'State',
              'ZIP Code',
-             ]]
+             name_column
+            ]]
     facility_df['Facility Type'] = facility_type
     facility_df['num_ccn'] = len(facility_df)
-    print("file length",len(facility_df))
-    facility_df[['latitude','longitude']] = facility_df.apply(add_lat_long_to_row, axis=1)
+    print(facility_type, name_column, facility_id_column)
+    if add_location:
+        facility_df[['latitude','longitude']] = facility_df.apply(add_lat_long_to_row, axis=1)
     return facility_df
+
+def update_provider_data():
+    provider_list_path = os.path.join(export_path, f"all_providers_by_CMS.csv")
+    provider_df = pd.read_csv(provider_list_path, low_memory=False)
+    provider_df["Facility Name"] = ""
+    hospital_df = load_ccn_file("Hospital", "Facility ID")
+    ed_df = load_ccn_file("ED", "Facility ID")
+    
+    print(provider_df["Facility ID"].head(20))
+    print(ed_df["Facility ID"].head(20))
+    print(hospital_df["Facility ID"].head(20))
+
+    home_health_df = load_ccn_file("Home Health", "CMS Certification Number (CCN)")
+    #home_health_df['CMS Certification Number (CCN)'] = home_health_df['CMS Certification Number (CCN)'].astype(str).apply(lambda x: x.lstrip('0')).astype(int)
+    #ed_df['Facility ID'] = ed_df['Facility ID'].astype(str).apply(lambda x: x.lstrip('0')).astype(int)
+    #provider_df['Facility ID'] = provider_df['Facility ID'].astype(str).apply(lambda x: x.lstrip('0')).astype(int)
+    print("ED columns " ,provider_df["Facility ID"].isin(ed_df["Facility ID"]).value_counts())
+    print("hospital columns " ,provider_df["Facility ID"].isin(hospital_df["Facility ID"]).value_counts())
+    print("home health columns " ,provider_df["Facility ID"].isin(home_health_df["CMS Certification Number (CCN)"]).value_counts())
+    hospital_id_matches = hospital_df["Facility ID"].isin(provider_df["Facility ID"])
+    ed_id_matches = ed_df["Facility ID"].isin(provider_df["Facility ID"])
+    home_health_id_matches = home_health_df["CMS Certification Number (CCN)"].isin(provider_df["Facility ID"])
+    print("ed caount", ed_id_matches.value_counts())
+    provider_df.loc[provider_df["Facility ID"].isin(hospital_df["Facility ID"]),"Facility Name"] = hospital_df[hospital_id_matches]["Facility Name"]
+    provider_df.loc[provider_df["Facility ID"].isin(ed_df["Facility ID"]),"Facility Name"] = ed_df[ed_id_matches]["Facility Name"]
+    provider_df.loc[provider_df["Facility ID"].isin(home_health_df["CMS Certification Number (CCN)"]),"Facility Name"] = home_health_df[home_health_id_matches]["Provider Name"]
+    all_providers_export_path = os.path.join(export_path,'all_providers_by_CMS_with_name.csv')
+    provider_df.to_csv(all_providers_export_path, index=False)
+    
+    print(provider_df)
 
 def load_provider_cms_list():
     hospital_df = load_ccn_file("Hospital", "Facility ID")
@@ -211,6 +243,6 @@ export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 #hcahps_df = load_hcahps_data(export_path)
 #hai_df = load_hai_data(export_path)
 #df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
-hospital_df = load_provider_cms_list()
-# %%
+#hospital_df = load_provider_cms_list()
+update_provider_data()
 

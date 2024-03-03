@@ -25,24 +25,25 @@ gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 summary_metrics = load_summary_metrics()
 provider_list = load_provider_list()
 
-def find_providers_in_radius(search_location, radius, provider_list):
+def find_providers_in_radius(search_location, radius, care_type, provider_list):
     search_location_tuple = (search_location[0], search_location[1])
     print(provider_list.columns)
-    print("search loca ", search_location)
+    print("search loca ", search_location, radius, care_type)
     filtered_provider_list = []
-    for index,row in provider_list[1:10].iterrows():
+    if care_type and care_type != "All":
+        provider_list = provider_list[provider_list["Facility Type"] == care_type]
+    for index,row in provider_list.iterrows():
         
         provider_location_tuple = (row['latitude'],row['longitude'])
-        print("provider loc", provider_location_tuple)
         provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
-        print(provider_distance)
         if provider_distance.km < radius:
-            print(row)
             filtered_provider_list.append({
                 "location" : {
                     "latitude" : row['latitude'],
                     "longitude" : row['longitude'],
-                }
+                },
+                "address" : row['Address'],
+                "name" : row['Facility Name']
             })
     return filtered_provider_list
 @timeit
@@ -53,18 +54,19 @@ def index(request, path=None):
     location_string = request.GET.get("location")
     radius = request.GET.get("radius") # in meters
     print("current location",location_string)
+    care_type = request.GET.get("careType")
+    print('careType backend', care_type)
+
     # Query google maps for places
     places_data = {}
-    if search_string:
-        if 'Na' in location_string:
-            location_string = "32.7853263,-117.2407347"
-        if not radius:
-            radius = 10000
-        split_location_string = location_string.strip().split(",")
-        filtered_providers = find_providers_in_radius(split_location_string, radius, provider_list)
-        #valid_results = filter_place_results(places_data["results"]) # Query args only support 1 type filter, so we filter results aftwards
-        #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
-        places_data['results'] = filtered_providers
+    if not location_string or 'Na' in location_string:
+        location_string = "32.7853263,-117.2407347"
+    if not radius:
+        radius = 100
+    split_location_string = location_string.strip().split(",")
+    filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
+    #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
+    places_data['results'] = filtered_providers
 
     # Context for the front end
     context = {

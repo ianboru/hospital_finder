@@ -29,7 +29,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
       return (
         <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
             <div style={{color : "black"}}><b>{place.name}</b></div>
-            <div>{place.formatted_address}</div>
+            <div>{place.address}</div>
             <div>{place.phone_number}</div>
             {
               place['Infection Rating']||place['Infection Rating'] === 0 ?

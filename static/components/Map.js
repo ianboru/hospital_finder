@@ -43,16 +43,14 @@ const Map = (props) => {
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const selectedPlaceCenter = {
-      lat : selectedPlace ? selectedPlace.geometry.location.lat : null,
-      lng : selectedPlace ? selectedPlace.geometry.location.lng : null
+      lat : selectedPlace ? selectedPlace.location.lat : null,
+      lng : selectedPlace ? selectedPlace.location.lng : null
     }
 
     const markers = placesData.results && placesData.results.length > 0 && placesData.results.map((place, index)=>{
-      console.log("result place",place)
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
-      console.log(latLng)
       return (
         <Marker
           onLoad={(marker) => {
@@ -103,9 +101,11 @@ const Map = (props) => {
     }, [])
 
     const onDragEnd = () => {
-      const newCenter = map.getCenter()
-      console.log("new center target", newCenter.lng() )
-      onSearchSubmit(newCenter)
+      if(false){
+        const newCenter = map.getCenter()
+        console.log("new center target", newCenter.lng() )
+        onSearchSubmit(newCenter)
+      }
     }
 
     //priority to center the map: selected place, first result in google maps result, current gps location
@@ -123,7 +123,7 @@ const Map = (props) => {
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
               onZoomChanged={()=>{
-                if(map){
+                if(map && false){
                   const bounds = map.getBounds()
                   const neCornerLatLng = bounds.getNorthEast()
                   const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }

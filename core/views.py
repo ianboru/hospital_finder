@@ -45,14 +45,20 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
         print('provider row ', row)
         provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         if provider_distance.km < radius:
-            filtered_provider_list.append({
-                "location" : {
-                    "latitude" : row['latitude'],
-                    "longitude" : row['longitude'],
-                },
-                "address" : row['Address'],
-                "name" : row['Facility Name']
-            })
+             for col in row.index:
+                filtered_provider_list = {
+                    
+                }
+                print('col ', col)
+                provider_list[col] = summary_metrics[col] 
+            # filtered_provider_list.append({
+            #     "location" : {
+            #         "latitude" : row['latitude'],
+            #         "longitude" : row['longitude'],
+            #     },
+            #     "address" : row['Address'],
+            #     "name" : row['Facility Name']
+            # })
     return filtered_provider_list
 @timeit
 def index(request, path=None):

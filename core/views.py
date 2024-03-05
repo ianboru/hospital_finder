@@ -14,7 +14,8 @@ from core.models import Favorite
 from core.utils import timeit, load_summary_metrics, load_provider_list, get_places, filter_place_results, update_place_results
 pd.set_option('display.max_rows', None,)
 from geopy import distance
-#https://learndjango.com/tutorials/django-signup-tutorial
+from rapidfuzz import fuzz
+import math
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
@@ -40,15 +41,18 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
     filtered_provider_list = []
     if care_type and care_type != "All":
         provider_list = provider_list[provider_list["Facility Type"] == care_type]
-    print(provider_list.head(50))
     for index,row in provider_list.iterrows():
         provider_location_tuple = (row['latitude'],row['longitude'])
-        provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
+        if provider_location_tuple[0] == float('nan'):
+            continue
+        try:
+            provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
+        except:
+            continue
         if provider_distance.km < radius:
             cur_provider = {}
             row.fillna('',inplace=True)
             cols = row.index
-            print(cols)
             for col in cols:
                 if row[col] == None:
                     row[col] = ""
@@ -62,6 +66,7 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
             }
             filtered_provider_list.append(cur_provider)
     return filtered_provider_list
+
 @timeit
 def index(request, path=None):
     """ The main landing route for the app"""
@@ -81,12 +86,20 @@ def index(request, path=None):
         radius = 100
     split_location_string = location_string.strip().split(",")
     # print('provider_list ', provider_list)
+    search_match_threshold = 70
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
+    print(search_string)
+    name_filtered_providers = []
+    for provider in filtered_providers:
+        if fuzz.partial_ratio(provider['Facility Name'].lower(), search_string) > search_match_threshold:
+            name_filtered_providers.append(provider)
+    #print(filtered_providers[1:10])
+    filtered_providers = name_filtered_providers
+    print(filtered_providers)
     # print('filtered_providers, ', filtered_providers)
     #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
     
     places_data['results'] = filtered_providers
-    print("pre load",places_data['results'])
     # Context for the front end
     context = {
         'google_places_data' : places_data,

@@ -17,30 +17,44 @@ function App() {
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
   const initialLocation = initialLocationSplit ?  {"lng" : parseFloat(initialLocationSplit[0]), "lat" : parseFloat(initialLocationSplit[1])} : {}
-  console.log("initial",  url.searchParams, initialSearchParam)
   const initialZoomRadius =  url.searchParams.get("radius")
-  const initialCareType =  url.searchParams.get("careType")
+  const initialCareTypeParam =  url.searchParams.get("careType") 
+  const initialCareType = initialCareTypeParam ? initialCareTypeParam : "All"
+  console.log("initial care type", initialCareType)
 
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
-  const [selectedCareType, setCareTypeFilter] = React.useState(initialCareType ? initialCareType: "")
+  const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
+  useEffect(()=>{
+    navigator.geolocation.getCurrentPosition((position)=>{
+      console.log("updating current position", position.coords)
+      setCurrentGPSLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      })
+    })
+  }, [])
+
+
+  const onSelectCareType = (careType) => {
+    onSearchSubmit(null,null,careType)
+  }
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   } 
-
-  const onSearchSubmit = (newCenter, newRadius=null) => {
+  
+  const onSearchSubmit = (newCenter=null, newRadius=null, careType=careType) => {
     let url = new URL(window.location.origin + window.location.pathname)
-    console.log("values" , newCenter, initialSearchParam, searchTerm)
     url.searchParams.set("search", searchTerm)
-    url.searchParams.set("careType", selectedCareType)
-    if (newCenter !== undefined){
-      if(newCenter.lng){
-        url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
-      }
+    url.searchParams.set("careType", careType ? careType.name : initialCareType )
+    if (newCenter && newCenter !== undefined){
+      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
       if(newRadius){
         url.searchParams.set("radius", `${newRadius}`)
       }
+    }else{
+      url.searchParams.set("location", `${initialLocation.lng},${initialLocation.lat}`)
     }
     window.location.href = url
   }
@@ -63,7 +77,7 @@ function App() {
           <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
           <button type="submit" style={{marginLeft : 10}}>Search</button>
         </form> 
-        <CareTypeFilter selectedCareType={selectedCareType} setCareTypeFilter={setCareTypeFilter}/> 
+        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/> 
       </div>
       <div style={outerStyles}>
           <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
@@ -80,6 +94,7 @@ function App() {
           metricRanges={metricRanges}
           onSearchSubmit={onSearchSubmit}
           setZoomRadius={setZoomRadius}
+          currentGPSLocation={currentGPSLocation}
         />
 
       </div>

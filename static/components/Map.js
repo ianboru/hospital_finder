@@ -10,16 +10,7 @@ const Map = (props) => {
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius  
-    const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
 
-    useEffect(()=>{
-        navigator.geolocation.getCurrentPosition((position)=>{
-          setCurrentGPSLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          })
-        })
-      }, [])
 
     const getMarkerColor = (place, metric_ranges) => {
         const gray = "rgb(128,128,128)"
@@ -44,28 +35,28 @@ const Map = (props) => {
           return gray
         }
     }
-
-    const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].geometry.location) || {}
+    console.log("places", placesData)
+    const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
 
     const selectedPlaceCenter = {
-      lat : selectedPlace ? selectedPlace.geometry.location.lat : null,
-      lng : selectedPlace ? selectedPlace.geometry.location.lng : null
+      lat : selectedPlace ? selectedPlace.location.lat : null,
+      lng : selectedPlace ? selectedPlace.location.lng : null
     }
 
     const markers = placesData.results && placesData.results.length > 0 && placesData.results.map((place, index)=>{
-      const location = place.geometry.location
-      const latLng = {lat : location.lat, lng : location.lng} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
+      const location = place.location
+      const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
       return (
         <Marker
           onLoad={(marker) => {
             const customIcon = (opts) => Object.assign({
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: markerColor,
+              fillColor: "green",
               fillOpacity: 1,
               strokeColor: '#000',
               strokeWeight: 1,
@@ -110,14 +101,16 @@ const Map = (props) => {
     }, [])
 
     const onDragEnd = () => {
-      const newCenter = map.getCenter()
-      console.log("new center target", newCenter.lng() )
-      onSearchSubmit(newCenter)
+      if(false){
+        const newCenter = map.getCenter()
+        console.log("new center target", newCenter.lng() )
+        onSearchSubmit(newCenter)
+      }
     }
 
     //priority to center the map: selected place, first result in google maps result, current gps location
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
-        firstLocationCenter : currentGPSLocation
+        firstLocationCenter : props.currentGPSLocation
 
     console.log("current center", curCenter)
     return isLoaded && curCenter ? (
@@ -130,7 +123,7 @@ const Map = (props) => {
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
               onZoomChanged={()=>{
-                if(map){
+                if(map && false){
                   const bounds = map.getBounds()
                   const neCornerLatLng = bounds.getNorthEast()
                   const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }

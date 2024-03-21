@@ -47,8 +47,8 @@ const PlaceDetail = (props) => {
     return(
         <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10}}>
             <h3>Current Selection</h3>
-            <div>{selectedPlace.name}</div>
-            <div>{selectedPlace.formatted_address}</div>
+            <div><b>{selectedPlace.name}</b></div>
+            <div>{selectedPlace.address}</div>
             {
               selectedPlace['Summary star rating'] ?
               <div>

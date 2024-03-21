@@ -23,25 +23,6 @@ def timeit(f, print_=True):
         return result
     return wrap
 
-### Loading data
-def load_hospital_data():
-    data_path = os.path.join(DATA_DIR, 'hvbp_clinical_outcomes.csv')
-    quality_metrics = pd.read_csv(data_path)
-    quality_metrics.rename(columns={
-        "Facility Name" : "hospital",
-        "MORT-30-AMI Performance Rate" : "mort_30_ami",
-        "MORT-30-COPD Performance Rate" : "mort_30_copd",
-    }, inplace=True)
-    quality_metrics = quality_metrics.drop_duplicates(subset=['hospital'])
-    return quality_metrics
-
-def load_mrsa_data():
-    #need to rename this variable
-    data_path_mrsa_file = os.path.join(DATA_DIR, 'mrsa_bsi_odp_2022.csv')
-    mrsa_metrics = pd.read_csv(data_path_mrsa_file, encoding='latin1')
-    mrsa_metrics = mrsa_metrics.drop_duplicates(subset=['Facility_Name'])
-    return mrsa_metrics
-
 def load_summary_metric(metric_name: str) -> pd.DataFrame:
     """ Loads a DataFrame from a csv file in the data directory"""
     data_path = os.path.join(DATA_DIR, f'{metric_name}_summary_metrics.csv')
@@ -50,6 +31,11 @@ def load_summary_metric(metric_name: str) -> pd.DataFrame:
 
 def standardize_cms_name(cms_name_df: pd.DataFrame) -> pd.DataFrame:
     return cms_name_df.str.lower().replace('-', " ").replace('/', " ")
+
+def load_provider_list():
+    data_path = os.path.join(DATA_DIR, f'all_providers_by_CMS_with_name.csv')
+    provider_list = pd.read_csv(data_path).replace(np.nan, None)
+    return provider_list
 
 @timeit
 def load_summary_metrics() -> pd.DataFrame:
@@ -191,3 +177,4 @@ def update_place_results(results: Dict, google_maps: GoogleMapsClient, metrics: 
         if "formatted_phone_number" in place_detail:
             place_result["phone_number"] = place_detail["formatted_phone_number"]
         place_result = add_metrics_to_place(metrics, place_result)
+

@@ -1,0 +1,9 @@
+.app {
+    background-color: #ffffff;
+    display: column;
+  }
+
+.main-app {
+    background-color: #ffffff;
+    display: inline-block;
+}

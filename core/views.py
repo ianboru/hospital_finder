@@ -76,7 +76,8 @@ def index(request, path=None):
     radius = request.GET.get("radius") # in meters
     print("current location",location_string)
     care_type = request.GET.get("careType")
-    
+    print('careType backend', care_type)
+
     # Query google maps for places
     places_data = {}
     if not location_string or 'Na' in location_string:
@@ -87,10 +88,8 @@ def index(request, path=None):
     # print('provider_list ', provider_list)
     search_match_threshold = 70
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
-    print('filtered_providers, care type', care_type, filtered_providers)
     print(search_string)
     name_filtered_providers = []
-    
     if search_string:
         # filter base on fuzzy match on facility name base on search string
         for provider in filtered_providers:
@@ -98,10 +97,8 @@ def index(request, path=None):
                 name_filtered_providers.append(provider)
                 
         filtered_providers = name_filtered_providers 
-
     #print(filtered_providers[1:10])
-    print(filtered_providers)
-    # print('filtered_providers, ', filtered_providers)
+    filtered_providers = name_filtered_providers
     #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
     
     places_data['results'] = filtered_providers

@@ -3,6 +3,8 @@ import React, { useEffect, Component } from 'react'
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail"
 import TitleBanner from './components/TitleBanner'
+import SearchButton from './components/SearchButton'
+import HeaderInformation from './components/HeaderInformation'
 import Map from "./components/Map"
 import CareTypeFilter from "./components/CareTypeFilter"
 
@@ -66,17 +68,9 @@ function App() {
 
   return (
     <div className="App">
-      <TitleBanner />
+      <HeaderInformation />
       <div style={{marginBottom : 15}}>
-        <form onSubmit={
-              (event) => {
-                event.preventDefault()
-                onSearchSubmit()
-              }}
-        >
-          <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
-          <button type="submit" style={{marginLeft : 10}}>Search</button>
-        </form> 
+        <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange}/>
         <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/> 
       </div>
       <div style={outerStyles}>

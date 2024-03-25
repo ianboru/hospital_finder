@@ -90,13 +90,15 @@ def index(request, path=None):
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
     print(search_string)
     name_filtered_providers = []
-    for provider in filtered_providers:
-        if fuzz.partial_ratio(provider['Facility Name'].lower(), search_string) > search_match_threshold:
-            name_filtered_providers.append(provider)
+    if search_string:
+        # filter base on fuzzy match on facility name base on search string
+        for provider in filtered_providers:
+            if fuzz.partial_ratio(provider['Facility Name'].lower(), search_string) > search_match_threshold:
+                name_filtered_providers.append(provider)
+                
+        filtered_providers = name_filtered_providers 
     #print(filtered_providers[1:10])
     filtered_providers = name_filtered_providers
-    print(filtered_providers)
-    # print('filtered_providers, ', filtered_providers)
     #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
     
     places_data['results'] = filtered_providers

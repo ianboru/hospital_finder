@@ -1,20 +1,38 @@
 import React from 'react'
+import "../SearchButton.css"
 
 const SearchButton = (props) => {
     let onSearchSubmit = props.onSearchSubmit
     let searchTerm = props.searchTerm
     let onSearchInputChange = props.onSearchInputChange
+    let setSearchTerm = props.setSearchTerm
+
+    const clearSearchTerm = () => {
+        setSearchTerm("")
+    }
 
     return (
-        <form onSubmit={
-                    (event) => {
-                        event.preventDefault()
-                        onSearchSubmit()
-                    }}
-                >
-          <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
-          <button type="submit" style={{marginLeft : 10}}>Search</button>
-        </form> 
+        <form onSubmit={(event) => {
+            event.preventDefault()
+            onSearchSubmit()
+        }} className="search-form">
+        <input 
+            className="search-input"
+            placeholder="Hospital or location name here"
+            value={searchTerm}
+            onChange={onSearchInputChange}
+        />
+        <button type="submit" className="search-icon-button">
+            🔍
+        </button>
+        {searchTerm && (
+            <button type="button" onClick={clearSearchTerm} className="clear-search-button">
+                ❌
+            </button>
+         )}
+    </form>
+
+
     )
 }
 

@@ -114,8 +114,9 @@ const Map = (props) => {
 
     console.log("current center", curCenter)
     return isLoaded && curCenter ? (
-        <div style={{alignSelf : 'flex-end', width : "600px", height : "800px"}}>
+        <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap
+              style={{ width : "100%", height : "100%"}}
               mapContainerStyle={mapContainerStyle}
               center={curCenter}
               zoom={.85}
@@ -140,7 +141,7 @@ const Map = (props) => {
             { markers ? markers : <></> }
           </GoogleMap>
         </div>
-    ) : <div style={{fontWeight : "bold", marginTop : "15px"}}>Loading Map...</div>
+    ) : <div style={{fontWeight : "bold", marginTop : "15px", width : "100%", height : "100%"}}>Loading Map...</div>
   }
 
   export default Map

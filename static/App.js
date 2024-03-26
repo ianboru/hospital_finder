@@ -64,36 +64,41 @@ function App() {
 
   const outerStyles = {
     display : "flex",
-    alignContent : "flex-start"
+    alignContent : "flex-start",
+    flexDirection: 'column'
   }
 
   return (
     <div className="app">
       <HeaderInformation />
       <div className='main-app'>
-        <div style={{marginBottom : 15}}>
-          <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange}/>
-          <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/> 
+      <div className='left-container'>
+        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
+        <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
+        <div>
+          <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Results</div>
+          <div>
+            <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
+          </div>
         </div>
-        <div style={outerStyles}>
-            <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
-              <h1>Search results</h1>
-              <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
-            </div>
-          {
-            selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
-          }
-        </div>
-        <Map
-            placesData={placesData}
-            initialLocation={initialLocation}
-            selectedPlace={selectedPlace}
-            metricRanges={metricRanges}
-            onSearchSubmit={onSearchSubmit}
-            setZoomRadius={setZoomRadius}
-            currentGPSLocation={currentGPSLocation}
-          />
       </div>
+      <div className='map-container'>
+        {selectedPlace && (
+          <div className='place-detail-overlay'>
+            <PlaceDetail selectedPlace={selectedPlace} />
+          </div>
+        )}
+        <Map
+          placesData={placesData}
+          initialLocation={initialLocation}
+          selectedPlace={selectedPlace}
+          metricRanges={metricRanges}
+          onSearchSubmit={onSearchSubmit}
+          setZoomRadius={setZoomRadius}
+          currentGPSLocation={currentGPSLocation}
+        />
+      </div>
+    </div>
     </div>
   );
 }

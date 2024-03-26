@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import '../CareTypeFilter.css'
 
 const CareTypeFilter = (props) => { 
 
@@ -25,15 +26,18 @@ const CareTypeFilter = (props) => {
     }
     console.log("filter selected", selectedCareTypeId, selectedCareType)
     return(
-        <div>
-            <h3>Filter</h3> 
-            <span>Select Care Type </span>
-            <select value={selectedCareType ? selectedCareTypeId : ''} onChange={handleChange}>
+    <div class="dropdown-container">
+        <span class="dropdown-label">Care Type</span>
+        <div class="dropdown">
+            <select class="dropdown-select" value={selectedCareType ? selectedCareTypeId : ''} onChange={handleChange}>
+                <option value="" disabled>Select Care Type</option>
                 {careTypes.map(careType => (
                     <option key={careType.id} value={careType.id}>{careType.name}</option>
                 ))}
             </select>
+            <span class="dropdown-arrow">&#9662;</span>
         </div>
+    </div>
     )
 }
 

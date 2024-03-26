@@ -7,7 +7,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
       "height" : "150px",
       "color" : "gray",
       "padding" : 10,
-      "width" : "300px",
+      "width" : "350px",
       cursor: 'pointer'
     }
     if(!selectedPlace){
@@ -46,7 +46,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         </div>
       )
       //how am i structuring the data from the backend so i can do lookup by name on the FE
-    }) : <div>No valid results</div>
+    }) : <div style={{marginLeft: '1em'}}>No valid results</div>
 
     console.log('placeTiles', placeTiles)
     return (

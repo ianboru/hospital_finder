@@ -1,0 +1,23 @@
+.header-info {
+    background-color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    display: column;
+    margin-bottom: 20px;
+  }
+  
+.header-info h1 {
+font-size: 1.5em;
+}
+
+.header-info p {
+font-size: 1em;
+margin-top: 10px;
+}
+
+.infoStyle {
+  display: flex;
+  align-items: center;
+  flex-basis: 50%; 
+  padding-left: 10px;
+};

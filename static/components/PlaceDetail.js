@@ -45,7 +45,7 @@ const PlaceDetail = (props) => {
 
     console.log("Infection stars", detailedInfectionMetricStars)
     return(
-        <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10}}>
+        <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
             <h3>Current Selection</h3>
             <div><b>{selectedPlace.name}</b></div>
             <div>{selectedPlace.address}</div>

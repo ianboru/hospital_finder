@@ -4,7 +4,7 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import os
 import numpy as np
-
+import math
 def load_hcahps_data(export_path, **kwargs):
     hcahps_path = os.path.join(export_path, "HCAHPS-Hospital.csv")
     hcahps_df = pd.read_csv(hcahps_path, low_memory=False)
@@ -171,29 +171,38 @@ geolocator = GoogleV3(api_key="AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o")
 def add_lat_long_to_row(row):
     location = geolocator.geocode(f"{row['Address']} {row['State']}")
     index = row.name 
-    print(f"geocoding {index}/{row['num_ccn']}")
+    if index % 10 == 0:
+        print(f"geocoding {index}/{row['num_ccn']}")
     lat = location.latitude if location else None
     long = location.longitude if location else None
     return pd.Series([lat, long])
 
-def load_ccn_file(facility_type, facility_id_column, add_location=False):
+def load_ccn_file(facility_type, facility_id_column):
     facility_list_path = os.path.join(export_path, f"CCN - {facility_type}.csv")
-    facility_df = pd.read_csv(facility_list_path, low_memory=False)
+    facility_df = pd.read_csv(facility_list_path, low_memory=False, encoding='unicode_escape')
+    print(facility_df.columns)
     facility_df = facility_df.drop_duplicates(subset=[facility_id_column]).reset_index()
-    name_column = facility_df.columns[facility_df.columns.str.contains('Name')].values[0]
+    name_column = facility_df.columns[facility_df.columns.str.contains('Name', case=False)].values[0]
+    address_column = facility_df.columns[facility_df.columns.str.contains('Address', case=False)|facility_df.columns.str.contains('_St', case=False)].values[0]
+    city_column = facility_df.columns[facility_df.columns.str.contains('City', case=False)].values[0]
+    state_column = facility_df.columns[facility_df.columns.str.contains('State', case=False)].values[0]
+    zip_column = facility_df.columns[facility_df.columns.str.contains('Zip', case=False)].values[0]
+
     facility_df = facility_df[[
              facility_id_column,
-             'Address',
-             'City/Town',
-             'State',
-             'ZIP Code',
+             address_column,
+             city_column,
+             state_column,
+             zip_column,
              name_column
             ]]
     facility_df['Facility Type'] = facility_type
-    facility_df['num_ccn'] = len(facility_df)
-    print(facility_type, name_column, facility_id_column)
-    if add_location:
-        facility_df[['latitude','longitude']] = facility_df.apply(add_lat_long_to_row, axis=1)
+    return facility_df
+
+def add_locations_through_geocoding(facility_df,limit = None):
+    if not limit:
+        limit = len(facility_df)
+    facility_df[['latitude','longitude']] = facility_df[:limit].apply(add_lat_long_to_row, axis=1)
     return facility_df
 
 def update_provider_data():
@@ -232,17 +241,50 @@ def load_provider_cms_list():
     home_health_df = load_ccn_file("Home Health", "CMS Certification Number (CCN)")
     home_health_df.rename(columns={
         "CMS Certification Number (CCN)" : "Facility ID",
+        "Provider Name" : "Facility Name"
     }, inplace=True)
-    all_providers_df = pd.concat([hospital_df, ed_df, home_health_df], axis=0)
-    all_providers_export_path = os.path.join(export_path,'all_providers_by_CMS.csv')
-    all_providers_df.to_csv(all_providers_export_path, index=False)
+    hospice_df = load_ccn_file("Hospice", "CMS Certification Number (CCN)")
+    hospice_df.rename(columns={
+        "CMS Certification Number (CCN)" : "Facility ID",
+        "Address Line 1" : "Address",
+    }, inplace=True)
+    outpatient_df = load_ccn_file("Outpatient", "Rndrng_Prvdr_CCN")
+    outpatient_df.rename(columns={
+        "Rndrng_Prvdr_CCN" : "Facility ID",
+         "Rndrng_Prvdr_Org_Name" : "Facility Name",
+         "Rndrng_Prvdr_St" : "Address",
+         "Rndrng_Prvdr_City" : "City/Town",
+         "Rndrng_Prvdr_State_Abrvtn" : "State",
+         "Rndrng_Prvdr_Zip5" : "ZIP Code"
+    }, inplace=True)
+    all_providers_df = pd.concat([hospital_df, ed_df, home_health_df, hospice_df, outpatient_df], axis=0)
+    all_providers_df['num_ccn'] = len(all_providers_df)
+
     print(all_providers_df)
+    print(all_providers_df.columns)
     return all_providers_df
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 #hcahps_df = load_hcahps_data(export_path)
 #hai_df = load_hai_data(export_path)
 #df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
-#hospital_df = load_provider_cms_list()
-update_provider_data()
+all_providers_df = load_provider_cms_list()
+chunks = 1000
+chunk_limit = None 
+total_rows = len(all_providers_df)
+for chunk in range(chunks):
+    chunk_size = math.ceil(total_rows/chunks)
+    lower_index = chunk_size * chunk 
+    upper_index = min(chunk_size * (chunk + 1), total_rows - 1)
+    current_providers_df = add_locations_through_geocoding(all_providers_df[lower_index:upper_index])
+    all_providers_export_path = os.path.join(export_path,'all_providers_by_CMS_3_24.csv')
+    print(f"chunk {chunk}/{chunks}, size {chunk_size}, indices {lower_index} : {upper_index}")
+    if chunk == 0:
+        print("initialize")
+        current_providers_df.to_csv(all_providers_export_path, index=False)
+    else:
+        current_providers_df.to_csv(all_providers_export_path, index=False, mode='a',header=False)
+    if chunk_limit and chunk == chunk_limit:
+        break
+#update_provider_data()
 

@@ -25,6 +25,9 @@ const PlaceDetail = (props) => {
     })
     console.log("Patient stars", detailedExperienceMetricStars)
 
+    const closePlaceDetail = () => {
+      props.setSelectedPlace(null)
+    }
     // Map infection rating metrics to their respective labels
     const detailedInfectionMetricsMap = {
       "Central Line Associated Bloodstream Infection (ICU + select Wards) Compared to National" : "CLBAI",
@@ -38,15 +41,28 @@ const PlaceDetail = (props) => {
     const detailedInfectionMetricStars = Object.keys(detailedInfectionMetricsMap).map((metricName)=>{
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
+      console.log(metricName)
       return(
-        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiEmoji(metricValue,3)}</span> </div>
+        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiEmoji(metricValue,2)}</span> </div>
       )
     })
 
     console.log("Infection stars", detailedInfectionMetricStars)
     return(
-        <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10}}>
-            <h3>Current Selection</h3>
+        <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
+            <div onClick={closePlaceDetail} style={{
+              display : 'flex', 
+              justifyContent : 'flex-end', 
+              cursor :'pointer',
+              fontSize : 16, 
+              color: 'gray'
+            }}>
+              <span>x</span>
+            </div>
+            <div style={{
+              fontSize : 16, marginBottom : 15, fontWeight : 'bold',
+              color : 'gray'
+            }}>Current Selection</div>
             <div><b>{selectedPlace.name}</b></div>
             <div>{selectedPlace.address}</div>
             {
@@ -64,7 +80,7 @@ const PlaceDetail = (props) => {
               selectedPlace['Infection Rating'] ?
               <div>
                 <div>
-                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'])}</span>
+                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'],2)}</span>
                 </div>
                 <div style={{marginLeft : 15}}>
                   {detailedInfectionMetricStars}

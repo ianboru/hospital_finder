@@ -3,8 +3,11 @@ import React, { useEffect, Component } from 'react'
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail"
 import TitleBanner from './components/TitleBanner'
+import SearchButton from './components/SearchButton'
+import HeaderInformation from './components/HeaderInformation'
 import Map from "./components/Map"
 import CareTypeFilter from "./components/CareTypeFilter"
+import './App.css'
 
 function App() {
   console.log("version 0.1.1")
@@ -61,32 +64,30 @@ function App() {
 
   const outerStyles = {
     display : "flex",
-    alignContent : "flex-start"
+    alignContent : "flex-start",
+    flexDirection: 'column'
   }
 
   return (
-    <div className="App">
-      <TitleBanner />
-      <div style={{marginBottom : 15}}>
-        <form onSubmit={
-              (event) => {
-                event.preventDefault()
-                onSearchSubmit()
-              }}
-        >
-          <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
-          <button type="submit" style={{marginLeft : 10}}>Search</button>
-        </form> 
-        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/> 
-      </div>
-      <div style={outerStyles}>
-          <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
-            <h1>Search results</h1>
+    <div className="app">
+      <HeaderInformation />
+      <div className='main-app'>
+      <div className='left-container'>
+        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
+        <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
+        <div>
+          <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Search Results</div>
+          <div>
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
           </div>
-        {
-          selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
-        }
+        </div>
+      </div>
+      <div className='map-container'>
+        {selectedPlace && (
+          <div className='place-detail-overlay'>
+            <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
+          </div>
+        )}
         <Map
           placesData={placesData}
           initialLocation={initialLocation}
@@ -96,9 +97,8 @@ function App() {
           setZoomRadius={setZoomRadius}
           currentGPSLocation={currentGPSLocation}
         />
-
       </div>
-
+    </div>
     </div>
   );
 }

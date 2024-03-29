@@ -10,13 +10,13 @@ const HeaderInformation = () => {
             Our data comes from national standardized public reporting
         </p>
       </div>
-      <div style={{paddingTop: '3%'}}>
-        <p>
+      <div>
+        <div>
             <b>Infection Risks</b> illustrate a facility’s commitment to keeping their patients safe - choose wisely!
-        </p>
-        <p>
+        </div>
+        <div>
             <b>Patient Ratings</b> come from Consumer Assessment of Healthcare Providers and Systems (CAHPS) surveys.
-        </p>
+        </div>
       </div>
     </div>
   )

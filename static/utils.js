@@ -2,16 +2,17 @@ import React from 'react';
 
 const filledStarUnicode = "\u2605"
 const empyStarUnicode = "\u2606"
-const getHaiEmoji = (starCount) => {
+const getHaiEmoji = (starCount, midPoint) => {
+    console.log(starCount)
     if(!starCount){
         return ""
     }
     switch (true){
-        case starCount < 3:
+        case starCount < midPoint:
             return (<span style={{color:"green"}}>😄 Better Than Average</span>)
-        case starCount == 3:
+        case starCount == midPoint:
             return (<span style={{color:"orange"}}>😐 Average</span>)
-        case starCount > 3:
+        case starCount > midPoint:
             return (<span style={{color:"red"}}>🤢 Worse Than Average</span>)
     }
 }

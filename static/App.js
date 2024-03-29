@@ -76,7 +76,7 @@ function App() {
         <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
         <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
         <div>
-          <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Results</div>
+          <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Search Results</div>
           <div>
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
           </div>
@@ -85,7 +85,7 @@ function App() {
       <div className='map-container'>
         {selectedPlace && (
           <div className='place-detail-overlay'>
-            <PlaceDetail selectedPlace={selectedPlace} />
+            <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
           </div>
         )}
         <Map

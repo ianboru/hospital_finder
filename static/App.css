@@ -1,14 +1,16 @@
 .main-app {
   display: flex;
   flex-direction: row;
+  height : 100%;
 }
 
 .left-container {
-  flex: 1;
+  flex: 1.5;
   padding: 4px;
   margin-bottom: 15px;
   max-height: 800px;
   overflow-y: auto;
+  padding-right: 15;
 }
 
 .map-container {

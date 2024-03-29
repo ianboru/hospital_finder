@@ -64,6 +64,7 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
                 "latitude" : row['latitude'],
                 "longitude" : row['longitude'],
             }
+            cur_provider["address"] = row["Address"]
             filtered_provider_list.append(cur_provider)
     return filtered_provider_list
 
@@ -97,10 +98,7 @@ def index(request, path=None):
                 name_filtered_providers.append(provider)
                 
         filtered_providers = name_filtered_providers 
-    #print(filtered_providers[1:10])
-    filtered_providers = name_filtered_providers
-    #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
-    
+
     places_data['results'] = filtered_providers
     # Context for the front end
     context = {

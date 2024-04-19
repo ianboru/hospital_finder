@@ -3,7 +3,7 @@ import React from 'react';
 const filledStarUnicode = "\u2605"
 const empyStarUnicode = "\u2606"
 const getHaiEmoji = (starCount, midPoint) => {
-    console.log(starCount)
+    console.log(starCount, midPoint)
     if(!starCount){
         return ""
     }

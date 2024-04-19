@@ -91,6 +91,7 @@ function App() {
         <Map
           placesData={placesData}
           initialLocation={initialLocation}
+          setSelectedPlace={setSelectedPlace}
           selectedPlace={selectedPlace}
           metricRanges={metricRanges}
           onSearchSubmit={onSearchSubmit}

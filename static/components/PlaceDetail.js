@@ -23,7 +23,6 @@ const PlaceDetail = (props) => {
         <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHCAHPSStars(metricValue)}</span> </div>
       )
     })
-    console.log("Patient stars", detailedExperienceMetricStars)
 
     const closePlaceDetail = () => {
       props.setSelectedPlace(null)
@@ -41,7 +40,6 @@ const PlaceDetail = (props) => {
     const detailedInfectionMetricStars = Object.keys(detailedInfectionMetricsMap).map((metricName)=>{
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
-      console.log(metricName)
       return(
         <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiEmoji(metricValue,2)}</span> </div>
       )
@@ -80,7 +78,7 @@ const PlaceDetail = (props) => {
               selectedPlace['Infection Rating'] ?
               <div>
                 <div>
-                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'],2)}</span>
+                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'],3)}</span>
                 </div>
                 <div style={{marginLeft : 15}}>
                   {detailedInfectionMetricStars}

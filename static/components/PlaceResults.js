@@ -58,7 +58,6 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         )
       }) : <div style={{marginLeft: '1em'}}>No valid results</div>
 
-    console.log('placeTiles', placeTiles)
     return (
       <div style={{width : "250px", marginRight : "15px"}}>
         {placeTiles}

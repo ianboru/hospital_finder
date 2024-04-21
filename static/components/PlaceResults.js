@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars } from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
-    console.log('placesData', placesData)
+  
     const placeTileStyles = {
       "border" : "1px solid gray",
       "height" : "150px",

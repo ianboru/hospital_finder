@@ -3,7 +3,6 @@ import React from 'react';
 const filledStarUnicode = "\u2605"
 const empyStarUnicode = "\u2606"
 const getHaiEmoji = (starCount, midPoint) => {
-    console.log(starCount, midPoint)
     if(!starCount){
         return ""
     }
@@ -19,6 +18,7 @@ const getHaiEmoji = (starCount, midPoint) => {
 const getHCAHPSStars = (starCount, maxCount=5) => {
     if (starCount === null){
         // TODO: Handle null values
+        return 0
     }
     return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
 }

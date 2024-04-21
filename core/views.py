@@ -84,7 +84,7 @@ def index(request, path=None):
     if not location_string or 'Na' in location_string:
         location_string = "32.7853263,-117.2407347"
     if not radius:
-        radius = 100
+        radius = 80
     split_location_string = location_string.strip().split(",")
     # print('provider_list ', provider_list)
     search_match_threshold = 70

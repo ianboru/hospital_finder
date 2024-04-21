@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars } from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
-    console.log('placesData', placesData)
     const placeTileStyles = {
       "border" : "1px solid gray",
       "height" : "150px",
@@ -34,13 +33,13 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             {
               place['Infection Rating']||place['Infection Rating'] === 0 ?
                 <div>
-                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'])}</span></b>
+                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'],3)}</span></b>
                 </div> : <></>
             }
             {
               place['Summary star rating']||place['Summary star rating'] === 0 ?
                 <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'])}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
                 </div> : <></>
             }
         </div>
@@ -48,7 +47,6 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
       //how am i structuring the data from the backend so i can do lookup by name on the FE
     }) : <div style={{marginLeft: '1em'}}>No valid results</div>
 
-    console.log('placeTiles', placeTiles)
     return (
       <div style={{width : "250px", marginRight : "15px"}}>
         {placeTiles}

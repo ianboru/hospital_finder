@@ -7,6 +7,7 @@ const Map = (props) => {
     const placesData = props.placesData 
     const initialLocation = props.initialLocation 
     const selectedPlace = props.selectedPlace 
+    const setSelectedPlace = props.setSelectedPlace 
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius  
@@ -35,7 +36,6 @@ const Map = (props) => {
           return gray
         }
     }
-    console.log("places", placesData)
     const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
@@ -70,6 +70,7 @@ const Map = (props) => {
           }}
           position={latLng}
           onClick={()=>{
+            console.log("selecting place in marker", place)
             setSelectedPlace(place)
           }}
         />
@@ -112,7 +113,7 @@ const Map = (props) => {
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
         firstLocationCenter : props.currentGPSLocation
 
-    console.log("current center", curCenter)
+    console.log("current center", curCenter, selectedPlace, selectedPlaceCenter, firstLocation, firstLocationCenter, props.currentGPSLocation )
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap

@@ -147,9 +147,6 @@ def load_hai_data(export_path):
     # Add summary metrics across all measures
     hai_df['Mean SIR'] = hai_df[[f"{measure} SIR" for measure in hai_measures]].astype(float).mean(axis=1)
     hai_df['Mean Compared to National'] = hai_df[[f"{measure} Compared to National" for measure in hai_measures]].astype(float).mean(axis=1)
-    # TODO: Determine the best way to convert this to a 5 star rating
-    # bins = hai_df['Mean Compared to National'].describe(percentiles=[0.2,0.4,0.6,0.8,1]).loc[['0%','20%','40%','60%','80%', '100%']]
-    # hai_df["Infection Rating"] = pd.cut(hai_df['Mean Compared to National'], bins=5, labels=[1,2,3,4,5])
     hai_df['Infection Rating'] = pd.cut(hai_df['Mean Compared to National'] - hai_df['Mean Compared to National'].mean(), bins=5, labels=[1,2,3,4,5])
     hai_export_path = os.path.join(export_path,'hai_summary_metrics.csv')
     hai_df.to_csv(hai_export_path, index=False)
@@ -196,13 +193,16 @@ def load_ccn_file(facility_type, facility_id_column):
              zip_column,
              name_column
             ]]
+    print(facility_df[facility_df[facility_id_column] == "50775"])
+    facility_df[facility_id_column] = facility_df[facility_id_column].str.zfill(6)
     facility_df['Facility Type'] = facility_type
     return facility_df
 
 def add_locations_through_geocoding(facility_df,limit = None):
     if not limit:
         limit = len(facility_df)
-    facility_df[['latitude','longitude']] = facility_df[:limit].apply(add_lat_long_to_row, axis=1)
+    #uncomment to add locations 
+    #facility_df[['latitude','longitude']] = facility_df[:limit].apply(add_lat_long_to_row, axis=1)
     return facility_df
 
 def update_provider_data():

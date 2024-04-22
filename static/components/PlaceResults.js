@@ -14,15 +14,19 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     }
     if (placesData.results && placesData.results.length){
       //sort by existence of cms metrics
+      console.log("initial results", placesData.results)
+      placesData.results = [...new Map(placesData.results.map(item => [item["Facility ID"], item])).values()]
       placesData.results = placesData.results.sort(function(left, right) {
         const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary star rating']||left['Summary star rating'] === 0
         const rightHasCMSMetric = right['Infection Rating']||right['Infection Rating'] === 0||right['Summary star rating']||right['Summary star rating'] === 0
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
+    console.log("re-rendering results")
     const placeTiles = (placesData.results && placesData.results.length) > 0 ? placesData.results.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles}
-      if(place.name == selectedPlace.name){
+      console.log("palce",selectedPlace['Facility ID'],)
+      if(place['Facility ID'] == selectedPlace['Facility ID']){
         selectedPlaceStyle.border = "2px solid black"
       }
       return (

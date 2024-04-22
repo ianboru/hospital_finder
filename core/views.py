@@ -16,6 +16,7 @@ pd.set_option('display.max_rows', None,)
 from geopy import distance
 from rapidfuzz import fuzz
 import math
+import pprint
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
@@ -65,6 +66,11 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
                 "longitude" : row['longitude'],
             }
             cur_provider["address"] = row["Address"]
+            if "50755" in cur_provider["Facility ID"]:
+                print("50755")
+                #print( row)
+            #normalize ids to 6 digits
+            #cur_provider["Facility ID"] = cur_provider["Facility ID"].zfill(6)
             filtered_provider_list.append(cur_provider)
     return filtered_provider_list
 
@@ -98,7 +104,7 @@ def index(request, path=None):
                 name_filtered_providers.append(provider)
                 
         filtered_providers = name_filtered_providers 
-
+    #pprint.pprint(filtered_providers)
     places_data['results'] = filtered_providers
     # Context for the front end
     context = {

@@ -24,7 +24,8 @@ const Map = (props) => {
         // Use average of the two metrics
         const min_combined_metric = (metric_ranges['min_hai'] + metric_ranges['min_hcahps'])/2
         const max_combined_metric = (metric_ranges['max_hai'] + metric_ranges['max_hcahps'])/2
-    
+        //console.log("marker ", "1) " + place['Infection Rating'],"2) " + place['Summary star rating'], "3) " + metric_ranges )
+        //console.log("has em", has_infection_rating, has_patient_summary)
         if(has_infection_rating && has_patient_summary){
           marker_metric = (place['Infection Rating'] + place['Summary star rating'])/2
           return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
@@ -36,6 +37,7 @@ const Map = (props) => {
           return gray
         }
     }
+    console.log(placesData.results)
     const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
@@ -114,6 +116,11 @@ const Map = (props) => {
         firstLocationCenter : props.currentGPSLocation
 
     console.log("current center", curCenter, selectedPlace, selectedPlaceCenter, firstLocation, firstLocationCenter, props.currentGPSLocation )
+    if (curCenter){
+      //curCenter.lat = curCenter.latitude
+      //curCenter.long = curCenter.longitude
+    }
+    
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap

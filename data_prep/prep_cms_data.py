@@ -202,7 +202,8 @@ def load_ccn_file(facility_type, facility_id_column):
 def add_locations_through_geocoding(facility_df,limit = None):
     if not limit:
         limit = len(facility_df)
-    facility_df[['latitude','longitude']] = facility_df[:limit].apply(add_lat_long_to_row, axis=1)
+    #uncomment to add locations 
+    #facility_df[['latitude','longitude']] = facility_df[:limit].apply(add_lat_long_to_row, axis=1)
     return facility_df
 
 def update_provider_data():

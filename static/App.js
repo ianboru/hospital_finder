@@ -37,7 +37,7 @@ function App() {
         lng: position.coords.longitude
       })
     })
-  }, [selectedPlace])
+  }, [])
 
 
   const onSelectCareType = (careType) => {

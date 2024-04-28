@@ -14,7 +14,6 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     }
     if (placesData.results && placesData.results.length){
       //sort by existence of cms metrics
-      console.log("initial results", placesData.results)
       placesData.results = [...new Map(placesData.results.map(item => [item["Facility ID"], item])).values()]
       placesData.results = placesData.results.sort(function(left, right) {
         const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary star rating']||left['Summary star rating'] === 0
@@ -25,12 +24,11 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log("re-rendering results")
     const placeTiles = (placesData.results && placesData.results.length) > 0 ? placesData.results.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles}
-      console.log("palce",selectedPlace['Facility ID'],)
       if(place['Facility ID'] == selectedPlace['Facility ID']){
         selectedPlaceStyle.border = "2px solid black"
       }
       return (
-        <div style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
+        <div id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
             <div style={{color : "black"}}><b>{place.name}</b></div>
             <div>{place.address}</div>
             <div>{place.phone_number}</div>

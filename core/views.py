@@ -87,12 +87,13 @@ def index(request, path=None):
 
     # Query google maps for places
     places_data = {}
+    print("location string", location_string)
     if not location_string or 'Na' in location_string:
         location_string = "32.7853263,-117.2407347"
     if not radius:
         radius = 80
     split_location_string = location_string.strip().split(",")
-    # print('provider_list ', provider_list)
+    print('parsed location', split_location_string)
     search_match_threshold = 70
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
     print(search_string)

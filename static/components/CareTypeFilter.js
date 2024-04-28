@@ -24,16 +24,16 @@ const CareTypeFilter = (props) => {
     }
     console.log("filter selected", selectedCareTypeId, selectedCareType)
     return(
-    <div class="dropdown-container">
-        <span class="dropdown-label">Care Type |</span>
-        <div style={{fontSize : 20}} class="dropdown">
-            <select class="dropdown-select" value={selectedCareType ? selectedCareTypeId : ''} onChange={handleChange}>
+    <div className="dropdown-container">
+        <span className="dropdown-label">Care Type |</span>
+        <div style={{fontSize : 20}} className="dropdown">
+            <select className="dropdown-select" value={selectedCareType ? selectedCareTypeId : ''} onChange={handleChange}>
                 <option style={{fontSize : 20}} value="" disabled>Select Care Type</option>
                 {careTypes.map(careType => (
                     <option style={{fontSize : 20}} key={careType.id} value={careType.id}>{careType.name}</option>
                 ))}
             </select>
-            <span class="dropdown-arrow">&#9662;</span>
+            <span className="dropdown-arrow">&#9662;</span>
         </div>
     </div>
     )

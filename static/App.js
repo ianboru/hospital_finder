@@ -31,7 +31,14 @@ function App() {
   const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
-      console.log("updating current position", position.coords)
+      console.log("updating current position", position.coords, initialLocation)
+      if(!initialLocation.lat){
+        console.log("updating url")
+        let url = new URL(window.location.origin + window.location.pathname)
+        url.searchParams.set("location", `${position.coords.latitude},${position.coords.longitude}`)
+        window.location.href = url
+      }
+      
       setCurrentGPSLocation({
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -52,7 +59,6 @@ function App() {
     url.searchParams.set("search", searchTerm)
     url.searchParams.set("careType", careType ? careType.name : initialCareType )
     if (newCenter && newCenter !== undefined){
-      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
       if(newRadius){
         url.searchParams.set("radius", `${newRadius}`)
       }
@@ -67,7 +73,7 @@ function App() {
     alignContent : "flex-start",
     flexDirection: 'column'
   }
-
+  console.log("initial map location", initialLocation)
   return (
     <div className="app">
       <HeaderInformation />

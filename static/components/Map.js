@@ -37,7 +37,6 @@ const Map = (props) => {
           return gray
         }
     }
-    console.log(placesData.results)
     const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
@@ -53,26 +52,28 @@ const Map = (props) => {
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
+      const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
+      const strokeWeight = isSelectedPlace ? 1.2 : 1
+      const scale = isSelectedPlace ? 1.2 : 1
+      const strokeColor = isSelectedPlace ? "black" : "white"
+      const fillOpacity = isSelectedPlace ? 1 : .8
+
+      if(isSelectedPlace){
+        console.log("marker data", isSelectedPlace, place["Facility Name"], strokeWeight, scale, strokeColor)
+      }
       return (
         <Marker
-          onLoad={(marker) => {
-            const customIcon = (opts) => Object.assign({
+          icon={{
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: "green",
-              fillOpacity: 1,
-              strokeColor: '#000',
-              strokeWeight: 1,
-              scale: 1,
-            }, opts);
-
-            marker.setIcon(customIcon({
               fillColor: markerColor,
-              strokeColor: 'white'
-            }));
+              strokeColor : strokeColor,
+              strokeWeight: strokeWeight,
+              fillOpacity: fillOpacity,
+              scale: scale,
           }}
           position={latLng}
-          onClick={()=>{
-            console.log("selecting place in marker", place)
+          onClick={(marker)=>{
+            console.log("selecting place in marker", marker)
             setSelectedPlace(place)
           }}
         />
@@ -115,10 +116,17 @@ const Map = (props) => {
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
         firstLocationCenter : props.currentGPSLocation
 
-    console.log("current center", curCenter, selectedPlace, selectedPlaceCenter, firstLocation, firstLocationCenter, props.currentGPSLocation )
-    if (curCenter){
-      //curCenter.lat = curCenter.latitude
-      //curCenter.long = curCenter.longitude
+    console.log("current center", curCenter)
+    if (curCenter && curCenter.lat < 1 ){
+      //for some reason lat and lng are flipped by this point
+      const tempCenter = {...curCenter}
+      curCenter.lat = tempCenter.lng
+      curCenter.lng = tempCenter.lat
+    }
+    if(curCenter && !curCenter.lat && selectedPlace){
+      //sets lat and long from selected place (maybe best done earlier in the flow)
+      curCenter.lat = selectedPlace.latitude
+      curCenter.lng = selectedPlace.longitude
     }
     
     return isLoaded && curCenter ? (

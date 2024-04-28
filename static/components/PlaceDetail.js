@@ -45,7 +45,6 @@ const PlaceDetail = (props) => {
       )
     })
 
-    console.log("Infection stars", detailedInfectionMetricStars)
     return(
         <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
             <div onClick={closePlaceDetail} style={{

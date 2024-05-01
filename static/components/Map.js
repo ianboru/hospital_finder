@@ -7,6 +7,7 @@ const Map = (props) => {
     const placesData = props.placesData 
     const initialLocation = props.initialLocation 
     const selectedPlace = props.selectedPlace 
+    const setSelectedPlace = props.setSelectedPlace 
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius  
@@ -23,7 +24,8 @@ const Map = (props) => {
         // Use average of the two metrics
         const min_combined_metric = (metric_ranges['min_hai'] + metric_ranges['min_hcahps'])/2
         const max_combined_metric = (metric_ranges['max_hai'] + metric_ranges['max_hcahps'])/2
-    
+        //console.log("marker ", "1) " + place['Infection Rating'],"2) " + place['Summary star rating'], "3) " + metric_ranges )
+        //console.log("has em", has_infection_rating, has_patient_summary)
         if(has_infection_rating && has_patient_summary){
           marker_metric = (place['Infection Rating'] + place['Summary star rating'])/2
           return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
@@ -35,7 +37,6 @@ const Map = (props) => {
           return gray
         }
     }
-    console.log("places", placesData)
     const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
@@ -51,25 +52,28 @@ const Map = (props) => {
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
+      const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
+      const strokeWeight = isSelectedPlace ? 1.2 : 1
+      const scale = isSelectedPlace ? 1.2 : 1
+      const strokeColor = isSelectedPlace ? "black" : "white"
+      const fillOpacity = isSelectedPlace ? 1 : .8
+
+      if(isSelectedPlace){
+        console.log("marker data", isSelectedPlace, place["Facility Name"], strokeWeight, scale, strokeColor)
+      }
       return (
         <Marker
-          onLoad={(marker) => {
-            const customIcon = (opts) => Object.assign({
+          icon={{
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              fillColor: "green",
-              fillOpacity: 1,
-              strokeColor: '#000',
-              strokeWeight: 1,
-              scale: 1,
-            }, opts);
-
-            marker.setIcon(customIcon({
               fillColor: markerColor,
-              strokeColor: 'white'
-            }));
+              strokeColor : strokeColor,
+              strokeWeight: strokeWeight,
+              fillOpacity: fillOpacity,
+              scale: scale,
           }}
           position={latLng}
-          onClick={()=>{
+          onClick={(marker)=>{
+            console.log("selecting place in marker", marker)
             setSelectedPlace(place)
           }}
         />
@@ -113,9 +117,22 @@ const Map = (props) => {
         firstLocationCenter : props.currentGPSLocation
 
     console.log("current center", curCenter)
+    if (curCenter && curCenter.lat < 1 ){
+      //for some reason lat and lng are flipped by this point
+      const tempCenter = {...curCenter}
+      curCenter.lat = tempCenter.lng
+      curCenter.lng = tempCenter.lat
+    }
+    if(curCenter && !curCenter.lat && selectedPlace){
+      //sets lat and long from selected place (maybe best done earlier in the flow)
+      curCenter.lat = selectedPlace.latitude
+      curCenter.lng = selectedPlace.longitude
+    }
+    
     return isLoaded && curCenter ? (
-        <div style={{alignSelf : 'flex-end', width : "600px", height : "800px"}}>
+        <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap
+              style={{ width : "100%", height : "100%"}}
               mapContainerStyle={mapContainerStyle}
               center={curCenter}
               zoom={.85}
@@ -140,7 +157,7 @@ const Map = (props) => {
             { markers ? markers : <></> }
           </GoogleMap>
         </div>
-    ) : <div style={{fontWeight : "bold", marginTop : "15px"}}>Loading Map...</div>
+    ) : <div style={{fontWeight : "bold", marginTop : "15px", width : "100%", height : "100%"}}>Loading Map...</div>
   }
 
   export default Map

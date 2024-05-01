@@ -33,8 +33,9 @@ def standardize_cms_name(cms_name_df: pd.DataFrame) -> pd.DataFrame:
     return cms_name_df.str.lower().replace('-', " ").replace('/', " ")
 
 def load_provider_list():
-    data_path = os.path.join(DATA_DIR, f'all_providers_by_CMS_with_name.csv')
+    data_path = os.path.join(DATA_DIR, f'all_providers_by_CMS_3_24.csv')
     provider_list = pd.read_csv(data_path).replace(np.nan, None)
+    provider_list["Facility ID"] = provider_list["Facility ID"].str.zfill(6)
     return provider_list
 
 @timeit

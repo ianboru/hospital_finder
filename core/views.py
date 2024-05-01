@@ -16,6 +16,7 @@ pd.set_option('display.max_rows', None,)
 from geopy import distance
 from rapidfuzz import fuzz
 import math
+import pprint
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
@@ -64,6 +65,12 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
                 "latitude" : row['latitude'],
                 "longitude" : row['longitude'],
             }
+            cur_provider["address"] = row["Address"]
+            if "50755" in cur_provider["Facility ID"]:
+                print("50755")
+                #print( row)
+            #normalize ids to 6 digits
+            #cur_provider["Facility ID"] = cur_provider["Facility ID"].zfill(6)
             filtered_provider_list.append(cur_provider)
     return filtered_provider_list
 
@@ -80,12 +87,13 @@ def index(request, path=None):
 
     # Query google maps for places
     places_data = {}
+    print("location string", location_string)
     if not location_string or 'Na' in location_string:
         location_string = "32.7853263,-117.2407347"
     if not radius:
-        radius = 100
+        radius = 80
     split_location_string = location_string.strip().split(",")
-    # print('provider_list ', provider_list)
+    print('parsed location', split_location_string)
     search_match_threshold = 70
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
     print(search_string)
@@ -97,10 +105,7 @@ def index(request, path=None):
                 name_filtered_providers.append(provider)
                 
         filtered_providers = name_filtered_providers 
-    #print(filtered_providers[1:10])
-    filtered_providers = name_filtered_providers
-    #update_place_results(valid_results, gmaps, summary_metrics) # Updates in place
-    
+    #pprint.pprint(filtered_providers)
     places_data['results'] = filtered_providers
     # Context for the front end
     context = {

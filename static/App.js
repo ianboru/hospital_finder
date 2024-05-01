@@ -3,8 +3,11 @@ import React, { useEffect, Component } from 'react'
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail"
 import TitleBanner from './components/TitleBanner'
+import SearchButton from './components/SearchButton'
+import HeaderInformation from './components/HeaderInformation'
 import Map from "./components/Map"
 import CareTypeFilter from "./components/CareTypeFilter"
+import './App.css'
 
 function App() {
   console.log("version 0.1.1")
@@ -28,7 +31,14 @@ function App() {
   const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
-      console.log("updating current position", position.coords)
+      console.log("updating current position", position.coords, initialLocation)
+      if(!initialLocation.lat){
+        console.log("updating url")
+        let url = new URL(window.location.origin + window.location.pathname)
+        url.searchParams.set("location", `${position.coords.latitude},${position.coords.longitude}`)
+        window.location.href = url
+      }
+      
       setCurrentGPSLocation({
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -49,7 +59,6 @@ function App() {
     url.searchParams.set("search", searchTerm)
     url.searchParams.set("careType", careType ? careType.name : initialCareType )
     if (newCenter && newCenter !== undefined){
-      url.searchParams.set("location", `${newCenter.lng()},${newCenter.lat()}`)
       if(newRadius){
         url.searchParams.set("radius", `${newRadius}`)
       }
@@ -61,44 +70,42 @@ function App() {
 
   const outerStyles = {
     display : "flex",
-    alignContent : "flex-start"
+    alignContent : "flex-start",
+    flexDirection: 'column'
   }
-
+  console.log("initial map location", initialLocation)
   return (
-    <div className="App">
-      <TitleBanner />
-      <div style={{marginBottom : 15}}>
-        <form onSubmit={
-              (event) => {
-                event.preventDefault()
-                onSearchSubmit()
-              }}
-        >
-          <input style={{width : 350, height: 40, borderRadius : 5, padding: 5}} placeholder={"Search care provider types e.g. hospital, clinic, etc"} value={searchTerm} onChange={onSearchInputChange}/>
-          <button type="submit" style={{marginLeft : 10}}>Search</button>
-        </form> 
-        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/> 
-      </div>
-      <div style={outerStyles}>
-          <div style={{maxHeight : '800px', overflowY : 'scroll'}}>
-            <h1>Search results</h1>
+    <div className="app">
+      <HeaderInformation />
+      <div className='main-app'>
+      <div className='left-container'>
+        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
+        <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
+        <div>
+          <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Search Results</div>
+          <div>
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
           </div>
-        {
-          selectedPlace ? <PlaceDetail selectedPlace={selectedPlace}/> : <></>
-        }
+        </div>
+      </div>
+      <div className='map-container'>
+        {selectedPlace && (
+          <div className='place-detail-overlay'>
+            <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
+          </div>
+        )}
         <Map
           placesData={placesData}
           initialLocation={initialLocation}
+          setSelectedPlace={setSelectedPlace}
           selectedPlace={selectedPlace}
           metricRanges={metricRanges}
           onSearchSubmit={onSearchSubmit}
           setZoomRadius={setZoomRadius}
           currentGPSLocation={currentGPSLocation}
         />
-
       </div>
-
+    </div>
     </div>
   );
 }

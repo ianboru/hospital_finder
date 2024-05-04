@@ -66,11 +66,7 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
                 "longitude" : row['longitude'],
             }
             cur_provider["address"] = row["Address"]
-            if "50755" in cur_provider["Facility ID"]:
-                print("50755")
-                #print( row)
-            #normalize ids to 6 digits
-            #cur_provider["Facility ID"] = cur_provider["Facility ID"].zfill(6)
+
             filtered_provider_list.append(cur_provider)
     return filtered_provider_list
 
@@ -96,7 +92,7 @@ def index(request, path=None):
     print('parsed location', split_location_string)
     search_match_threshold = 70
     filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
-    print(search_string)
+    print("search string", search_string)
     name_filtered_providers = []
     if search_string:
         # filter base on fuzzy match on facility name base on search string
@@ -104,7 +100,10 @@ def index(request, path=None):
             if fuzz.partial_ratio(provider['Facility Name'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
                 
+            if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
+                name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
+    print("provider results",filtered_providers)
     #pprint.pprint(filtered_providers)
     places_data['results'] = filtered_providers
     # Context for the front end

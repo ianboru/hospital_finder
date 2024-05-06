@@ -20,7 +20,10 @@ const PlaceDetail = (props) => {
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedExperienceMetricsMap[metricName]
       return(
-        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHCAHPSStars(metricValue)}</span> </div>
+        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between",}}>
+          <b>{metricLabel}</b>
+          <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> 
+        </div>
       )
     })
 
@@ -41,9 +44,15 @@ const PlaceDetail = (props) => {
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
       return(
-        <div style={{marginTop : 5, marginBottom: 5}}><b style={{alignSelf : "flex-start"}}>{metricLabel}</b> <span style={{color: "gold",alignSelf : "flex-end"}}>{getHaiEmoji(metricValue,2)}</span> </div>
+        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
+          <b>{metricLabel}</b> 
+          <span style={{color: "gold"}}>{getHaiEmoji(metricValue,2)}</span> 
+        </div>
       )
     })
+
+    const metricDivStyle = {marginLeft : 15, marginTop: "4px"}
+    const ratingDivStyle = {display: "flex", justifyContent: "space-between", marginTop: "1em"}
 
     return(
         <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
@@ -64,25 +73,29 @@ const PlaceDetail = (props) => {
             <div>{selectedPlace.address}</div>
             {
               selectedPlace['Summary star rating'] ?
-              <div>
-                <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary star rating'])}</span></b>
+              <>
+                <div style={ratingDivStyle}>
+                  <b>Patient Rating:</b>
+                  <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary star rating'])}</span>
                 </div>
-                <div style={{marginLeft : 15}}>
+                <hr style={{marginTop: "0px"}}/>
+                <div style={metricDivStyle}>
                   {detailedExperienceMetricStars}
                 </div>
-              </div> : <></>
+              </> : <></>
             }
             {
               selectedPlace['Infection Rating'] ?
-              <div>
-                <div>
-                  <b>Infection Rating:</b> <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'],3)}</span>
+              <>
+                <div style={ratingDivStyle}>
+                  <b>Infection Rating:</b> 
+                  <span style={{color:"#fdcc0d",}}>{getHaiEmoji(selectedPlace['Infection Rating'],3)}</span>
                 </div>
-                <div style={{marginLeft : 15}}>
+                <hr style={{marginTop: "0px"}}/>
+                <div  style={metricDivStyle}>
                   {detailedInfectionMetricStars}
                 </div>
-              </div> : <></>
+              </> : <></>
             }
        </div>
     )

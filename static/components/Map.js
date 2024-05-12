@@ -11,6 +11,7 @@ const Map = (props) => {
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius  
+    const scrollToPlaceResult = props.scrollToPlaceResult
 
 
     const getMarkerColor = (place, metric_ranges) => {
@@ -75,6 +76,7 @@ const Map = (props) => {
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)
             setSelectedPlace(place)
+            scrollToPlaceResult(place['Facility ID'])
           }}
         />
       )

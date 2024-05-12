@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom"
-import React, { useEffect, Component } from 'react'
+import React, { useEffect } from 'react'
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail"
 import TitleBanner from './components/TitleBanner'
@@ -16,6 +16,11 @@ function App() {
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
+
+  const scrollToPlaceResult = (id) => {
+    const element = document.getElementByid(id)
+    element.scrollIntoView({behavior: 'smooth'})
+  }
   const initialSearchParam = url.searchParams.get("search")
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
@@ -84,7 +89,7 @@ function App() {
         <div>
           <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Search Results</div>
           <div>
-            <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}/>
+            <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
           </div>
         </div>
       </div>
@@ -103,6 +108,7 @@ function App() {
           onSearchSubmit={onSearchSubmit}
           setZoomRadius={setZoomRadius}
           currentGPSLocation={currentGPSLocation}
+          scrollToPlaceResult={scrollToPlaceResult}
         />
       </div>
     </div>

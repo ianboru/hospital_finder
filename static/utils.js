@@ -22,8 +22,14 @@ const getHCAHPSStars = (starCount, maxCount=5) => {
     return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
 }
 
+const scrollToPlaceResult = (id) => {
+    const element = document.getElementById(id)
+    element.scrollIntoView({behavior: 'smooth'})
+}
+
 
 export {
     getHaiEmoji,
-    getHCAHPSStars
+    getHCAHPSStars,
+    scrollToPlaceResult
 }

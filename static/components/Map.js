@@ -53,10 +53,11 @@ const Map = (props) => {
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricRanges)
       const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
-      const strokeWeight = isSelectedPlace ? 1.2 : 1
-      const scale = isSelectedPlace ? 1.2 : 1
+      const strokeWeight = isSelectedPlace ? 1.4 : 1
+      const scale = isSelectedPlace ? 1.3 : 1
       const strokeColor = isSelectedPlace ? "black" : "white"
       const fillOpacity = isSelectedPlace ? 1 : .8
+      const zindex = isSelectedPlace ? 999 : 1
 
       if(isSelectedPlace){
         console.log("marker data", isSelectedPlace, place["Facility Name"], strokeWeight, scale, strokeColor)
@@ -71,6 +72,8 @@ const Map = (props) => {
               fillOpacity: fillOpacity,
               scale: scale,
           }}
+          zIndex={zindex}
+
           position={latLng}
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)
@@ -116,7 +119,6 @@ const Map = (props) => {
     const curCenter = selectedPlace ? selectedPlaceCenter : firstLocationCenter && firstLocationCenter.lat ?
         firstLocationCenter : props.currentGPSLocation
 
-    console.log("current center", curCenter)
     if (curCenter && curCenter.lat < 1 ){
       //for some reason lat and lng are flipped by this point
       const tempCenter = {...curCenter}
@@ -125,10 +127,17 @@ const Map = (props) => {
     }
     if(curCenter && !curCenter.lat && selectedPlace){
       //sets lat and long from selected place (maybe best done earlier in the flow)
+      const mapBounds =  map.getBounds()
+      const swCornerLatLng = mapBounds.getSouthWest()
+      const leftMostLong =  swCornerLatLng.lng()
+
       curCenter.lat = selectedPlace.latitude
-      curCenter.lng = selectedPlace.longitude
+      //average between selected place and left edge 
+      //to ensure marker isn't blocked by place detail card
+      curCenter.lng = selectedPlace.longitude - (selectedPlace.longitude - leftMostLong)/3
+      console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
-    
+
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap

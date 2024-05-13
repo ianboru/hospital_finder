@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { numberToRGB } from "../colorUtils"
 import haversine from 'haversine-distance'
+import { scrollToPlaceResult } from "../utils"
 
 const Map = (props) => {
     const placesData = props.placesData 
@@ -10,7 +11,7 @@ const Map = (props) => {
     const setSelectedPlace = props.setSelectedPlace 
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
-    const setZoomRadius = props.setZoomRadius  
+    const setZoomRadius = props.setZoomRadius 
 
 
     const getMarkerColor = (place, metric_ranges) => {
@@ -78,6 +79,7 @@ const Map = (props) => {
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)
             setSelectedPlace(place)
+            scrollToPlaceResult(place['Facility ID'])
           }}
         />
       )

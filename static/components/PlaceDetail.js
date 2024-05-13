@@ -54,6 +54,12 @@ const PlaceDetail = (props) => {
     const metricDivStyle = {marginLeft : 15, marginTop: "4px"}
     const ratingDivStyle = {display: "flex", justifyContent: "space-between", marginTop: "1em"}
 
+    const addressToUrl = (address) => {
+      const urlAddress = address.replace(/\,/g, '');
+      const url = urlAddress.replace(/\ /g, '%20');
+      return  `http://maps.google.com/maps?q=${url}`
+    }
+    const googleMapsUrl = addressToUrl(selectedPlace.address)
     return(
         <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
             <div onClick={closePlaceDetail} style={{
@@ -71,6 +77,7 @@ const PlaceDetail = (props) => {
             }}>Current Selection</div>
             <div><b>{selectedPlace.name}</b></div>
             <div>{selectedPlace.address}</div>
+            <a href={googleMapsUrl} target="_blank">view on Google Maps</a>
             {
               selectedPlace['Summary star rating'] ?
               <>

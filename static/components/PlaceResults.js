@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars } from '../utils';
-const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
+
+const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, scrollToItemRef}) => {
+
     const placeTileStyles = {
       "border" : "1px solid gray",
       "height" : "150px",
@@ -28,7 +30,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         selectedPlaceStyle.border = "2px solid black"
       }
       return (
-        <div id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
+        <div id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)} ref={(ref) => (scrollToItemRef.current[i] = ref)}>
             <div style={{color : "black"}}><b>{place.name}</b></div>
             <div>{place.address}</div>
             <div>{place.phone_number}</div>

@@ -5,26 +5,9 @@ import plotly.graph_objects as go
 import os
 import numpy as np
 import math
-def load_hcahps_data(export_path, **kwargs):
-    hcahps_path = os.path.join(export_path, "HCAHPS-Hospital.csv")
-    hcahps_df = pd.read_csv(hcahps_path, low_memory=False)
-    hcahps_df = hcahps_df[[
-             'Facility ID',
-             'Address',
-             'City/Town',
-             'State',
-             'ZIP Code',
-             'Facility Name',
-             'Patient Survey Star Rating',
-             'HCAHPS Question',
-             ]]
+import time
 
-    # Combine address columns
-
-    hcahps_df["Address"] = hcahps_df["Address"] + ", " + hcahps_df["City/Town"] + ", " + hcahps_df["State"] + " " + hcahps_df["ZIP Code"].astype(str)
-    hcahps_df = hcahps_df.drop(columns=['City/Town', 'State', 'ZIP Code'])
-
-    def extract_star_ratings(df, show_plots=True):
+def extract_star_ratings(df):
         questions = df['HCAHPS Question'].unique()
         questions_with_star_ratings = []
         rating_counts = []
@@ -44,24 +27,32 @@ def load_hcahps_data(export_path, **kwargs):
                     ))
                 rating_counts.append(df_ratings.value_counts(normalize=True).sort_index()*100)
                 base_df[q] = df_ratings.values
-        if show_plots:
-            titles = [f"{q} ({m:.2f}/5)" for q, m, _ in questions_with_star_ratings]
-            fig = make_subplots(rows=len(rating_counts),
-                                cols=1,
-                                shared_xaxes=True,
-                                vertical_spacing=0.025,
-                                x_title="Patient Survey Star Rating",
-                                y_title="Percent of Ratings [%]",
-                                subplot_titles=titles)
-            for i,r in enumerate(rating_counts):
-                fig.append_trace(go.Bar(x=r.index, y=r.values),row=i+1,col=1)
-            fig.update_layout(height=1000, width=600, showlegend=False)
-            fig.show()
-            df_summary = pd.DataFrame(questions_with_star_ratings, columns=['Question', 'Mean Rating', 'Standard Deviation']).set_index('Question')
-            print(df_summary)
 
         return base_df.reset_index(drop=True)
 
+def load_hcahps_data(export_path, care_type, current_date):
+    hcahps_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
+    hcahps_df = pd.read_csv(hcahps_path, low_memory=False)
+    measure_column_name = "Measure Name" if "Measure Name" in hcahps_df.columns else "HCAHPS Question"
+    # Home health - measure names as columns
+    # Outpatient ambulatory - measure names as columns 
+    # ED Measure names as rows 
+    # hospice has summary star and various other rows 
+    hcahps_df = hcahps_df[[
+             'Facility ID',
+             'Address',
+             'City/Town',
+             'State',
+             'ZIP Code',
+             'Facility Name',
+             'Patient Survey Star Rating',
+             measure_column_name,
+             ]]
+
+    # Combine address columns
+
+    hcahps_df["Address"] = hcahps_df["Address"] + ", " + hcahps_df["City/Town"] + ", " + hcahps_df["State"] + " " + hcahps_df["ZIP Code"].astype(str)
+    hcahps_df = hcahps_df.drop(columns=['City/Town', 'State', 'ZIP Code'])
 
     # For now remove questions wihtout star ratings
     hcahps_df = hcahps_df[hcahps_df['Patient Survey Star Rating'] != 'Not Applicable']
@@ -69,11 +60,41 @@ def load_hcahps_data(export_path, **kwargs):
     hcahps_df = hcahps_df[hcahps_df['Patient Survey Star Rating'] != 'Not Available']
     hcahps_df['Patient Survey Star Rating'] = hcahps_df['Patient Survey Star Rating'].astype(int)
     # Extract star ratings
-    hcahps_df = extract_star_ratings(hcahps_df,**kwargs)
+    hcahps_df = extract_star_ratings(hcahps_df)
     # Export
-    hcahps_export_path = os.path.join(export_path,'hcahps_summary_metrics.csv')
+    hcahps_export_path = os.path.join(export_path,f'hcahps_summary_metrics {current_date}.csv')
     hcahps_df.to_csv(hcahps_export_path, index=False)
     return hcahps_df
+
+def extract_hai_measurements(df, hai_measures):
+        # Ensure data is sorted by facility ID and measure ID
+        df = df.sort_values(by=['Facility ID', 'Measure ID'])
+        # There are 6 measures per facility and 6 rows per measure
+        rows_per_facility = sum(df['Facility ID'].iloc[0] == df['Facility ID'])
+
+        num_measures = len(hai_measures)
+        facility_columns = ['Facility ID', 'Facility Name', 'Address']
+        for measure in hai_measures:
+            facility_columns += [f"{measure} Lower CI", f"{measure} Upper CI", f"{measure} SIR", f"{measure} Compared to National"]
+
+        # Loop through each facility and extract all measures, much faster than using groupby but less readable
+        all_facility_data = []
+        for i in range(0,len(df),rows_per_facility):
+            g = df.iloc[i:i+rows_per_facility].reset_index(drop=True)
+
+            score = g['Score']
+            national = g['Compared to National']
+            facility_data = [g['Facility ID'].iloc[0], g['Facility Name'].iloc[0], g['Address'].iloc[0]]
+            for j in range(0,num_measures):
+                facility_data += [
+                    score.iloc[0+j*num_measures], # Lower CI
+                    score.iloc[1+j*num_measures], # Upper CI
+                    score.iloc[5+j*num_measures], # SIR
+                    national.iloc[5+j*num_measures] # Compared to National
+                    ]
+
+            all_facility_data.append(facility_data)
+        return pd.DataFrame(all_facility_data, columns=facility_columns)
 
 def load_hai_data(export_path):
     hai_path = os.path.join(export_path, "Healthcare_Associated_Infections-Hospital.csv")
@@ -105,36 +126,6 @@ def load_hai_data(export_path):
         "MRSA Bacteremia",
         "Clostridium Difficile (C.Diff)"
         ]
-
-    def extract_hai_measurements(df, hai_measures=hai_measures):
-        # Ensure data is sorted by facility ID and measure ID
-        df = df.sort_values(by=['Facility ID', 'Measure ID'])
-        # There are 6 measures per facility and 6 rows per measure
-        rows_per_facility = sum(df['Facility ID'].iloc[0] == df['Facility ID'])
-
-        num_measures = len(hai_measures)
-        facility_columns = ['Facility ID', 'Facility Name', 'Address']
-        for measure in hai_measures:
-            facility_columns += [f"{measure} Lower CI", f"{measure} Upper CI", f"{measure} SIR", f"{measure} Compared to National"]
-
-        # Loop through each facility and extract all measures, much faster than using groupby but less readable
-        all_facility_data = []
-        for i in range(0,len(df),rows_per_facility):
-            g = df.iloc[i:i+rows_per_facility].reset_index(drop=True)
-
-            score = g['Score']
-            national = g['Compared to National']
-            facility_data = [g['Facility ID'].iloc[0], g['Facility Name'].iloc[0], g['Address'].iloc[0]]
-            for j in range(0,num_measures):
-                facility_data += [
-                    score.iloc[0+j*num_measures], # Lower CI
-                    score.iloc[1+j*num_measures], # Upper CI
-                    score.iloc[5+j*num_measures], # SIR
-                    national.iloc[5+j*num_measures] # Compared to National
-                    ]
-
-            all_facility_data.append(facility_data)
-        return pd.DataFrame(all_facility_data, columns=facility_columns)
 
     hai_df = extract_hai_measurements(hai_df)
 
@@ -175,6 +166,7 @@ def add_lat_long_to_row(row):
     return pd.Series([lat, long])
 
 def load_ccn_file(facility_type, facility_id_column):
+    #These files have the universal CCN identifier and other metadata like facility name and address
     facility_list_path = os.path.join(export_path, f"CCN - {facility_type}.csv")
     facility_df = pd.read_csv(facility_list_path, low_memory=False, encoding='unicode_escape')
     print(facility_df.columns)
@@ -193,7 +185,6 @@ def load_ccn_file(facility_type, facility_id_column):
              zip_column,
              name_column
             ]]
-    print(facility_df[facility_df[facility_id_column] == "50775"])
     facility_df[facility_id_column] = facility_df[facility_id_column].str.zfill(6)
     facility_df['Facility Type'] = facility_type
     return facility_df
@@ -217,9 +208,6 @@ def update_provider_data():
     print(hospital_df["Facility ID"].head(20))
 
     home_health_df = load_ccn_file("Home Health", "CMS Certification Number (CCN)")
-    #home_health_df['CMS Certification Number (CCN)'] = home_health_df['CMS Certification Number (CCN)'].astype(str).apply(lambda x: x.lstrip('0')).astype(int)
-    #ed_df['Facility ID'] = ed_df['Facility ID'].astype(str).apply(lambda x: x.lstrip('0')).astype(int)
-    #provider_df['Facility ID'] = provider_df['Facility ID'].astype(str).apply(lambda x: x.lstrip('0')).astype(int)
     print("ED columns " ,provider_df["Facility ID"].isin(ed_df["Facility ID"]).value_counts())
     print("hospital columns " ,provider_df["Facility ID"].isin(hospital_df["Facility ID"]).value_counts())
     print("home health columns " ,provider_df["Facility ID"].isin(home_health_df["CMS Certification Number (CCN)"]).value_counts())
@@ -265,26 +253,37 @@ def load_provider_cms_list():
     return all_providers_df
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
-#hcahps_df = load_hcahps_data(export_path)
+current_date = today = time.strftime("%m-%d-%Y")
 #hai_df = load_hai_data(export_path)
 #df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
-all_providers_df = load_provider_cms_list()
-chunks = 1000
-chunk_limit = None 
-total_rows = len(all_providers_df)
-for chunk in range(chunks):
-    chunk_size = math.ceil(total_rows/chunks)
-    lower_index = chunk_size * chunk 
-    upper_index = min(chunk_size * (chunk + 1), total_rows - 1)
-    current_providers_df = add_locations_through_geocoding(all_providers_df[lower_index:upper_index])
-    all_providers_export_path = os.path.join(export_path,'all_providers_by_CMS_3_24.csv')
-    print(f"chunk {chunk}/{chunks}, size {chunk_size}, indices {lower_index} : {upper_index}")
-    if chunk == 0:
-        print("initialize")
-        current_providers_df.to_csv(all_providers_export_path, index=False)
-    else:
-        current_providers_df.to_csv(all_providers_export_path, index=False, mode='a',header=False)
-    if chunk_limit and chunk == chunk_limit:
-        break
-#update_provider_data()
+HCAHPS_facility_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "n-Center Hemodialysis", "Nursing Homes"]
+regenerate_ccn_list = False
+for facility_type in HCAHPS_facility_types:
+    hcahps_df = load_hcahps_data(export_path, facility_type, current_date)
 
+if regenerate_ccn_list:
+    all_providers_df = load_provider_cms_list()
+    chunks = 1000
+    chunk_limit = None 
+    total_rows = len(all_providers_df)
+
+    for chunk in range(chunks):
+        chunk_size = math.ceil(total_rows/chunks)
+        lower_index = chunk_size * chunk 
+        upper_index = min(chunk_size * (chunk + 1), total_rows - 1)
+        current_providers_df = all_providers_df[lower_index:upper_index]
+        #add_locations_through_geocoding can only be run once for free tier of geocode api
+        #current_providers_df = add_locations_through_geocoding(all_providers_df[lower_index:upper_index])
+        all_providers_export_path = os.path.join(export_path,f'all_providers_by_CMS_{current_date}.csv')
+        print(f"chunk {chunk}/{chunks}, size {chunk_size}, indices {lower_index} : {upper_index}")
+        if chunk == 0:
+            print("initialize")
+            current_providers_df.to_csv(all_providers_export_path, index=False)
+        else:
+            current_providers_df.to_csv(all_providers_export_path, index=False, mode='a',header=False)
+        if chunk_limit and chunk == chunk_limit:
+            break
+    #update_provider_data()
+
+
+# %%

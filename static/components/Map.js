@@ -44,7 +44,6 @@ const Map = (props) => {
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
-
     const selectedPlaceCenter = {
       lat : selectedPlace ? selectedPlace.location.lat : null,
       lng : selectedPlace ? selectedPlace.location.lng : null
@@ -75,7 +74,6 @@ const Map = (props) => {
               scale: scale,
           }}
           zIndex={zindex}
-
           position={latLng}
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)
@@ -165,7 +163,7 @@ const Map = (props) => {
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
-              onZoomChanged={()=>{
+              // onZoomChanged={()=>{
                 // if(map && false){
                 //   const bounds = map.getBounds()
                 //   const neCornerLatLng = bounds.getNorthEast()
@@ -178,7 +176,15 @@ const Map = (props) => {
                 //   const newCenter = map.getCenter()
                 //   onSearchSubmit(newCenter, windowRadius)
                 // }
-              }}
+
+                //FOR SATELITE VIEW DISABLED
+                options={{
+                  mapTypeControl: false, //this disables the map chaging satelite option
+                  mapTypeControlOptions: { //sets the default style to roadmap
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, 
+                    mapTypeIds: ['roadmap']
+                  }
+                }}
             >
             { markers ? markers : <></> }
             {blueMarker}

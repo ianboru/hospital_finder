@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { numberToRGB } from "../colorUtils"
-import haversine from 'haversine-distance'
+//import haversine from 'haversine-distance'
 import { scrollToPlaceResult } from "../utils"
 
 const Map = (props) => {
@@ -11,7 +11,8 @@ const Map = (props) => {
     const setSelectedPlace = props.setSelectedPlace 
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
-    const setZoomRadius = props.setZoomRadius 
+    const setZoomRadius = props.setZoomRadius
+    const currentGPSLocation = props.currentGPSLocation
 
 
     const getMarkerColor = (place, metric_ranges) => {
@@ -43,7 +44,6 @@ const Map = (props) => {
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
-
     const selectedPlaceCenter = {
       lat : selectedPlace ? selectedPlace.location.lat : null,
       lng : selectedPlace ? selectedPlace.location.lng : null
@@ -141,6 +141,20 @@ const Map = (props) => {
       console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 
+    const currentLocationMarker = currentGPSLocation ? (
+      <Marker
+        position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
+        icon={{
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: '#4285F4',
+          fillOpacity: 1,
+          strokeColor: 'white',
+          strokeWeight: 2,
+        }}
+      />
+    ) : null;
+
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap
@@ -151,22 +165,31 @@ const Map = (props) => {
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
-              onZoomChanged={()=>{
-                if(map && false){
-                  const bounds = map.getBounds()
-                  const neCornerLatLng = bounds.getNorthEast()
-                  const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }
-                  const swCornerLatLng = bounds.getSouthWest()
-                  const swCornerLocation = {'lat': swCornerLatLng.lat(), 'lng': swCornerLatLng.lng(), }
+              // onZoomChanged={()=>{
+                // if(map && false){
+                //   const bounds = map.getBounds()
+                //   const neCornerLatLng = bounds.getNorthEast()
+                //   const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }
+                //   const swCornerLatLng = bounds.getSouthWest()
+                //   const swCornerLocation = {'lat': swCornerLatLng.lat(), 'lng': swCornerLatLng.lng(), }
 
-                  const windowRadius = haversine(neCornerLocation, swCornerLocation)/2
-                  setZoomRadius(windowRadius)
-                  const newCenter = map.getCenter()
-                  onSearchSubmit(newCenter, windowRadius)
-                }
-              }}
+                //   //const windowRadius = haversine(neCornerLocation, swCornerLocation)/2
+                //   setZoomRadius(windowRadius)
+                //   const newCenter = map.getCenter()
+                //   onSearchSubmit(newCenter, windowRadius)
+                // }
+
+                //FOR SATELITE VIEW DISABLED
+                options={{
+                  mapTypeControl: false, //this disables the map chaging satelite option
+                  mapTypeControlOptions: { //sets the default style to roadmap
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, 
+                    mapTypeIds: ['roadmap']
+                  }
+                }}
             >
             { markers ? markers : <></> }
+            {currentLocationMarker}
           </GoogleMap>
         </div>
     ) : <div style={{fontWeight : "bold", marginTop : "15px", width : "100%", height : "100%"}}>Loading Map...</div>

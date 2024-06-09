@@ -147,7 +147,7 @@ const Map = (props) => {
         icon={{
           path: google.maps.SymbolPath.CIRCLE,
           scale: 10,
-          fillColor: 'blue',
+          fillColor: '#4285F4',
           fillOpacity: 1,
           strokeColor: 'white',
           strokeWeight: 2,

@@ -72,9 +72,10 @@ const Map = (props) => {
               strokeWeight: strokeWeight,
               fillOpacity: fillOpacity,
               scale: scale,
+              labelOrigin: new google.maps.Point(0, -30)
           }}
           zIndex={zindex}
-
+          label={{color: '#800020', text: 'H'} }
           position={latLng}
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)

@@ -141,7 +141,7 @@ const Map = (props) => {
       console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 
-    const blueMarker = currentGPSLocation ? (
+    const currentLocationMarker = currentGPSLocation ? (
       <Marker
         position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
         icon={{
@@ -189,7 +189,7 @@ const Map = (props) => {
                 }}
             >
             { markers ? markers : <></> }
-            {blueMarker}
+            {currentLocationMarker}
           </GoogleMap>
         </div>
     ) : <div style={{fontWeight : "bold", marginTop : "15px", width : "100%", height : "100%"}}>Loading Map...</div>

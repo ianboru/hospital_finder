@@ -142,6 +142,19 @@ const Map = (props) => {
     }
 
     const currentLocationMarker = currentGPSLocation ? (
+      <>
+      {/* Translucent background circle */}
+      <Marker
+      position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
+      icon={{
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 20,
+        fillColor: '#4285F4',
+        fillOpacity: 0.3,
+        strokeWeight: 0,
+      }}
+    />
+      {/* Blue front circle */}
       <Marker
         position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
         icon={{
@@ -153,6 +166,7 @@ const Map = (props) => {
           strokeWeight: 2,
         }}
       />
+      </>
     ) : null;
 
     return isLoaded && curCenter ? (
@@ -194,5 +208,4 @@ const Map = (props) => {
         </div>
     ) : <div style={{fontWeight : "bold", marginTop : "15px", width : "100%", height : "100%"}}>Loading Map...</div>
   }
-
-  export default Map
+export default Map

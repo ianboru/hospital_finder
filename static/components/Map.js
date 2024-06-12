@@ -169,6 +169,22 @@ const Map = (props) => {
       </>
     ) : null;
 
+    //FOR SATELITE VIEW DISABLED AND FOR POINTS OF INTEREST DISABLED
+    const mapOptions = {
+      mapTypeControl: false, // Disable the map changing satellite option
+      mapTypeControlOptions: { // Set the default style to roadmap
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+          mapTypeIds: ['roadmap']
+      },
+      styles: [
+          {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }] // Hide labels for points of interest
+          }
+      ]
+    };
+
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap
@@ -179,6 +195,7 @@ const Map = (props) => {
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
+              options={mapOptions}
               // onZoomChanged={()=>{
                 // if(map && false){
                 //   const bounds = map.getBounds()
@@ -192,15 +209,7 @@ const Map = (props) => {
                 //   const newCenter = map.getCenter()
                 //   onSearchSubmit(newCenter, windowRadius)
                 // }
-
-                //FOR SATELITE VIEW DISABLED
-                options={{
-                  mapTypeControl: false, //this disables the map chaging satelite option
-                  mapTypeControlOptions: { //sets the default style to roadmap
-                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, 
-                    mapTypeIds: ['roadmap']
-                  }
-                }}
+                
             >
             { markers ? markers : <></> }
             {currentLocationMarker}

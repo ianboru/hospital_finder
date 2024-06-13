@@ -176,22 +176,22 @@ const Map = (props) => {
       </>
     ) : null;
 
-    //THE NEW FEATURE AFTER THE CURRENT LOCATION MARKER
-    // //map options object for satelite view disabled and points of interest disabled
-    // const mapOptions = {
-    //   mapTypeControl: false, // Disable the map changing satellite option
-    //   mapTypeControlOptions: { // Set the default style to roadmap
-    //       style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-    //       mapTypeIds: ['roadmap']
-    //   },
-    //   styles: [
-    //       {
-    //           featureType: "poi",
-    //           elementType: "labels",
-    //           stylers: [{ visibility: "off" }] // Hide labels for points of interest
-    //       }
-    //   ]
-    // };
+
+    //map options object for satelite view disabled and points of interest disabled
+    const mapOptions = {
+      mapTypeControl: false, // Disable the map changing satellite option
+      mapTypeControlOptions: { // Set the default style to roadmap
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+          mapTypeIds: ['roadmap']
+      },
+      styles: [
+          {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }] // Hide labels for points of interest
+          }
+      ]
+    };
 
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
@@ -203,7 +203,7 @@ const Map = (props) => {
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
-              //options={mapOptions}
+              options={mapOptions}
               // onZoomChanged={()=>{
                 // if(map && false){
                 //   const bounds = map.getBounds()

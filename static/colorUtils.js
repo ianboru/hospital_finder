@@ -1,8 +1,8 @@
 const numberToRGB = (value, min, max) => {
-    const perc = 100*value/(max-min)
-    if(perc < 33){
+
+    if(value < min){
         return "red"
-    }else if(perc >= 33 && perc < 66){
+    }else if(value >= min && value < max){
         return "yellow"
     }else{
         return "green"

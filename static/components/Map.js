@@ -141,20 +141,21 @@ const Map = (props) => {
       console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 
-    const currentLocationMarker = currentGPSLocation ? (
-      <>
-      {/* Translucent background circle */}
+    //translucent background circle for the CurrentLocationMarker
+    const translucentBackgroundCircleCurrentLocationMarker = currentGPSLocation && (
       <Marker
-      position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
-      icon={{
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 20,
-        fillColor: '#4285F4',
-        fillOpacity: 0.3,
-        strokeWeight: 0,
-      }}
-    />
-      {/* Blue front circle */}
+        position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
+        icon={{
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 20,
+          fillColor: '#4285F4',
+          fillOpacity: 0.3,
+          strokeWeight: 0,
+        }}
+      />
+    );
+    //front blue circle for the CurrentLocationMarker
+    const blueFrontCircleCurrentLocationMarker = currentGPSLocation && (
       <Marker
         position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
         icon={{
@@ -166,6 +167,12 @@ const Map = (props) => {
           strokeWeight: 2,
         }}
       />
+    );
+
+    const currentLocationMarker = currentGPSLocation ? (
+      <>
+        {translucentBackgroundCircleCurrentLocationMarker}
+        {blueFrontCircleCurrentLocationMarker}
       </>
     ) : null;
 
@@ -179,6 +186,7 @@ const Map = (props) => {
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
+              
               // onZoomChanged={()=>{
                 // if(map && false){
                 //   const bounds = map.getBounds()
@@ -192,15 +200,7 @@ const Map = (props) => {
                 //   const newCenter = map.getCenter()
                 //   onSearchSubmit(newCenter, windowRadius)
                 // }
-
-                //FOR SATELITE VIEW DISABLED
-                options={{
-                  mapTypeControl: false, //this disables the map chaging satelite option
-                  mapTypeControlOptions: { //sets the default style to roadmap
-                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU, 
-                    mapTypeIds: ['roadmap']
-                  }
-                }}
+                
             >
             { markers ? markers : <></> }
             {currentLocationMarker}

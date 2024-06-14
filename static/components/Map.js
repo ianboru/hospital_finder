@@ -9,32 +9,34 @@ const Map = (props) => {
     const initialLocation = props.initialLocation 
     const selectedPlace = props.selectedPlace 
     const setSelectedPlace = props.setSelectedPlace 
-    const metricRanges = props.metricRanges 
+    const metricQuantiles = props.metricQuantiles 
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius
     const currentGPSLocation = props.currentGPSLocation
 
 
-    const getMarkerColor = (place, metric_ranges) => {
+    const getMarkerColor = (place, metricQuantiles) => {
         const gray = "rgb(128,128,128)"
         if(!place){
           return gray
         }
         const has_infection_rating = place['Infection Rating']||place['Infection Rating'] === 0
-        const has_patient_summary = place['Summary star rating']||place['Summary star rating'] === 0
+        const has_summary_star_rating = place['Summary star rating']||place['Summary star rating'] === 0
         let marker_metric = null
         // Use average of the two metrics
-        const min_combined_metric = (metric_ranges['min_hai'] + metric_ranges['min_hcahps'])/2
-        const max_combined_metric = (metric_ranges['max_hai'] + metric_ranges['max_hcahps'])/2
-        //console.log("marker ", "1) " + place['Infection Rating'],"2) " + place['Summary star rating'], "3) " + metric_ranges )
-        //console.log("has em", has_infection_rating, has_patient_summary)
-        if(has_infection_rating && has_patient_summary){
-          marker_metric = (place['Infection Rating'] + place['Summary star rating'])/2
-          return numberToRGB(marker_metric,min_combined_metric,max_combined_metric)
+        const min_combined_metric_quantile = (metricQuantiles['hai_bottom_quantile'] + metricQuantiles['hcahps_bottom_quantile'])
+        const max_combined_metric_quantile = (metricQuantiles['hai_top_quantile'] + metricQuantiles['hcahps_top_quantile'])
+        //console.log("has em", has_infection_rating, has_summary_star_rating)
+        if(has_infection_rating && has_summary_star_rating){
+          marker_metric = (place['Infection Rating'] + place['Summary star rating'])*1
+          console.log("both",place['Infection Rating'],  place['Summary star rating'])
+          return numberToRGB(marker_metric,min_combined_metric_quantile,max_combined_metric_quantile)
         }else if(has_infection_rating){
-          return numberToRGB(place['Infection Rating'],metric_ranges['min_hai'],metric_ranges['max_hai'])
-        }else if(has_patient_summary){
-          return numberToRGB(place['Summary star rating'],metric_ranges['min_hcahps'],metric_ranges['max_hcahps'])
+          console.log("hai")
+          return numberToRGB(place['Infection Rating'],metricQuantiles['hai_bottom_quantile'],metricQuantiles['hai_top_quantile'])
+        }else if(has_summary_star_rating){
+          console.log("star")
+          return numberToRGB(place['Summary star rating'],metricQuantiles['hcahps_bottom_quantile'],metricQuantiles['hcahps_top_quantile'])
         }else{
           return gray
         }
@@ -52,7 +54,7 @@ const Map = (props) => {
     const markers = placesData.results && placesData.results.length > 0 && placesData.results.map((place, index)=>{
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      const markerColor = getMarkerColor(place, metricRanges)
+      const markerColor = getMarkerColor(place, metricQuantiles)
       const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
       const strokeWeight = isSelectedPlace ? 1.4 : 1
       const scale = isSelectedPlace ? 1.3 : 1

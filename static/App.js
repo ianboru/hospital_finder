@@ -12,7 +12,7 @@ import './App.css'
 function App() {
   console.log("version 0.1.1")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
-  const metricRanges = JSON.parse(document.getElementById("metric_ranges").textContent)
+  const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
@@ -100,7 +100,7 @@ function App() {
           initialLocation={initialLocation}
           setSelectedPlace={setSelectedPlace}
           selectedPlace={selectedPlace}
-          metricRanges={metricRanges}
+          metricQuantiles={metricQuantiles}
           onSearchSubmit={onSearchSubmit}
           setZoomRadius={setZoomRadius}
           currentGPSLocation={currentGPSLocation}

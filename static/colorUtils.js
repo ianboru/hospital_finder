@@ -1,9 +1,9 @@
 const numberToRGB = (value, min, max) => {
-    const perc = 100*value/(max-min)
-    if(perc < 33){
+    console.log(value, min, max)
+    if(value < min){
         return "red"
-    }else if(perc >= 33 && perc < 66){
-        return "yellow"
+    }else if(value >= min && value < max){
+        return "#e7b416"//stoplight yellow
     }else{
         return "green"
     }

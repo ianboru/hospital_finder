@@ -29,44 +29,6 @@ def extract_star_ratings(df):
                 base_df[q] = df_ratings.values
 
         return base_df.reset_index(drop=True)
-def extract_questions_as_columns(df, care_type):
-    facility_id_column = "Facility ID" if "Facility ID" in df.columns else "CMS Certification Number (CCN)"
-    measure_columns_by_care_type = {
-        "Home Health" : [
-            "HHCAHPS Survey Summary Star Rating",
-            "Star Rating for health team gave care in a professional way",
-            "Star Rating for health team communicated well with them",
-            "Star Rating team discussed medicines, pain, and home safety",
-            "Star Rating for how patients rated overall care from agency"
-        ],
-        "Outpatient" : [
-            "Facilities and staff linear mean score",
-            "Communication about your procedure linear mean score",
-            "Patients' rating of the facility linear mean score",
-            "Patients recommending the facility linear mean score"
-        ]
-    }   
-
-    df = df[measure_columns_by_care_type[care_type] + [facility_id_column]]
-    
-    return df 
-
-def extract_questions_as_rows(df, question_name):
-    facility_id_column = "Facility ID" if "Facility ID" in df.columns else "CMS Certification Number (CCN)"
-    
-    measure_column_by_care_type = {
-        "Hospital" : "HCAHPS Question",
-        "Hospice" : "Measure Name",
-        "Emergency" : "Measure Name",
-    }   
-    individual_measures = df[measure_column_by_care_type[measure_column_by_care_type]].unique()
-    measures_per_facility = pd.DataFrame()
-    for measure in individual_measures:
-        
-            df_ratings = df[df['HCAHPS Question'] == q]['Patient Survey Star Rating']
-            df_with_measure[q] = df_ratings.values
-
-    return base_df.reset_index(drop=True)
 
 def load_hcahps_data(export_path, care_type, current_date):
 

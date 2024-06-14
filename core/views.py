@@ -37,8 +37,8 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
     provider_list.drop(provider_list.filter(regex='_y$').columns, axis=1, inplace=True)
     #provider_list.dropna(inplace=True)
     # print('provider_list.rows ', provider_list[""])
-    
     print("search loca ", search_location, radius, care_type)
+    print(provider_list.columns)
     filtered_provider_list = []
     if care_type and care_type != "All":
         provider_list = provider_list[provider_list["Facility Type"] == care_type]
@@ -68,7 +68,8 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
             cur_provider["address"] = row["Address"]
 
             filtered_provider_list.append(cur_provider)
-    return filtered_provider_list
+    print("after filters" ,provider_list.columns)
+    return filtered_provider_list, provider_list
 
 @timeit
 def index(request, path=None):
@@ -91,8 +92,15 @@ def index(request, path=None):
     split_location_string = location_string.strip().split(",")
     print('parsed location', split_location_string)
     search_match_threshold = 70
-    filtered_providers = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
+    filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
     print("search string", search_string)
+    upper_quantile = .8
+    lower_quantile = .5
+    hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
+    hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)
+    hcahps_top_quantile = providers_with_metrics_df["Summary star rating"].quantile(upper_quantile)
+    hcahps_bottom_quantile = providers_with_metrics_df["Summary star rating"].quantile(lower_quantile)
+    
     name_filtered_providers = []
     if search_string:
         # filter base on fuzzy match on facility name base on search string
@@ -103,19 +111,21 @@ def index(request, path=None):
             if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
-    print("provider results",filtered_providers)
     #pprint.pprint(filtered_providers)
+
     places_data['results'] = filtered_providers
     # Context for the front end
     context = {
         'google_places_data' : places_data,
-        'metric_ranges' : {
-            'max_hai' : 5,
-            'min_hai' : 1,
-            'max_hcahps' : 5,
-            'min_hcahps' : 1
+        'metric_quantiles' : {
+            'hai_top_quantile' : hai_top_quantile,
+            'hai_bottom_quantile' : hai_bottom_quantile,
+            'hcahps_top_quantile' : hcahps_top_quantile,
+            'hcahps_bottom_quantile' : hcahps_bottom_quantile
+
         }
     }
+    print("context", context["metric_quantiles"])
     return render(request, "index.html", context)
 
 

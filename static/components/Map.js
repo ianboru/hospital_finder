@@ -24,16 +24,18 @@ const Map = (props) => {
         const has_summary_star_rating = place['Summary star rating']||place['Summary star rating'] === 0
         let marker_metric = null
         // Use average of the two metrics
-        const min_combined_metric_quantile = (metricQuantiles['hai_bottom_quantile'] + metricQuantiles['hcahps_bottom_quantile'])/2
-        const max_combined_metric_quantile = (metricQuantiles['hai_top_quantile'] + metricQuantiles['hcahps_top_quantile'])/2
-        //console.log("marker ", "1) " + place['Infection Rating'],"2) " + place['Summary star rating'], "3) " + metricQuantiles )
+        const min_combined_metric_quantile = (metricQuantiles['hai_bottom_quantile'] + metricQuantiles['hcahps_bottom_quantile'])
+        const max_combined_metric_quantile = (metricQuantiles['hai_top_quantile'] + metricQuantiles['hcahps_top_quantile'])
         //console.log("has em", has_infection_rating, has_summary_star_rating)
         if(has_infection_rating && has_summary_star_rating){
-          marker_metric = (place['Infection Rating'] + place['Summary star rating'])/2
+          marker_metric = (place['Infection Rating'] + place['Summary star rating'])*1
+          console.log("both",place['Infection Rating'],  place['Summary star rating'])
           return numberToRGB(marker_metric,min_combined_metric_quantile,max_combined_metric_quantile)
         }else if(has_infection_rating){
+          console.log("hai")
           return numberToRGB(place['Infection Rating'],metricQuantiles['hai_bottom_quantile'],metricQuantiles['hai_top_quantile'])
         }else if(has_summary_star_rating){
+          console.log("star")
           return numberToRGB(place['Summary star rating'],metricQuantiles['hcahps_bottom_quantile'],metricQuantiles['hcahps_top_quantile'])
         }else{
           return gray

@@ -94,11 +94,13 @@ def index(request, path=None):
     search_match_threshold = 70
     filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
     print("search string", search_string)
-    hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(.90)
-    hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(.33),
-    hcahps_top_quantile = providers_with_metrics_df["Summary star rating"].quantile(.90),
-    hcahps_bottom_quantile = providers_with_metrics_df["Summary star rating"].quantile(.33)
-
+    upper_quantile = .8
+    lower_quantile = .5
+    hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
+    hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)
+    hcahps_top_quantile = providers_with_metrics_df["Summary star rating"].quantile(upper_quantile)
+    hcahps_bottom_quantile = providers_with_metrics_df["Summary star rating"].quantile(lower_quantile)
+    
     name_filtered_providers = []
     if search_string:
         # filter base on fuzzy match on facility name base on search string
@@ -123,6 +125,7 @@ def index(request, path=None):
 
         }
     }
+    print("context", context["metric_quantiles"])
     return render(request, "index.html", context)
 
 

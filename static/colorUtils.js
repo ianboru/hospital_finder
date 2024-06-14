@@ -1,9 +1,9 @@
 const numberToRGB = (value, min, max) => {
-
+    console.log(value, min, max)
     if(value < min){
         return "red"
     }else if(value >= min && value < max){
-        return "yellow"
+        return "#e7b416"//stoplight yellow
     }else{
         return "green"
     }

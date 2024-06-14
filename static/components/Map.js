@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { numberToRGB } from "../colorUtils"
-import haversine from 'haversine-distance'
+//import haversine from 'haversine-distance'
 import { scrollToPlaceResult } from "../utils"
 
 const Map = (props) => {
@@ -11,7 +11,8 @@ const Map = (props) => {
     const setSelectedPlace = props.setSelectedPlace 
     const metricRanges = props.metricRanges 
     const onSearchSubmit = props.onSearchSubmit 
-    const setZoomRadius = props.setZoomRadius 
+    const setZoomRadius = props.setZoomRadius
+    const currentGPSLocation = props.currentGPSLocation
 
 
     const getMarkerColor = (place, metric_ranges) => {
@@ -43,7 +44,6 @@ const Map = (props) => {
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
-
     const selectedPlaceCenter = {
       lat : selectedPlace ? selectedPlace.location.lat : null,
       lng : selectedPlace ? selectedPlace.location.lng : null
@@ -72,9 +72,10 @@ const Map = (props) => {
               strokeWeight: strokeWeight,
               fillOpacity: fillOpacity,
               scale: scale,
+              labelOrigin: new google.maps.Point(0, -30)
           }}
           zIndex={zindex}
-
+          label={{color: 'white', text: 'H', strokeColor: 'black', strokeWeight: 2} }
           position={latLng}
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)
@@ -140,6 +141,58 @@ const Map = (props) => {
       console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 
+    //translucent background circle for the CurrentLocationMarker
+    const translucentBackgroundCircleCurrentLocationMarker = currentGPSLocation && (
+      <Marker
+        position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
+        icon={{
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 20,
+          fillColor: '#4285F4',
+          fillOpacity: 0.3,
+          strokeWeight: 0,
+        }}
+      />
+    );
+    //front blue circle for the CurrentLocationMarker
+    const blueFrontCircleCurrentLocationMarker = currentGPSLocation && (
+      <Marker
+        position={{ lat: currentGPSLocation.lat, lng: currentGPSLocation.lng }}
+        icon={{
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: '#4285F4',
+          fillOpacity: 1,
+          strokeColor: 'white',
+          strokeWeight: 2,
+        }}
+      />
+    );
+
+    const currentLocationMarker = currentGPSLocation ? (
+      <>
+        {translucentBackgroundCircleCurrentLocationMarker}
+        {blueFrontCircleCurrentLocationMarker}
+      </>
+    ) : null;
+
+
+    //map options object for satelite view disabled and points of interest disabled
+    const mapOptions = {
+      mapTypeControl: false, // Disable the map changing satellite option
+      mapTypeControlOptions: { // Set the default style to roadmap
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+          mapTypeIds: ['roadmap']
+      },
+      styles: [
+          {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }] // Hide labels for points of interest
+          }
+      ]
+    };
+
     return isLoaded && curCenter ? (
         <div style={{alignItems: 'stretch', width : "100%", height : "100%"}}>
             <GoogleMap
@@ -150,25 +203,26 @@ const Map = (props) => {
               onLoad={onLoad}
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
-              onZoomChanged={()=>{
-                if(map && false){
-                  const bounds = map.getBounds()
-                  const neCornerLatLng = bounds.getNorthEast()
-                  const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }
-                  const swCornerLatLng = bounds.getSouthWest()
-                  const swCornerLocation = {'lat': swCornerLatLng.lat(), 'lng': swCornerLatLng.lng(), }
+              options={mapOptions}
+              // onZoomChanged={()=>{
+                // if(map && false){
+                //   const bounds = map.getBounds()
+                //   const neCornerLatLng = bounds.getNorthEast()
+                //   const neCornerLocation = {'lat': neCornerLatLng.lat(), 'lng': neCornerLatLng.lng(), }
+                //   const swCornerLatLng = bounds.getSouthWest()
+                //   const swCornerLocation = {'lat': swCornerLatLng.lat(), 'lng': swCornerLatLng.lng(), }
 
-                  const windowRadius = haversine(neCornerLocation, swCornerLocation)/2
-                  setZoomRadius(windowRadius)
-                  const newCenter = map.getCenter()
-                  onSearchSubmit(newCenter, windowRadius)
-                }
-              }}
+                //   //const windowRadius = haversine(neCornerLocation, swCornerLocation)/2
+                //   setZoomRadius(windowRadius)
+                //   const newCenter = map.getCenter()
+                //   onSearchSubmit(newCenter, windowRadius)
+                // }
+                
             >
             { markers ? markers : <></> }
+            {currentLocationMarker}
           </GoogleMap>
         </div>
     ) : <div style={{fontWeight : "bold", marginTop : "15px", width : "100%", height : "100%"}}>Loading Map...</div>
   }
-
-  export default Map
+export default Map

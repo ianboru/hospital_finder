@@ -29,13 +29,10 @@ const Map = (props) => {
         //console.log("has em", has_infection_rating, has_summary_star_rating)
         if(has_infection_rating && has_summary_star_rating){
           marker_metric = (place['Infection Rating'] + place['Summary star rating'])*1
-          console.log("both",place['Infection Rating'],  place['Summary star rating'])
           return numberToRGB(marker_metric,min_combined_metric_quantile,max_combined_metric_quantile)
         }else if(has_infection_rating){
-          console.log("hai")
           return numberToRGB(place['Infection Rating'],metricQuantiles['hai_bottom_quantile'],metricQuantiles['hai_top_quantile'])
         }else if(has_summary_star_rating){
-          console.log("star")
           return numberToRGB(place['Summary star rating'],metricQuantiles['hcahps_bottom_quantile'],metricQuantiles['hcahps_top_quantile'])
         }else{
           return gray

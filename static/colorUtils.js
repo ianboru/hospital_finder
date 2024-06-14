@@ -1,5 +1,4 @@
 const numberToRGB = (value, min, max) => {
-    console.log(value, min, max)
     if(value < min){
         return "red"
     }else if(value >= min && value < max){

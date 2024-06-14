@@ -94,7 +94,7 @@ def index(request, path=None):
     search_match_threshold = 70
     filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
     print("search string", search_string)
-    upper_quantile = .8
+    upper_quantile = .9
     lower_quantile = .5
     hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
     hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)

@@ -29,6 +29,47 @@ def extract_star_ratings(df):
                 base_df[q] = df_ratings.values
 
         return base_df.reset_index(drop=True)
+def extract_questions_as_columns(df, care_type):
+    facility_id_column = "Facility ID" if "Facility ID" in df.columns else "CMS Certification Number (CCN)"
+    measure_columns_by_care_type = {
+        "Home Health" : [
+            "HHCAHPS Survey Summary Star Rating",
+            "Star Rating for health team gave care in a professional way",
+            "Star Rating for health team communicated well with them",
+            "Star Rating team discussed medicines, pain, and home safety",
+            "Star Rating for how patients rated overall care from agency"
+        ],
+        "Outpatient" : [
+            "Facilities and staff linear mean score",
+            "Communication about your procedure linear mean score",
+            "Patients' rating of the facility linear mean score",
+            "Patients recommending the facility linear mean score"
+        ]
+    }   
+
+    df = df[measure_columns_by_care_type[care_type] + [facility_id_column]]
+    
+    return df 
+
+def extract_questions_as_rows(df, care_type):    
+    measure_name_column_by_care_type = {
+        "Hospitals" : "HCAHPS Question",
+        "Hospice" : "Measure Name",
+        "ED + Others" : "Measure Name",
+    }   
+    measure_value_column_by_care_type = {
+        "Hospitals" : "Patient Survey Star Rating",
+        "Hospice" : "Score",
+        "ED + Others" : "Score",
+    }
+    measure_name_column = measure_name_column_by_care_type[care_type]
+    measure_value_column = measure_value_column_by_care_type[care_type]
+    individual_measures = df[measure_name_column].unique()
+    measures_per_facility = pd.DataFrame()
+    for measure in individual_measures:
+        measures_per_facility[measure] = df[measure_value_column].loc[df[measure_name_column] != measure]
+
+    return measures_per_facility
 
 def load_hcahps_data(export_path, care_type, current_date):
 
@@ -39,16 +80,14 @@ def load_hcahps_data(export_path, care_type, current_date):
     # Nursing homes - measure names as columns 
     # ED Measure names as rows 
     # hospice has summary star and various other rows 
-    files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", ]
+    files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
     if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
         hcahps_df = extract_questions_as_columns(hcahps_df, care_type)
     else:
         hcahps_df = extract_questions_as_rows(hcahps_df, care_type)
         #hcahps_df['Patient Survey Star Rating'] = hcahps_df['Patient Survey Star Rating'].astype(int)
-
-    # Extract star ratings
+    print(hcahps_df.tail(10))
     #hcahps_df = extract_star_ratings(hcahps_df)
-    # Export
     hcahps_export_path = os.path.join(export_path,f'hcahps_summary_metrics {current_date}.csv')
     #hcahps_df.to_csv(hcahps_export_path, index=False)
     return hcahps_df
@@ -250,7 +289,8 @@ all_providers_df = load_provider_cms_list()
 total_hcahps_df = pd.DataFrame()
 for facility_type in HCAHPS_facility_types:
     cur_hcahps_df = load_hcahps_data(export_path, facility_type, current_date)
-    pd.concat([total_hcahps_df, cur_hcahps_df])
+    total_hcahps_df = pd.concat([total_hcahps_df, cur_hcahps_df])
+    print(total_hcahps_df.tail(10))
 
 if regenerate_ccn_list:
     

@@ -19,15 +19,15 @@ const colorLegendComponent = () => {
     const colorLegend = (
         <div style={colorLegendStyle}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ width: '10px', height: '10px', backgroundColor: 'red', display: 'inline-block', marginRight: '5px', fontStyle: 'bold' }}></div>
+            <div style={{ width: '10px', height: '10px', backgroundColor: 'red', marginRight: '5px', fontStyle: 'bold' }}></div>
             <span>Lower Than Average</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', marginLeft: '15px'}}>
-            <div style={{ width: '10px', height: '10px', backgroundColor: '#e7b416', display: 'inline-block', marginRight: '5px' }}></div>
+            <div style={{ width: '10px', height: '10px', backgroundColor: '#e7b416', marginRight: '5px' }}></div>
             <span>Average</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', marginLeft: '15px'}}>
-            <div style={{ width: '10px', height: '10px', backgroundColor: 'green', display: 'inline-block', marginRight: '5px' }}></div>
+            <div style={{ width: '10px', height: '10px', backgroundColor: 'green', marginRight: '5px' }}></div>
             <span> Above Average</span>
           </div>
         </div>

@@ -218,7 +218,6 @@ def load_provider_cms_list():
     return all_providers_df
 
 def extract_questions_as_columns(df, care_type):
-    facility_id_column = "Facility ID" if "Facility ID" in df.columns else "CMS Certification Number (CCN)"
     measure_columns_by_care_type = {
         "Home Health" : [
             "HHCAHPS Survey Summary Star Rating",
@@ -253,7 +252,7 @@ def extract_questions_as_columns(df, care_type):
         ]
     }   
 
-    df = df[measure_columns_by_care_type[care_type] + [facility_id_column]]
+    df = df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
     
     return df 
 
@@ -271,37 +270,71 @@ def extract_questions_as_rows(df, care_type):
     measure_name_column = measure_name_column_by_care_type[care_type]
     measure_value_column = measure_value_column_by_care_type[care_type]
     individual_measures = df[measure_name_column].unique()
+    print("# unique measures ", len(individual_measures))
     measures_per_facility = pd.DataFrame()
     for measure in individual_measures:
-        measures_per_facility[measure] = df[measure_value_column].loc[df[measure_name_column] != measure]
-
+        #print(measure)
+        measure_values = df[[measure_value_column, "Facility ID"]].loc[df[measure_name_column] == measure]
+        #measure_values = measure_values.reset_index()
+        column_map = {}
+        column_map[measure_value_column] = measure
+        measure_values = measure_values.rename(columns=column_map)
+        if measures_per_facility.empty:
+            print("was empty")
+            measures_per_facility = measure_values
+        else:
+            #print(measure_values.columns)
+            #print("Adding measure pre ", measures_per_facility.columns)
+            measures_per_facility = pd.merge(measures_per_facility, measure_values, on="Facility ID")
+            #print("Adding measure post", measures_per_facility.columns)
+    measures_per_facility = measures_per_facility.reset_index(drop=True)
     return measures_per_facility
 
-def load_hcahps_data(export_path, care_type, current_date):
-
-    hcahps_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
-    hcahps_df = pd.read_csv(hcahps_path, low_memory=False)
-    files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+def load_cahps_data(export_path, care_type, files_with_measures_as_columns):
+    print("loading cahps care type", care_type)
+    cahps_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
+    cahps_df = pd.read_csv(cahps_path, low_memory=False)
+    facility_id_column = "Facility ID" if "Facility ID" in cahps_df.columns else "CMS Certification Number (CCN)"
+    column_map = {}
+    column_map[facility_id_column] = 'Facility ID'
+    #print("current care type", care_type,cahps_df.columns)
+    cahps_df = cahps_df.rename(columns=column_map)
+    #print("after care type", care_type,cahps_df.columns)
     if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
-        hcahps_df = extract_questions_as_columns(hcahps_df, care_type)
+        cahps_df = extract_questions_as_columns(cahps_df, care_type)
     else:
-        hcahps_df = extract_questions_as_rows(hcahps_df, care_type)
-   
-    return hcahps_df
+        cahps_df = extract_questions_as_rows(cahps_df, care_type)
+    print("finishing cahps load")
+    return cahps_df
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 current_date = today = time.strftime("%m-%d-%Y")
 #hai_df = load_hai_data(export_path)
 #df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
-HCAHPS_facility_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
 regenerate_ccn_list = False
 all_providers_df = load_provider_cms_list()
 all_cahps_df = pd.DataFrame()
-for facility_type in HCAHPS_facility_types:
-    cur_hcahps_df = load_hcahps_data(export_path, facility_type, current_date)
-    all_cahps_df = pd.concat([all_cahps_df, cur_hcahps_df])
-    print(all_cahps_df.tail(10))
+files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+for care_type in care_types:
+    cur_hcahps_df = load_cahps_data(export_path, care_type, files_with_measures_as_columns)
+    if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
+        print("pre concatening to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
+        all_cahps_df = pd.concat([all_cahps_df, cur_hcahps_df])
+        print("post concatening to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
+
+    else:
+        if all_cahps_df.empty:
+            all_cahps_df = cur_hcahps_df
+        else:
+            #print("merge columns",care_type, cur_hcahps_df.columns)
+            print("pre merging to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
+            all_cahps_df = pd.merge(all_cahps_df, cur_hcahps_df, how="outer", on="Facility ID")
+            print("post merging to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
+    #print(all_cahps_df.columns)
+
 all_cahps_export_path = os.path.join(export_path,f'all_cahps_summary_metrics {current_date}.csv')
+all_cahps_df = all_cahps_df.reset_index(drop=True)
 all_cahps_df.to_csv(all_cahps_export_path, index=False)
 if regenerate_ccn_list:
     

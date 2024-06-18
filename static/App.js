@@ -89,7 +89,6 @@ function App() {
             <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
           </div>
         </div>
-      <ColorLegend />
       </div>
       <div className='map-container'>
         <ColorLegend />

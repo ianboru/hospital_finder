@@ -37,9 +37,9 @@ def extract_hai_measurements(df, hai_measures):
         rows_per_facility = sum(df['Facility ID'].iloc[0] == df['Facility ID'])
 
         num_measures = len(hai_measures)
-        facility_columns = ['Facility ID', 'Facility Name', 'Address']
+        facility_columns = ['Facility ID']
         for measure in hai_measures:
-            facility_columns += [f"{measure} Lower CI", f"{measure} Upper CI", f"{measure} SIR", f"{measure} Compared to National"]
+            facility_columns += [f"{measure} Compared to National"]
 
         # Loop through each facility and extract all measures, much faster than using groupby but less readable
         all_facility_data = []
@@ -48,12 +48,9 @@ def extract_hai_measurements(df, hai_measures):
 
             score = g['Score']
             national = g['Compared to National']
-            facility_data = [g['Facility ID'].iloc[0], g['Facility Name'].iloc[0], g['Address'].iloc[0]]
+            facility_data = [g['Facility ID'].iloc[0]]
             for j in range(0,num_measures):
                 facility_data += [
-                    score.iloc[0+j*num_measures], # Lower CI
-                    score.iloc[1+j*num_measures], # Upper CI
-                    score.iloc[5+j*num_measures], # SIR
                     national.iloc[5+j*num_measures] # Compared to National
                     ]
 
@@ -65,21 +62,12 @@ def load_hai_data(export_path):
     hai_df = pd.read_csv(hai_path)
     hai_df = hai_df[[
                 'Facility ID',
-                'Address',
-                'City/Town',
-                'State',
-                'ZIP Code',
-                'Facility Name',
                 'Measure ID',
                 'Measure Name',
                 'Compared to National',
                 'Score'
                 ]]
 
-    # Combine address columns
-    hai_df["Address"] = hai_df["Address"] + ", " + hai_df["City/Town"] + ", " + hai_df["State"] + " " + hai_df["ZIP Code"].astype(str)
-    hai_df = hai_df.drop(columns=['City/Town', 'State', 'ZIP Code'])
-    # Replace Not Available with NaN
     hai_df['Compared to National'] = hai_df['Compared to National'].replace('Not Available', np.nan)
     hai_df['Score'] = hai_df['Score'].replace('Not Available', np.nan)
     hai_measures = [
@@ -91,7 +79,7 @@ def load_hai_data(export_path):
         "Clostridium Difficile (C.Diff)"
         ]
 
-    hai_df = extract_hai_measurements(hai_df)
+    hai_df = extract_hai_measurements(hai_df, hai_measures)
 
     # Map categories to numeric index
     category_map = {"Worse than the National Benchmark":1, "No Different than National Benchmark":2, "Better than the National Benchmark":3}
@@ -100,20 +88,15 @@ def load_hai_data(export_path):
         hai_df[col] = hai_df[col].map(category_map).astype(float)
 
     # Add summary metrics across all measures
-    hai_df['Mean SIR'] = hai_df[[f"{measure} SIR" for measure in hai_measures]].astype(float).mean(axis=1)
     hai_df['Mean Compared to National'] = hai_df[[f"{measure} Compared to National" for measure in hai_measures]].astype(float).mean(axis=1)
     hai_df['Infection Rating'] = pd.cut(hai_df['Mean Compared to National'] - hai_df['Mean Compared to National'].mean(), bins=5, labels=[1,2,3,4,5])
-    hai_export_path = os.path.join(export_path,'hai_summary_metrics.csv')
-    hai_df.to_csv(hai_export_path, index=False)
     return hai_df
 
 
 def merge_hcahps_and_hai(hcahps_df, hai_df, export_path):
     # Merge HCAHPS and HAI data
+    print("merging hcahps and hai)" ,hcahps_df.shape,hai_df.shape, hai_df.columns)
     df = hcahps_df.merge(hai_df, on=['Facility ID'], how='outer', suffixes=(None,'_y'))
-    df['Facility Name'] = df['Facility Name'].fillna(df['Facility Name_y'])
-    df['Address'] = df['Address'].fillna(df['Address_y'])
-    df = df.drop(['Facility Name_y', 'Address_y'], axis=1)
     df_export_path = os.path.join(export_path,'all_summary_metrics.csv')
     df.to_csv(df_export_path, index=False)
     return df
@@ -309,9 +292,7 @@ def load_cahps_data(export_path, care_type, files_with_measures_as_columns):
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 current_date = today = time.strftime("%m-%d-%Y")
-#hai_df = load_hai_data(export_path)
-#df_final = merge_hcahps_and_hai(hcahps_df, hai_df, export_path)
-care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+care_types = ["ED + Others"]#, "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
 regenerate_ccn_list = False
 all_providers_df = load_provider_cms_list()
 all_cahps_df = pd.DataFrame()
@@ -332,14 +313,14 @@ for care_type in care_types:
             all_cahps_df = pd.merge(all_cahps_df, cur_hcahps_df, how="outer", on="Facility ID")
             print("post merging to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
     #print(all_cahps_df.columns)
-
-all_cahps_export_path = os.path.join(export_path,f'all_cahps_summary_metrics {current_date}.csv')
 all_cahps_df = all_cahps_df.reset_index(drop=True)
+hai_df = load_hai_data(export_path)
+all_cahps_df = merge_hcahps_and_hai(all_cahps_df, hai_df, export_path)
+print("final shape", all_cahps_df.shape)
+all_cahps_export_path = os.path.join(export_path,f'all_cahps_summary_metrics {current_date}.csv')
 all_cahps_df.to_csv(all_cahps_export_path, index=False)
 if regenerate_ccn_list:
-    
     chunks = 1000
-
     chunk_limit = None 
     total_rows = len(all_providers_df)
 

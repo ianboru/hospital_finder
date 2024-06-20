@@ -68,6 +68,7 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
             cur_provider["address"] = row["Address"]
 
             filtered_provider_list.append(cur_provider)
+    
     print("after filters" ,provider_list.columns)
     return filtered_provider_list, provider_list
 

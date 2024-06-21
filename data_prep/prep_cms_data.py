@@ -292,7 +292,7 @@ def load_cahps_data(export_path, care_type, files_with_measures_as_columns):
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 current_date = today = time.strftime("%m-%d-%Y")
-care_types = ["ED + Others"]#, "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
 regenerate_ccn_list = False
 all_providers_df = load_provider_cms_list()
 all_cahps_df = pd.DataFrame()

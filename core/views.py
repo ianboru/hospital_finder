@@ -26,6 +26,8 @@ class SignUpView(generic.CreateView):
 gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 summary_metrics = load_summary_metrics()
 provider_list = load_provider_list()
+print("summary metric columns", summary_metrics.columns)
+print("provider list columns", provider_list.columns)
 
 def find_providers_in_radius(search_location, radius, care_type, provider_list):
     search_location_tuple = (search_location[0], search_location[1])
@@ -99,8 +101,14 @@ def index(request, path=None):
     lower_quantile = .5
     hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
     hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)
-    hcahps_top_quantile = providers_with_metrics_df["Summary star rating"].quantile(upper_quantile)
-    hcahps_bottom_quantile = providers_with_metrics_df["Summary star rating"].quantile(lower_quantile)
+    summary_star_for_quantile = providers_with_metrics_df["Summary star rating"][providers_with_metrics_df["Summary star rating"].notna()]
+    print("unique 1",summary_star_for_quantile.unique())
+    #summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile.apply(lambda x: isinstance(x, float))]
+    summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile != "Not Available"]
+    summary_star_for_quantile = summary_star_for_quantile.astype(int)
+    print("unique",summary_star_for_quantile.unique())
+    hcahps_top_quantile = summary_star_for_quantile.quantile(upper_quantile)
+    hcahps_bottom_quantile = summary_star_for_quantile.quantile(lower_quantile)
     
     name_filtered_providers = []
     if search_string:

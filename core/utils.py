@@ -42,8 +42,8 @@ def load_provider_list():
 def load_summary_metrics() -> pd.DataFrame:
     """ Initialize the data for the app"""
     all_metrics = load_summary_metric('all')
-    all_metrics["Facility Name"] = standardize_cms_name(all_metrics["Facility Name"])
-    all_metrics["Address"] = all_metrics["Address"].str.lower()
+    all_metrics = all_metrics[1:10000]
+    print("loading summary",all_metrics.columns)
     return all_metrics
 
 ### Formatting and parsing

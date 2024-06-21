@@ -167,7 +167,7 @@ const Map = (props) => {
         }}
       />
     );
-
+    //current location marker parent
     const currentLocationMarker = currentGPSLocation ? (
       <>
         {translucentBackgroundCircleCurrentLocationMarker}
@@ -203,6 +203,7 @@ const Map = (props) => {
               onUnmount={onUnmount}
               onDragEnd={onDragEnd}
               options={mapOptions}
+              
               // onZoomChanged={()=>{
                 // if(map && false){
                 //   const bounds = map.getBounds()

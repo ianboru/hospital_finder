@@ -249,10 +249,19 @@ def extract_questions_as_rows(df, care_type):
         "Hospice" : "Score",
         "ED + Others" : "Score",
     }
-    allowed_columns = ["Family caregiver survey rating",
+    allowed_columns = [
+        "Family caregiver survey rating",
         "Ambulatory Quality Measures - Mean Linear Scores",
         "Emergency department volume",
-        "Summary star rating"
+        "Summary star rating",
+        "Nurse communication - star rating",
+        "Doctor communication - star rating",
+        "Staff responsiveness - star rating",
+        "Communication about medicines - star rating",
+        "Discharge information - star raing",
+        "Care transition - star rating",
+        "Cleanliness - star rating",
+        "Quietness - star rating" 
     ]
     measure_name_column = measure_name_column_by_care_type[care_type]
     measure_value_column = measure_value_column_by_care_type[care_type]

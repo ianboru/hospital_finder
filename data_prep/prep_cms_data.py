@@ -95,7 +95,6 @@ def load_hai_data(export_path):
 
 def merge_hcahps_and_hai(hcahps_df, hai_df, export_path):
     # Merge HCAHPS and HAI data
-    print("merging hcahps and hai)" ,hcahps_df.shape,hai_df.shape, hai_df.columns)
     df = hcahps_df.merge(hai_df, on=['Facility ID'], how='outer', suffixes=(None,'_y'))
     df_export_path = os.path.join(export_path,'all_summary_metrics.csv')
     df.to_csv(df_export_path, index=False)
@@ -204,34 +203,34 @@ def extract_questions_as_columns(df, care_type):
     measure_columns_by_care_type = {
         "Home Health" : [
             "HHCAHPS Survey Summary Star Rating",
-            "Star Rating for health team gave care in a professional way",
-            "Star Rating for health team communicated well with them",
-            "Star Rating team discussed medicines, pain, and home safety",
-            "Star Rating for how patients rated overall care from agency"
+            # "Star Rating for health team gave care in a professional way",
+            # "Star Rating for health team communicated well with them",
+            # "Star Rating team discussed medicines, pain, and home safety",
+            # "Star Rating for how patients rated overall care from agency"
         ],
         "Outpatient" : [
             "Facilities and staff linear mean score",
-            "Communication about your procedure linear mean score",
-            "Patients' rating of the facility linear mean score",
-            "Patients recommending the facility linear mean score"
+            # "Communication about your procedure linear mean score",
+            # "Patients' rating of the facility linear mean score",
+            # "Patients recommending the facility linear mean score"
         ],
         "In-Center Hemodialysis" : [
             "Patient Hospital Readmission Category",
-            "Patient Transfusion category text",
-            "SWR category text",
-            "PPPW category text",
-            "SEDR category text",
-            "ED30 Category text",
-            "Patient Infection category text",
-            "Fistula Category Text"
+            # "Patient Transfusion category text",
+            # "SWR category text",
+            # "PPPW category text",
+            # "SEDR category text",
+            # "ED30 Category text",
+            # "Patient Infection category text",
+            # "Fistula Category Text"
         ],
         "Nursing Homes" : [
             "Overall Rating",
-            "Health Inspection Rating",
-            "QM Rating",
-            "Long-Stay QM Rating",
-            "Short-Stay QM Rating",
-            "Staffing Rating"
+            # "Health Inspection Rating",
+            # "QM Rating",
+            # "Long-Stay QM Rating",
+            # "Short-Stay QM Rating",
+            # "Staffing Rating"
         ]
     }   
 
@@ -250,10 +249,17 @@ def extract_questions_as_rows(df, care_type):
         "Hospice" : "Score",
         "ED + Others" : "Score",
     }
+    allowed_columns = ["Family caregiver survey rating",
+        "Ambulatory Quality Measures - Mean Linear Scores",
+        "Emergency department volume",
+        "Summary star rating"
+    ]
     measure_name_column = measure_name_column_by_care_type[care_type]
     measure_value_column = measure_value_column_by_care_type[care_type]
     individual_measures = df[measure_name_column].unique()
+    individual_measures = list(set(allowed_columns).intersection(set(individual_measures)))
     print("# unique measures ", len(individual_measures))
+    print("remaining measures", care_type, individual_measures)
     measures_per_facility = pd.DataFrame()
     for measure in individual_measures:
         #print(measure)
@@ -316,8 +322,9 @@ for care_type in care_types:
 all_cahps_df = all_cahps_df.reset_index(drop=True)
 hai_df = load_hai_data(export_path)
 all_cahps_df = merge_hcahps_and_hai(all_cahps_df, hai_df, export_path)
-print("final shape", all_cahps_df.shape)
+print("final shape", all_cahps_df.columns)
 all_cahps_export_path = os.path.join(export_path,f'all_cahps_summary_metrics {current_date}.csv')
+print(all_cahps_df[all_cahps_df["HHCAHPS Survey Summary Star Rating"].notna()].head(10))
 all_cahps_df.to_csv(all_cahps_export_path, index=False)
 if regenerate_ccn_list:
     chunks = 1000

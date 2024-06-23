@@ -17,6 +17,8 @@ from geopy import distance
 from rapidfuzz import fuzz
 import math
 import pprint
+pd.set_option('display.max_columns', None)
+
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
@@ -26,24 +28,24 @@ class SignUpView(generic.CreateView):
 gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 summary_metrics = load_summary_metrics()
 provider_list = load_provider_list()
-print("summary metric columns", summary_metrics.columns)
-print("provider list columns", provider_list.columns)
 
 def find_providers_in_radius(search_location, radius, care_type, provider_list):
     search_location_tuple = (search_location[0], search_location[1])
-    
     # provider_list = provider_list.merge(summary_metrics, left_on="Facility ID", right_on="Facility ID")
-    provider_list = provider_list.merge(summary_metrics, left_on="Facility ID", right_on="Facility ID",
-                 how='outer', suffixes=('', '_y'))
+    provider_list = provider_list.merge(summary_metrics, on="Facility ID",
+                 how='left', suffixes=('', '_y'))
 
     provider_list.drop(provider_list.filter(regex='_y$').columns, axis=1, inplace=True)
     #provider_list.dropna(inplace=True)
     # print('provider_list.rows ', provider_list[""])
     print("search loca ", search_location, radius, care_type)
-    print(provider_list.columns)
     filtered_provider_list = []
+    total_provider_list = provider_list
+
     if care_type and care_type != "All":
         provider_list = provider_list[provider_list["Facility Type"] == care_type]
+        print("post filter", care_type)
+        pprint.pprint(provider_list.head(3))
     for index,row in provider_list.iterrows():
         provider_location_tuple = (row['latitude'],row['longitude'])
         if provider_location_tuple[0] == float('nan'):
@@ -71,8 +73,7 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
 
             filtered_provider_list.append(cur_provider)
     
-    print("after filters" ,provider_list.columns)
-    return filtered_provider_list, provider_list
+    return filtered_provider_list, total_provider_list
 
 @timeit
 def index(request, path=None):
@@ -102,6 +103,8 @@ def index(request, path=None):
     hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
     hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)
     summary_star_for_quantile = providers_with_metrics_df["Summary star rating"][providers_with_metrics_df["Summary star rating"].notna()]
+    quantile_rows = providers_with_metrics_df[providers_with_metrics_df["Summary star rating"].notna()][1:10]
+    print(quantile_rows[["Facility Name", "Facility Type", "Summary star rating"]])
     print("unique 1",summary_star_for_quantile.unique())
     #summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile.apply(lambda x: isinstance(x, float))]
     summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile != "Not Available"]

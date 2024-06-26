@@ -62,3 +62,42 @@ navigate to this link, copy the csvs to the data directory
 ```
 python manage.py migrate
 ```
+
+
+// DATABASE AND PGSQL INSTRUCTIONS
+
+brew install postgresql
+pip install psycopg2
+brew list postgresql@14
+
+// start postgresql
+brew services start postgresql
+// If the above doesn't work use this command
+brew services restart postgresql
+
+// 
+export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/postgresql@14/14.10_1/lib:$DYLD_LIBRARY_PATH"
+
+// reload your shell
+source ~/.zshrc  # or source ~/.bash_profile
+
+// 
+brew link --force --overwrite postgresql@14
+
+// create db
+createdb yourdb
+
+// start the shell for the selected db
+psql -d yourdb
+
+
+CREATE DATABASE your_database_name;
+CREATE USER your_database_user WITH PASSWORD 'your_database_password';
+ALTER ROLE your_database_user SET client_encoding TO 'utf8';
+ALTER ROLE your_database_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE your_database_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_database_user;
+
+// this is the required port for postgresql 
+DB_HOST=localhost
+DB_PORT=5432

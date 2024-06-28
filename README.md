@@ -101,3 +101,32 @@ GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_database_user;
 // this is the required port for postgresql 
 DB_HOST=localhost
 DB_PORT=5432
+
+
+//TO CREATE SUPERUSER
+
+//create the super user 
+python3 manage.py createsuperuser
+
+//You will be prompted for username, emial, password, then password confirmation
+
+//to open the shell
+python manage.py shell
+
+//import the user in the shell
+from django.contrib.auth.models import User
+
+//grab the user
+user = User.objects.get(username='your_username')
+
+//to delete the user
+user.delete()
+
+//to adjust user email
+user.email = 'new_email@example.com'
+
+//to save
+user.save()
+
+//to exit the shell
+exit()

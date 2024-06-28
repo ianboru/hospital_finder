@@ -1,5 +1,6 @@
+from core import models
+from core.models.Favorite import Favorite
 from django.contrib import admin
-from core.models import Favorite
 
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = [

@@ -11,10 +11,17 @@ class Facility(models.Model):
         null=True,
         blank=True,
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ('-created_at',)
     
 class Address(models.Model):
     zip = models.IntegerField()
     street = models.CharField(max_length=100, blank=True) 
     city = models.CharField(max_length=100, blank=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
     
-// still need to add Hai Metric and CAPHS
+    class Meta:
+        ordering = ('-created_at',)
+    
+# still need to add Hai Metric and CAPHS

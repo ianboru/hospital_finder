@@ -17,4 +17,5 @@ class Address(models.Model):
     street = models.CharField(max_length=100, blank=True) 
     city = models.CharField(max_length=100, blank=True) 
     
-// still need to add Hai Metric and CAPHS
+
+#still need to add Hai Metric and CAPHS

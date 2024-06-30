@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .timestamp import TimeStamp
 
-class Facility(models.Model):
+class Facility(TimeStamp):
     facility_name = models.CharField(max_length=100, blank=False) 
     care_type = models.CharField(max_length=100, blank=True) 
     address = models.ForeignKey(
@@ -11,17 +12,10 @@ class Facility(models.Model):
         null=True,
         blank=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        ordering = ('-created_at',)
     
-class Address(models.Model):
+class Address(TimeStamp):
     zip = models.IntegerField()
     street = models.CharField(max_length=100, blank=True) 
     city = models.CharField(max_length=100, blank=True) 
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        ordering = ('-created_at',)
     
 # still need to add Hai Metric and CAPHS

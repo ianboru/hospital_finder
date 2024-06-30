@@ -1,8 +1,16 @@
 from core import models
 from core.models.favorite import Favorite
 from core.models.facility import Facility, Address
+from core.models.caphs_metrics import CAPHSMetrics
 from django.contrib import admin
 
+class CAPHSMetricsAdmin(admin.ModelAdmin):
+    list_display = [
+        "caphs_metric_json",
+        "id"
+    ]
+
+admin.site.register(CAPHSMetrics, CAPHSMetricsAdmin)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = [
         "user",

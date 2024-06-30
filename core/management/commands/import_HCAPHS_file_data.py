@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
     def create_instance_for_each_hcaphs(self, export_path, care_types):
         export_path = DATA_DIR
-        care_types = ["Outpatient Ambulatory Services", "Home Health", "Hospice", "Hospitals", "Nursing Homes"]
+        care_types = ["Home Health", "Outpatient Ambulatory Services"]
         
         for care_type in care_types:
             self.load_hcahps_data_to_db(export_path, care_type)

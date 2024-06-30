@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-import os, time, json, sys
+import os, time, json, sys, hashlib
 import pandas as pd
 from core.models.caphs_metrics import CAPHSMetrics
 from hospital_finder.settings import DATA_DIR
@@ -32,7 +32,7 @@ class Command(BaseCommand):
     def load_hcahps_data_to_db(self, export_path, care_type): 
         hcahps_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
         hcahps_df = pd.read_csv(hcahps_path, low_memory=False)
-        # only using these two care types for now because other care types are not metrics are not properly defined
+        # only using these two care types for now because other care types metrics are not properly defined
         files_with_measures_as_columns = ["Home Health", "Outpatient Ambulatory Services"]
         
         if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
@@ -43,7 +43,9 @@ class Command(BaseCommand):
             hospital = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             hospital = json.dumps(hospital) 
-            caphs_metrics = CAPHSMetrics(caphs_metric_json=hospital)
+            # Calculate the hash value of the JSON string
+            hash_value = hashlib.sha256(hospital.encode('utf-8')).hexdigest()
+            caphs_metrics = CAPHSMetrics(caphs_metric_json=hospital, hash_value=hash_value)
             caphs_metrics.save()
             
         return hcahps_df

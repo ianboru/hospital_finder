@@ -3,14 +3,6 @@ import os, time, json, sys
 import pandas as pd
 from core.models.caphs_metrics import CAPHSMetrics
 from hospital_finder.settings import DATA_DIR
-# facility_id_column = "Facility ID" if "Facility ID" in df.columns else "CMS Certification Number (CCN)"
-    
-#     measure_column_by_care_type = {
-#         "Hospital" : "HCAHPS Question",
-#         "Hospice" : "Measure Name",
-#         "Emergency" : "Measure Name",
-#     }   
-
 
 class Command(BaseCommand):
     help = 'Import HCAHPS CSV Data'

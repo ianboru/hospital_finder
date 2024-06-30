@@ -32,11 +32,8 @@ class Command(BaseCommand):
     def load_hcahps_data_to_db(self, export_path, care_type): 
         hcahps_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
         hcahps_df = pd.read_csv(hcahps_path, low_memory=False)
-        # only using these two care types for now because other care types metrics are not properly defined
-        files_with_measures_as_columns = ["Home Health", "Outpatient Ambulatory Services"]
         
-        if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
-            hcahps_df = self.filter_columns_and_convert_to_df(hcahps_df, care_type)
+        hcahps_df = self.filter_columns_and_convert_to_df(hcahps_df, care_type)
         
         # drops a row if it's a duplicate
         hcahps_df = hcahps_df.drop_duplicates()
@@ -53,15 +50,14 @@ class Command(BaseCommand):
         return hcahps_df
 
     def create_instance_for_each_hcaphs(self, export_path, care_types):
-        export_path = DATA_DIR
-        care_types = ["Home Health", "Outpatient Ambulatory Services"]
-        
         for care_type in care_types:
             self.load_hcahps_data_to_db(export_path, care_type)
             
     def handle(self, *args, **options):
         export_path = DATA_DIR
-        care_types = ["Outpatient Ambulatory Services", "Home Health", "Hospice", "Hospitals", "Nursing Homes"]
+        # only using these two care types for now because other care types metrics are not properly defined
+        care_types = ["Home Health", "Outpatient Ambulatory Services"]
+        # care_types = ["Outpatient Ambulatory Services", "Home Health", "Hospice", "Hospitals", "Nursing Homes"]
         self.create_instance_for_each_hcaphs(export_path, care_types)
         
     

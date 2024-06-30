@@ -1,7 +1,7 @@
 from core import models
 from core.models.favorite import Favorite
 from core.models.facility import Facility, Address
-from core.models.caphs_metrics import CAPHSMetrics
+from core.models.facility_data import CAPHSMetrics, HAIMetrics
 from django.contrib import admin
 
 class CAPHSMetricsAdmin(admin.ModelAdmin):
@@ -11,6 +11,16 @@ class CAPHSMetricsAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(CAPHSMetrics, CAPHSMetricsAdmin)
+
+class HAIMetricsAdmin(admin.ModelAdmin):
+    list_display = [
+        "hai_metric_json",
+        "id"
+    ]
+
+admin.site.register(HAIMetrics, HAIMetricsAdmin)
+
+
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = [
         "user",

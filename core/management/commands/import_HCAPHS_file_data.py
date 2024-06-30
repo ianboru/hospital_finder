@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import os, time, json, sys, hashlib
 import pandas as pd
-from core.models.caphs_metrics import CAPHSMetrics
+from core.models.facility_data import CAPHSMetrics
 from hospital_finder.settings import DATA_DIR
 
 class Command(BaseCommand):
@@ -38,14 +38,16 @@ class Command(BaseCommand):
         if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
             hcahps_df = self.filter_columns_and_convert_to_df(hcahps_df, care_type)
         
+        # drops a row if it's a duplicate
+        hcahps_df = hcahps_df.drop_duplicates()
+        
         for index, row in hcahps_df.iterrows():
             # Convert the row to a dictionary
             hospital = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             hospital = json.dumps(hospital) 
-            # Calculate the hash value of the JSON string
-            hash_value = hashlib.sha256(hospital.encode('utf-8')).hexdigest()
-            caphs_metrics = CAPHSMetrics(caphs_metric_json=hospital, hash_value=hash_value)
+            
+            caphs_metrics = CAPHSMetrics(caphs_metric_json=hospital)
             caphs_metrics.save()
             
         return hcahps_df

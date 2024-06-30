@@ -3,5 +3,5 @@ from django.contrib.auth.models import User
 from .timestamp import TimeStamp
 
 class CAPHSMetrics(TimeStamp):
-    caphs_metric_json = models.JSONField()
+    caphs_metric_json = models.JSONField(default=dict)
     

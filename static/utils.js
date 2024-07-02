@@ -7,11 +7,11 @@ const getHaiEmoji = (starCount, midPoint) => {
         return ""
     }
     switch (true){
-        case starCount < midPoint:
+        case starCount > midPoint:
             return (<span style={{color:"green"}}>😄 Better Than Average</span>)
         case starCount == midPoint:
             return (<span style={{color:"orange"}}>😐 Average</span>)
-        case starCount > midPoint:
+        case starCount < midPoint:
             return (<span style={{color:"red"}}>🤢 Worse Than Average</span>)
     }
 }

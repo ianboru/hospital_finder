@@ -31,17 +31,33 @@ admin.site.register(Favorite, FavoriteAdmin)
 
 class FacilityAdmin(admin.ModelAdmin):
     list_display = [
+        "facility_id",
         "facility_name",
         "care_type",
         "address"
     ]
+    search_fields = [
+        "facility_id",
+        "facility_name",
+        "care_type",
+        "address__city",
+        "address__street",
+        "address__zip"
+    ]
+    raw_id_fields = ['address']
 
 admin.site.register(Facility, FacilityAdmin)
 class AddressAdmin(admin.ModelAdmin):
     list_display = [
-        "zip",
+        "id",
         "street",
-        "city"
+        "city",
+        "zip",
+    ]
+    search_fields = [
+        "street",
+        "city",
+        "zip",
     ]
 
 admin.site.register(Address, AddressAdmin)

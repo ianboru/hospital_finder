@@ -8,7 +8,7 @@ from hospital_finder.settings import DATA_DIR
 class Command(BaseCommand):
     help = 'Import Patient Data'
 
-    def filter_columns_and_convert_to_df(self, care_type, facility_type, facility_df):
+    def filter_columns(self, care_type, facility_type, facility_df):
         facility_id_column = "Facility ID" if "Facility ID" in facility_df.columns else "CMS Certification Number (CCN)"
         facility_df = facility_df.drop_duplicates()
         
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         if care_type == "Hospice":
             provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
         
-        ccn_facility_df = self.filter_columns_and_convert_to_df(care_type, facility_type, provider_df)
+        ccn_facility_df = self.filter_columns(care_type, facility_type, provider_df)
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
             # create_address_instance = Address.objects.create(

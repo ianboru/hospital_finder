@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = 'Import Patient Data'
 
     def filter_columns(self, care_type, facility_type, facility_df):
-        facility_id_column = "Facility ID" if "Facility ID" in facility_df.columns else "CMS Certification Number (CCN)"
+        facility_id_column = "Facility ID" if "Facility ID" in facility_df.columns else facility_df.rename(columns={"CMS Certification Number (CCN)" : "Facility Name"}, inplace=True)
         facility_df = facility_df.drop_duplicates()
         
         if facility_type == 'CCN':
@@ -50,15 +50,13 @@ class Command(BaseCommand):
             
         if care_type == "Hospice":
             provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
+            
+        if care_type == "Home Health":
+            provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
         
         ccn_facility_df = self.filter_columns(care_type, facility_type, provider_df)
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
-            # create_address_instance = Address.objects.create(
-            #     zip=row['ZIP Code'],
-            #     street=row['Address'],
-            #     city=row['City/Town'],
-            # )
             if Facility.objects.filter(facility_id=row[facility_id]):
                 pass
             else: 

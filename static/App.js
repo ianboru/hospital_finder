@@ -2,6 +2,7 @@ import ReactDOM from "react-dom"
 import React, { useEffect } from 'react'
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail"
+import ColorLegend from './components/ColorLegend';
 import TitleBanner from './components/TitleBanner'
 import SearchButton from './components/SearchButton'
 import HeaderInformation from './components/HeaderInformation'
@@ -90,6 +91,7 @@ function App() {
         </div>
       </div>
       <div className='map-container'>
+        <ColorLegend />
         {selectedPlace && (
           <div className='place-detail-overlay'>
             <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />

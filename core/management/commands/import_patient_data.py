@@ -9,9 +9,9 @@ class Command(BaseCommand):
     help = 'Import Patient Data'
 
     def filter_columns(self, care_type, facility_type, facility_df):
-        facility_id_column = "Facility ID" if "Facility ID" in facility_df.columns else facility_df.rename(columns={"CMS Certification Number (CCN)" : "Facility Name"}, inplace=True)
+        facility_id_column = "Facility ID" if "Facility ID" in facility_df.columns else "CMS Certification Number (CCN)"
         facility_df = facility_df.drop_duplicates()
-        
+        print("facility_id_column", facility_id_column)
         if facility_type == 'CCN':
             name_column = facility_df.columns[facility_df.columns.str.contains('Name', case=False)].values[0]
             address_column = facility_df.columns[facility_df.columns.str.contains('Address', case=False)|facility_df.columns.str.contains('_St', case=False)].values[0]

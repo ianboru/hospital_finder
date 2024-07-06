@@ -7,16 +7,20 @@ from django.contrib import admin
 class CAPHSMetricsAdmin(admin.ModelAdmin):
     list_display = [
         "caphs_metric_json",
-        "id"
+        "facility"
     ]
+    
+    raw_id_fields = ['facility']
 
 admin.site.register(CAPHSMetrics, CAPHSMetricsAdmin)
 
 class HAIMetricsAdmin(admin.ModelAdmin):
     list_display = [
         "hai_metric_json",
-        "id"
+        "facility"
     ]
+    
+    raw_id_fields = ['facility']
 
 admin.site.register(HAIMetrics, HAIMetricsAdmin)
 

@@ -57,25 +57,22 @@ class Command(BaseCommand):
         ccn_facility_df = self.filter_columns(care_type, facility_type, provider_df)
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
+            # we don't want to create duplicate facilit data so if facility exists then go to the next row
             if Facility.objects.filter(facility_id=row[facility_id]):
                 pass
-            else: 
-                create_facility_instance = Facility.objects.create(
+            else:
+                current_facility = Facility.objects.create(
                     facility_name = row['Facility Name'],
                     facility_id = row[facility_id],
                     care_type = care_type,
-                    address = Address.objects.create(
+                )
+                address = Address.objects.create(
                         zip=row['ZIP Code'],
                         street=row['Address'],
                         city=row['City/Town'],
                         )
-                )
-                create_facility_instance.save()
-    
-    def create_instance_for_each_provider(self, export_path, ccn_care_types):
-        for care_type in ccn_care_types:
-            print('care_type', care_type)
-            self.load_ccn_data_to_facility_model(export_path, care_type)
+                current_facility.address = address
+                current_facility.save()
             
     def handle(self, *args, **options):
         export_path = DATA_DIR
@@ -84,6 +81,8 @@ class Command(BaseCommand):
         ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
         # care_types = ["Outpatient Ambulatory Services", "Home Health", "Hospice", "Hospitals", "Nursing Homes"]
         # self.create_instance_for_each_hcaphs(export_path, care_types)
-        self.create_instance_for_each_provider(export_path, ccn_care_types)
+        for care_type in ccn_care_types:
+            print('care_type', care_type)
+            self.load_ccn_data_to_facility_model(export_path, care_type)
         
     

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-import os, time, json, sys, hashlib
+import os
 import pandas as pd
 from core.models.facility_data import CAPHSMetrics
 from core.models.facility import Facility, Address
@@ -57,14 +57,19 @@ class Command(BaseCommand):
         ccn_facility_df = self.filter_columns(care_type, facility_type, provider_df)
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
-            # we don't want to create duplicate facilit data so if facility exists then go to the next row
-            if Facility.objects.filter(facility_id=row[facility_id]):
+            if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
+                # we don't want to create duplicate facilit data so if facility exists then go to the next row
                 pass
+            elif Facility.objects.filter(facility_id=row[facility_id]):
+                # if one facility has more than one care type we want to add it to the care types list 
+                facility = Facility.objects.filter(facility_id=row[facility_id]).first()
+                facility.care_types.append(care_type)
+                facility.save()
             else:
                 current_facility = Facility.objects.create(
                     facility_name = row['Facility Name'],
                     facility_id = row[facility_id],
-                    care_type = care_type,
+                    care_types = [care_type],
                 )
                 address = Address.objects.create(
                         zip=row['ZIP Code'],

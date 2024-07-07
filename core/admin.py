@@ -37,13 +37,13 @@ class FacilityAdmin(admin.ModelAdmin):
     list_display = [
         "facility_id",
         "facility_name",
-        "care_type",
+        "care_types",
         "address"
     ]
     search_fields = [
         "facility_id",
         "facility_name",
-        "care_type",
+        "care_types",
         "address__city",
         "address__street",
         "address__zip"

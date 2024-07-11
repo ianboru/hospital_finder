@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from core.models.facility_data import CAPHSMetrics
 from core.models.facility import Facility, Address
+from core.models.facility_data import HAIMetrics
 from hospital_finder.settings import DATA_DIR
 
 class Command(BaseCommand):
@@ -58,7 +59,7 @@ class Command(BaseCommand):
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
             if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
-                # we don't want to create duplicate facilit data so if facility exists then go to the next row
+                # we don't want to create duplicate facility data so if facility exists then go to the next row
                 pass
             elif Facility.objects.filter(facility_id=row[facility_id]):
                 # if one facility has more than one care type we want to add it to the care types list 
@@ -73,11 +74,44 @@ class Command(BaseCommand):
                 )
                 address = Address.objects.create(
                         zip=row['ZIP Code'],
-                        street=row['Address'],
+                        street=row['Address'],  
                         city=row['City/Town'],
                         )
                 current_facility.address = address
                 current_facility.save()
+
+    #populate the hai dataframe with the data from hai.csv
+        #iterate through the dataframe row by row
+        #instantiate the hai model to turn each row into an object
+        #link the object to the facility
+            #query for the facility row/object 
+        #populate new json object with the fields relevant to the metrics being used
+        #set that same json as the json property within it's respective model instance  
+
+    def load_hai_data_to_facility_model(self, export_path):
+        hai_path = os.path.join(export_path, "HAI.csv")
+        hai_df = pd.read_csv(hai_path, low_memory=False, encoding='unicode_escape')
+
+        for index, row in hai_df.iterrows():
+            facility_id = row['Facility ID']
+            facility = Facility.objects.filter(facility_id=facility_id).first()
+            if facility:
+                measure_id = row['Measure ID']
+                measure_name = row['Measure Name']
+                compared_to_national = row['Compared to National']
+                score = row['Score']
+
+                hai_metrics, created = HAIMetrics.objects.get_or_create(
+                    facility = facility,
+                    defaults={
+                        'measure_id' : measure_id,
+                        'measure_name': measure_name,
+                        'compared_to_national': compared_to_national,
+                        'score': score,
+                    }
+                )
+                hai_metrics.save()
+
             
     def handle(self, *args, **options):
         export_path = DATA_DIR
@@ -89,5 +123,8 @@ class Command(BaseCommand):
         for care_type in ccn_care_types:
             print('care_type', care_type)
             self.load_ccn_data_to_facility_model(export_path, care_type)
+
+        #load_hai must be after the facility has already loaded
+        self.load_hai_data_to_facility_model(export_path)
         
     

@@ -10,5 +10,7 @@ class CAPHSMetrics(TimeStamp):
 class HAIMetrics(TimeStamp):
     hai_metric_json = models.JSONField(default=dict)
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='hai_metrics', blank=False)
-
-    
+    measure_id = models.CharField(max_length=100, default = 'No Data')
+    measure_name = models.CharField(max_length=255, default = 'No Data')
+    compared_to_national = models.CharField(max_length=255, default = 'No Data')
+    score = models.CharField(max_length=255, default = 'Not Available')

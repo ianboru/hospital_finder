@@ -80,14 +80,6 @@ class Command(BaseCommand):
                 current_facility.address = address
                 current_facility.save()
 
-    #populate the hai dataframe with the data from hai.csv
-        #iterate through the dataframe row by row
-        #instantiate the hai model to turn each row into an object
-        #link the object to the facility
-            #query for the facility row/object 
-        #populate new json object with the fields relevant to the metrics being used
-        #set that same json as the json property within it's respective model instance  
-
     def load_hai_data_to_facility_model(self, export_path):
         hai_path = os.path.join(export_path, "HAI.csv")
         hai_df = pd.read_csv(hai_path, low_memory=False, encoding='unicode_escape')

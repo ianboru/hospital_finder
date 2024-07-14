@@ -104,8 +104,9 @@ class Command(BaseCommand):
             "Cleanliness - star rating",
             "Quietness - star rating" 
         ]
-        measure_name_column = measure_name_column_by_care_type[care_type]
+        
         # measure_name_column value is a column name 
+        measure_name_column = measure_name_column_by_care_type[care_type]
         measure_value_column = measure_value_column_by_care_type[care_type]
         individual_measures = df[measure_name_column].unique()
         individual_measures = list(set(column_name_from_values).intersection(set(individual_measures)))
@@ -177,15 +178,15 @@ class Command(BaseCommand):
         # load all ccn data into df and create facility for each row
         ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
         for care_type in ccn_care_types:
-            print('care_type', care_type)
+            print('ccn care_type', care_type)
             self.load_ccn_data_to_facility_model(export_path, care_type)
         
-        #load all caphs data and merge them into one df
         caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
         files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
         all_cahps_df = pd.DataFrame()
+        #load all caphs data and merge them into one df
         for care_type in caphs_care_types:
-            print('care_type', care_type)
+            print('caphs care_type', care_type)
             cur_cahps_df = self.load_caphs_data(export_path, care_type)
             
             #combine caph df into all_caphs_df

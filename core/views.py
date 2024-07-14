@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from googlemaps import Client as GoogleMapsClient
 import pandas as pd
 import plotly.graph_objects as go
-from core.models.favorite import Favorite
+# from core.models.favorite import Favorite
 from core.utils import timeit, load_summary_metrics, load_provider_list, get_places, filter_place_results, update_place_results
 pd.set_option('display.max_rows', None,)
 from geopy import distance

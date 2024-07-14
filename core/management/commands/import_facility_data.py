@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-import os
+import os, json
 import pandas as pd
 from core.models.facility_data import CAPHSMetrics
 from core.models.facility import Facility, Address
@@ -8,10 +8,9 @@ from hospital_finder.settings import DATA_DIR
 class Command(BaseCommand):
     help = 'Import Patient Data'
 
-    def filter_columns(self, care_type, facility_type, facility_df):
+    def filter_columns(self, facility_type, facility_df):
         facility_id_column = "Facility ID" if "Facility ID" in facility_df.columns else "CMS Certification Number (CCN)"
         facility_df = facility_df.drop_duplicates()
-        print("facility_id_column", facility_id_column)
         if facility_type == 'CCN':
             name_column = facility_df.columns[facility_df.columns.str.contains('Name', case=False)].values[0]
             address_column = facility_df.columns[facility_df.columns.str.contains('Address', case=False)|facility_df.columns.str.contains('_St', case=False)].values[0]
@@ -30,7 +29,7 @@ class Command(BaseCommand):
             facility_df[facility_id_column] = facility_df[facility_id_column].astype(str)
             facility_df[facility_id_column] = facility_df[facility_id_column].str.zfill(6)
             return facility_df
-            
+        
             
     def load_ccn_data_to_facility_model(self, export_path, care_type):
         facility_type = 'CCN'
@@ -54,7 +53,7 @@ class Command(BaseCommand):
         if care_type == "Home Health":
             provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
         
-        ccn_facility_df = self.filter_columns(care_type, facility_type, provider_df)
+        ccn_facility_df = self.filter_columns(facility_type, provider_df)
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
             if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
@@ -78,16 +77,126 @@ class Command(BaseCommand):
                         )
                 current_facility.address = address
                 current_facility.save()
-            
+    
+    def extract_questions_as_rows(self, df, care_type): 
+        measure_name_column_by_care_type = {
+        "Hospitals" : "HCAHPS Question",
+        "Hospice" : "Measure Name",
+        "ED + Others" : "Measure Name",
+        }   
+         
+        measure_value_column_by_care_type = {
+                "Hospitals" : "Patient Survey Star Rating",
+                "Hospice" : "Score",
+                "ED + Others" : "Score",
+        }
+        column_name_from_values = [
+            "Family caregiver survey rating",
+            "Ambulatory Quality Measures - Mean Linear Scores",
+            "Emergency department volume",
+            "Summary star rating",
+            "Nurse communication - star rating",
+            "Doctor communication - star rating",
+            "Staff responsiveness - star rating",
+            "Communication about medicines - star rating",
+            "Discharge information - star rating",
+            "Care transition - star rating",
+            "Cleanliness - star rating",
+            "Quietness - star rating" 
+        ]
+        measure_name_column = measure_name_column_by_care_type[care_type]
+        # measure_name_column value is a column name 
+        measure_value_column = measure_value_column_by_care_type[care_type]
+        individual_measures = df[measure_name_column].unique()
+        individual_measures = list(set(column_name_from_values).intersection(set(individual_measures)))
+        measures_per_facility = pd.DataFrame()
+        for measure in individual_measures:
+            measure_values = df[[measure_value_column, "Facility ID"]].loc[df[measure_name_column] == measure]
+            column_map = {}
+            column_map[measure_value_column] = measure
+            measure_values = measure_values.rename(columns=column_map)
+            if measures_per_facility.empty:
+                print("was empty")
+                measures_per_facility = measure_values
+            else:
+                measures_per_facility = pd.merge(measures_per_facility, measure_values, on="Facility ID")
+        measures_per_facility = measures_per_facility.reset_index(drop=True)
+        return measures_per_facility
+        
+    def load_caphs_data(self, export_path, care_type):
+        provider_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
+        files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+        
+        caphs_df = pd.read_csv(provider_path, low_memory=False, encoding='unicode_escape')
+        
+        if "CMS Certification Number (CCN)" in caphs_df.columns:
+            caphs_df = caphs_df.rename(columns={"CMS Certification Number (CCN)": "Facility ID"})
+
+        
+        if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
+            # filter column
+            measure_columns_by_care_type = {
+                "Home Health" : [
+                    "HHCAHPS Survey Summary Star Rating",
+                ],
+                "Outpatient" : [
+                    "Facilities and staff linear mean score",
+                ],
+                "In-Center Hemodialysis" : [
+                    "Patient Hospital Readmission Category",
+                ],
+                "Nursing Homes" : [
+                    "Overall Rating",
+                ]
+            }   
+            caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
+        else:
+            caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
+        
+        caphs_df = caphs_df.drop_duplicates()
+        return caphs_df
+        
+    def create_caphs_json_by_row_of_all_caphs_df(self, all_cahps_df):
+        for index, row in all_cahps_df.iterrows():
+            # Convert the row to a dictionary
+            hospital = row.to_dict()  
+            # changing dict to json we need json type to save in the instance
+            hospital = json.dumps(hospital) 
+            if Facility.objects.filter(facility_id=row["Facility ID"]):
+                facility = Facility.objects.filter(facility_id=row["Facility ID"]).first()
+                caphs_metrics = CAPHSMetrics(
+                                    caphs_metric_json=hospital,
+                                    facility=facility
+                                    )
+                caphs_metrics.save()
+            else:
+                pass
+        
     def handle(self, *args, **options):
         export_path = DATA_DIR
-        # only using these two care types for now because other care types metrics are not properly defined
-        caphs_care_types = ["Home Health", "Outpatient Ambulatory Services"]
+        # load all ccn data into df and create facility for each row
         ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
-        # care_types = ["Outpatient Ambulatory Services", "Home Health", "Hospice", "Hospitals", "Nursing Homes"]
-        # self.create_instance_for_each_hcaphs(export_path, care_types)
         for care_type in ccn_care_types:
             print('care_type', care_type)
             self.load_ccn_data_to_facility_model(export_path, care_type)
         
-    
+        #load all caphs data and merge them into one df
+        caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+        files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+        all_cahps_df = pd.DataFrame()
+        for care_type in caphs_care_types:
+            print('care_type', care_type)
+            cur_cahps_df = self.load_caphs_data(export_path, care_type)
+            
+            #combine caph df into all_caphs_df
+            if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
+                all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
+            else:
+                if all_cahps_df.empty:
+                    all_cahps_df = cur_cahps_df
+                else:
+                    all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
+                    
+        all_cahps_df = all_cahps_df.reset_index(drop=True)
+
+        self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)

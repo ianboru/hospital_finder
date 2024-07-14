@@ -1,5 +1,5 @@
 from core import models
-from core.models.favorite import Favorite
+# from core.models.favorite import Favorite
 from core.models.facility import Facility, Address
 from core.models.facility_data import CAPHSMetrics, HAIMetrics
 from django.contrib import admin
@@ -25,13 +25,13 @@ class HAIMetricsAdmin(admin.ModelAdmin):
 admin.site.register(HAIMetrics, HAIMetricsAdmin)
 
 
-class FavoriteAdmin(admin.ModelAdmin):
-    list_display = [
-        "user",
-        "hospital",
-    ]
+# class FavoriteAdmin(admin.ModelAdmin):
+#     list_display = [
+#         "user",
+#         "hospital",
+#     ]
 
-admin.site.register(Favorite, FavoriteAdmin)
+# admin.site.register(Favorite, FavoriteAdmin)
 
 class FacilityAdmin(admin.ModelAdmin):
     list_display = [
@@ -49,6 +49,10 @@ class FacilityAdmin(admin.ModelAdmin):
         "address__zip"
     ]
     raw_id_fields = ['address']
+    
+    @admin.display(description='Facility ID', ordering='facility__id')
+    def get_facility_id(self, obj):
+        return obj.facility.id
 
 admin.site.register(Facility, FacilityAdmin)
 class AddressAdmin(admin.ModelAdmin):

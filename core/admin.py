@@ -49,10 +49,6 @@ class FacilityAdmin(admin.ModelAdmin):
         "address__zip"
     ]
     raw_id_fields = ['address']
-    
-    @admin.display(description='Facility ID', ordering='facility__id')
-    def get_facility_id(self, obj):
-        return obj.facility.id
 
 admin.site.register(Facility, FacilityAdmin)
 class AddressAdmin(admin.ModelAdmin):

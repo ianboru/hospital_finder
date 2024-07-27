@@ -90,7 +90,7 @@ class Command(BaseCommand):
 
         for index, row in hai_df.iterrows():
             facility_id = row['Facility ID']
-            facility_name = row['Facility Name']
+            #facility_name = row['Facility Name']
             metrics = {
                 "Central Line Associated Bloodstream Infection": {
                     "Lower CI": row['Central Line Associated Bloodstream Infection (ICU + select Wards) Lower CI'],
@@ -140,15 +140,13 @@ class Command(BaseCommand):
                     defaults={'hai_metric_json': []}
                 )
                 if not created:
-                    existing_metrics = hai_metrics.hai_metric_json
-                    if isinstance(existing_metrics, dict):
-                        existing_metrics = [existing_metrics]
-                        existing_metrics.append(metrics)
-                        hai_metrics.hai_metric_json = existing_metrics
-                    else:
-                        hai_metrics.hai_metric_json.append(metrics)
+                    # Update existing metrics
+                    hai_metrics.hai_metric_json = metrics
+                else:
+                    # Add new metrics
+                    hai_metrics.hai_metric_json = metrics
 
-                    hai_metrics.save()
+                hai_metrics.save()
 
             
     def handle(self, *args, **options):

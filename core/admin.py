@@ -1,5 +1,5 @@
 from core import models
-from core.models.favorite import Favorite
+# from core.models.favorite import Favorite
 from core.models.facility import Facility, Address
 from core.models.facility_data import CAPHSMetrics, HAIMetrics
 from django.contrib import admin
@@ -25,13 +25,13 @@ class HAIMetricsAdmin(admin.ModelAdmin):
 admin.site.register(HAIMetrics, HAIMetricsAdmin)
 
 
-class FavoriteAdmin(admin.ModelAdmin):
-    list_display = [
-        "user",
-        "hospital",
-    ]
+# class FavoriteAdmin(admin.ModelAdmin):
+#     list_display = [
+#         "user",
+#         "hospital",
+#     ]
 
-admin.site.register(Favorite, FavoriteAdmin)
+# admin.site.register(Favorite, FavoriteAdmin)
 
 class FacilityAdmin(admin.ModelAdmin):
     list_display = [

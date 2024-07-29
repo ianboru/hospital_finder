@@ -2,9 +2,9 @@ from django.core.management.base import BaseCommand
 import os
 import pandas as pd
 import numpy as np
-from core.models.facility_data import CAPHSMetrics
+from hospital_finder.core.models.facility_metrics import CAPHSMetrics
 from core.models.facility import Facility, Address
-from core.models.facility_data import HAIMetrics
+from hospital_finder.core.models.facility_metrics import HAIMetrics
 from hospital_finder.settings import DATA_DIR
 
 class Command(BaseCommand):
@@ -142,11 +142,10 @@ class Command(BaseCommand):
                 if not created:
                     # Update existing metrics
                     hai_metrics.hai_metric_json = metrics
-                else:
-                    # Add new metrics
-                    hai_metrics.hai_metric_json = metrics
 
                 hai_metrics.save()
+            else: 
+                print(f"No corresponding facility found for facility_id: {facility_id}")
 
             
     def handle(self, *args, **options):

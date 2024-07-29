@@ -8,7 +8,5 @@ class CAPHSMetrics(TimeStamp):
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='caphs_metrics', blank=False)
 
 class HAIMetrics(TimeStamp):
-    hai_metric_json = models.JSONField(default=dict)
+    hai_metric_json = models.JSONField(default=list)
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='hai_metrics', blank=False)
-
-    

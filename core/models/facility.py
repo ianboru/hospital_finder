@@ -34,6 +34,9 @@ class Facility(TimeStamp):
         null=True,
         blank=True,
     )
+
+    def __str__(self):
+        return f"{self.facility_name}"
     
     def __str__(self):
         return self.facility_id
@@ -45,5 +48,9 @@ class Address(TimeStamp):
     
     def __str__(self):
         return f"{self.street} {self.city} {self.zip}"
+    
+
+
+    
     
 # still need to add Hai Metric and CAPHS

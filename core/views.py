@@ -141,7 +141,7 @@ def index(request, path=None):
     # Context for the front end
     context = {
         'google_places_data' : places_data,
-        #replace the quantile values with those computed using ORM
+        #replace the quantile values with those computed using ORM 
         'metric_quantiles' : {
             'hai_top_quantile' : hai_top_quantile,
             'hai_bottom_quantile' : hai_bottom_quantile,
@@ -152,5 +152,3 @@ def index(request, path=None):
     }
     print("context", context["metric_quantiles"])
     return render(request, "index.html", context)
-
-

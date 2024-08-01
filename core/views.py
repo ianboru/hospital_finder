@@ -18,7 +18,7 @@ from rapidfuzz import fuzz
 import math
 import pprint
 pd.set_option('display.max_columns', None)
-#add from core.models.facility import Facility
+from core.models.facility import Facility
 #add from core.models.facility_data import HAIMetrics, CAPHSMetrics
 
 class SignUpView(generic.CreateView):
@@ -35,23 +35,17 @@ provider_list = load_provider_list() #delete
 #hai_metrics = HAIMetrics.objects.all()
 #caphs_metrics = CAPHSMetrics.objects.all()
 
-def find_providers_in_radius(search_location, radius, care_type, provider_list):
+def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
-#no merge since data is directly queried from database
-    provider_list = provider_list.merge(summary_metrics, on="Facility ID", #delete
-                 how='left', suffixes=('', '_y')) #delete
-    provider_list.drop(provider_list.filter(regex='_y$').columns, axis=1, inplace=True) #delete
-    
-
     print("search loca ", search_location, radius, care_type)
     filtered_provider_list = []
-    total_provider_list = provider_list #delete
 
-#replace pandas filtering with ORM filtering for care type
     if care_type and care_type != "All":
-        provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
+        provider_list = Facility.objects.filter(care_types__contains=[care_type])
         print("post filter", care_type)
-        pprint.pprint(provider_list.head(3)) #pprint.pprint(facilities[:3])
+    else:
+        provider_list = Facility.objects.all()
+    print(provider_list)
 
     for index,row in provider_list.iterrows(): #for facility in facilities:
         provider_location_tuple = (row['latitude'],row['longitude']) # = (facility.latitude, facility.longitude)
@@ -84,6 +78,7 @@ def find_providers_in_radius(search_location, radius, care_type, provider_list):
     
     return filtered_provider_list, total_provider_list
 
+#first part landing page
 @timeit
 def index(request, path=None):
     """ The main landing route for the app"""
@@ -106,7 +101,8 @@ def index(request, path=None):
     print('parsed location', split_location_string)
     search_match_threshold = 70
 #replace the pandas dataframe here
-    filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
+#provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
+    filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type)
     print("search string", search_string)
 #replace pandas quantile calculations here
     upper_quantile = .9

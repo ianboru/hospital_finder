@@ -18,8 +18,8 @@ from rapidfuzz import fuzz
 import math
 import pprint
 pd.set_option('display.max_columns', None)
-from core.models.facility import Facility
-#add from core.models.facility_data import HAIMetrics, CAPHSMetrics
+from core.models.facility import Facility, Address
+from core.models.facility_data import HAIMetrics, CAPHSMetrics
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -47,36 +47,28 @@ def find_providers_in_radius(search_location, radius, care_type):
         provider_list = Facility.objects.all()
     print(provider_list)
 
-    for index,row in provider_list.iterrows(): #for facility in facilities:
-        provider_location_tuple = (row['latitude'],row['longitude']) # = (facility.latitude, facility.longitude)
-        if provider_location_tuple[0] == float('nan'):
+    for facility in provider_list:
+        address = facility.address 
+        provider_location_tuple = (address.latitude, address.longitude) 
+        if math.isnan(provider_location_tuple[0]):
             continue
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         except:
             continue
         if provider_distance.km < radius:
-            cur_provider = {} #put content for provider name, adress, and location containing latitude and longitude
-            row.fillna('',inplace=True) #delete
-            cols = row.index #delete
-            for col in cols: #delete
-                if row[col] == None: #delete
-                    row[col] = "" #delete
-                else: #delete
-                    cur_provider[col] = row[col] #delete
-                
-            cur_provider["name"] = row["Facility Name"] #delete
-            cur_provider["location"] = { #delete
-                "latitude" : row['latitude'], #delete
-                "longitude" : row['longitude'], #delete
+            cur_provider = {
+                "name": facility.facility_name, 
+                "location": {
+                    "latitude": address.latitude, 
+                    "longitude": address.longitude,
+                },
+                "address": f"{address.street}, {address.city}, {address.zip}" 
             }
-            cur_provider["address"] = row["Address"] #delete
-
-            #attach hai and caphs metrics
 
             filtered_provider_list.append(cur_provider)
     
-    return filtered_provider_list, total_provider_list
+    return filtered_provider_list, provider_list
 
 #first part landing page
 @timeit
@@ -98,18 +90,26 @@ def index(request, path=None):
     if not radius:
         radius = 80
     split_location_string = location_string.strip().split(",")
+    search_location = (float(split_location_string[0]), float(split_location_string[1]))
     print('parsed location', split_location_string)
     search_match_threshold = 70
 #replace the pandas dataframe here
 #provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
-    filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type)
+    filtered_providers = find_providers_in_radius(search_location, radius, care_type)
     print("search string", search_string)
 #replace pandas quantile calculations here
     upper_quantile = .9
     lower_quantile = .5
 #replace pandas infection quantile calulations here
-    hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
-    hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)
+    all_hai_metrics = HAIMetrics.objects.all()
+    all_infection_ratings = [metric.infection_rating for metric in all_hai_metrics if metric.infection_rating is not None]  
+    if all_infection_ratings:
+        sorted_ratings = sorted(all_infection_ratings)
+        hai_top_quantile = sorted_ratings[int(upper_quantile * len(sorted_ratings)) - 1]
+        hai_bottom_quantile = sorted_ratings[int(lower_quantile * len(sorted_ratings)) - 1]
+    else:
+        hai_top_quantile = hai_bottom_quantile = None
+        
 #replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
     summary_star_for_quantile = providers_with_metrics_df["Summary star rating"][providers_with_metrics_df["Summary star rating"].notna()]
     quantile_rows = providers_with_metrics_df[providers_with_metrics_df["Summary star rating"].notna()][1:10]

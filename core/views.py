@@ -109,18 +109,24 @@ def index(request, path=None):
         hai_bottom_quantile = sorted_ratings[int(lower_quantile * len(sorted_ratings)) - 1]
     else:
         hai_top_quantile = hai_bottom_quantile = None
+
+    print("HAI Metrics Quantiles")
+    print(f"Top Quantile: {hai_top_quantile}")
+    print(f"Bottom Quantile: {hai_bottom_quantile}")
         
 #replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
-    summary_star_for_quantile = providers_with_metrics_df["Summary star rating"][providers_with_metrics_df["Summary star rating"].notna()]
-    quantile_rows = providers_with_metrics_df[providers_with_metrics_df["Summary star rating"].notna()][1:10]
-    print(quantile_rows[["Facility Name", "Facility Type", "Summary star rating"]]) #delete
-    print("unique 1",summary_star_for_quantile.unique()) #delete
-    summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile != "Not Available"]
-    summary_star_for_quantile = summary_star_for_quantile.astype(int)
-    print("unique",summary_star_for_quantile.unique()) #delete
-#calculate upper and lower quantiles for summary star using pandas (Series)
-    hcahps_top_quantile = summary_star_for_quantile.quantile(upper_quantile)
-    hcahps_bottom_quantile = summary_star_for_quantile.quantile(lower_quantile)
+    all_summary_star_ratings = Facility.objects.exclude(summary_star_rating__isnull=True).exclude(summary_star_rating="Not Available").values_list('summary_star_rating', flat=True)
+    all_summary_star_ratings = list(map(int, all_summary_star_ratings))
+    if all_summary_star_ratings:
+        sorted_summary_ratings = sorted(all_summary_star_ratings)
+        hcahps_top_quantile = sorted_summary_ratings[int(upper_quantile * len(sorted_summary_ratings)) - 1]
+        hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
+    else:
+        hcahps_top_quantile = hcahps_bottom_quantile = None
+
+    print("Summary Star Ratings Quantiles")
+    print(f"Top Quantile: {hcahps_top_quantile}")
+    print(f"Bottom Quantile: {hcahps_bottom_quantile}")
     
     name_filtered_providers = []
     if search_string:
@@ -137,13 +143,11 @@ def index(request, path=None):
     # Context for the front end
     context = {
         'google_places_data' : places_data,
-        #replace the quantile values with those computed using ORM 
         'metric_quantiles' : {
             'hai_top_quantile' : hai_top_quantile,
             'hai_bottom_quantile' : hai_bottom_quantile,
             'hcahps_top_quantile' : hcahps_top_quantile,
             'hcahps_bottom_quantile' : hcahps_bottom_quantile
-
         }
     }
     print("context", context["metric_quantiles"])

@@ -18,6 +18,8 @@ from rapidfuzz import fuzz
 import math
 import pprint
 pd.set_option('display.max_columns', None)
+from core.models.facility import Facility, Address
+from core.models.facility_data import HAIMetrics, CAPHSMetrics
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -26,55 +28,49 @@ class SignUpView(generic.CreateView):
 
 # Initialize the data for the app
 gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
-summary_metrics = load_summary_metrics()
-provider_list = load_provider_list()
+# Replace CSV loading with database queries below
+summary_metrics = load_summary_metrics() #delete
+provider_list = load_provider_list() #delete
+#facilities = Facility.objects.all()
+#hai_metrics = HAIMetrics.objects.all()
+#caphs_metrics = CAPHSMetrics.objects.all()
 
-def find_providers_in_radius(search_location, radius, care_type, provider_list):
+def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
-    # provider_list = provider_list.merge(summary_metrics, left_on="Facility ID", right_on="Facility ID")
-    provider_list = provider_list.merge(summary_metrics, on="Facility ID",
-                 how='left', suffixes=('', '_y'))
-
-    provider_list.drop(provider_list.filter(regex='_y$').columns, axis=1, inplace=True)
-    #provider_list.dropna(inplace=True)
-    # print('provider_list.rows ', provider_list[""])
     print("search loca ", search_location, radius, care_type)
     filtered_provider_list = []
-    total_provider_list = provider_list
 
     if care_type and care_type != "All":
-        provider_list = provider_list[provider_list["Facility Type"] == care_type]
+        provider_list = Facility.objects.filter(care_types__contains=[care_type])
         print("post filter", care_type)
-        pprint.pprint(provider_list.head(3))
-    for index,row in provider_list.iterrows():
-        provider_location_tuple = (row['latitude'],row['longitude'])
-        if provider_location_tuple[0] == float('nan'):
+    else:
+        provider_list = Facility.objects.all()
+    print(provider_list)
+
+    for facility in provider_list:
+        address = facility.address 
+        provider_location_tuple = (address.latitude, address.longitude) 
+        if math.isnan(provider_location_tuple[0]):
             continue
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         except:
             continue
         if provider_distance.km < radius:
-            cur_provider = {}
-            row.fillna('',inplace=True)
-            cols = row.index
-            for col in cols:
-                if row[col] == None:
-                    row[col] = ""
-                else:
-                    cur_provider[col] = row[col]
-                
-            cur_provider["name"] = row["Facility Name"]
-            cur_provider["location"] = {
-                "latitude" : row['latitude'],
-                "longitude" : row['longitude'],
+            cur_provider = {
+                "name": facility.facility_name, 
+                "location": {
+                    "latitude": address.latitude, 
+                    "longitude": address.longitude,
+                },
+                "address": f"{address.street}, {address.city}, {address.zip}" 
             }
-            cur_provider["address"] = row["Address"]
 
             filtered_provider_list.append(cur_provider)
     
-    return filtered_provider_list, total_provider_list
+    return filtered_provider_list, provider_list
 
+#first part landing page
 @timeit
 def index(request, path=None):
     """ The main landing route for the app"""
@@ -94,24 +90,43 @@ def index(request, path=None):
     if not radius:
         radius = 80
     split_location_string = location_string.strip().split(",")
+    search_location = (float(split_location_string[0]), float(split_location_string[1]))
     print('parsed location', split_location_string)
     search_match_threshold = 70
-    filtered_providers, providers_with_metrics_df = find_providers_in_radius(split_location_string, radius, care_type, provider_list)
+#replace the pandas dataframe here
+#provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
+    filtered_providers = find_providers_in_radius(search_location, radius, care_type)
     print("search string", search_string)
+#replace pandas quantile calculations here
     upper_quantile = .9
     lower_quantile = .5
-    hai_top_quantile = providers_with_metrics_df["Infection Rating"].quantile(upper_quantile)
-    hai_bottom_quantile = providers_with_metrics_df["Infection Rating"].quantile(lower_quantile)
-    summary_star_for_quantile = providers_with_metrics_df["Summary star rating"][providers_with_metrics_df["Summary star rating"].notna()]
-    quantile_rows = providers_with_metrics_df[providers_with_metrics_df["Summary star rating"].notna()][1:10]
-    print(quantile_rows[["Facility Name", "Facility Type", "Summary star rating"]])
-    print("unique 1",summary_star_for_quantile.unique())
-    #summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile.apply(lambda x: isinstance(x, float))]
-    summary_star_for_quantile = summary_star_for_quantile[summary_star_for_quantile != "Not Available"]
-    summary_star_for_quantile = summary_star_for_quantile.astype(int)
-    print("unique",summary_star_for_quantile.unique())
-    hcahps_top_quantile = summary_star_for_quantile.quantile(upper_quantile)
-    hcahps_bottom_quantile = summary_star_for_quantile.quantile(lower_quantile)
+#replace pandas infection quantile calulations here
+    all_hai_metrics = HAIMetrics.objects.all()
+    all_infection_ratings = [metric.infection_rating for metric in all_hai_metrics if metric.infection_rating is not None]  
+    if all_infection_ratings:
+        sorted_ratings = sorted(all_infection_ratings)
+        hai_top_quantile = sorted_ratings[int(upper_quantile * len(sorted_ratings)) - 1]
+        hai_bottom_quantile = sorted_ratings[int(lower_quantile * len(sorted_ratings)) - 1]
+    else:
+        hai_top_quantile = hai_bottom_quantile = None
+
+    print("HAI Metrics Quantiles")
+    print(f"Top Quantile: {hai_top_quantile}")
+    print(f"Bottom Quantile: {hai_bottom_quantile}")
+        
+#replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
+    all_summary_star_ratings = Facility.objects.exclude(summary_star_rating__isnull=True).exclude(summary_star_rating="Not Available").values_list('summary_star_rating', flat=True)
+    all_summary_star_ratings = list(map(int, all_summary_star_ratings))
+    if all_summary_star_ratings:
+        sorted_summary_ratings = sorted(all_summary_star_ratings)
+        hcahps_top_quantile = sorted_summary_ratings[int(upper_quantile * len(sorted_summary_ratings)) - 1]
+        hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
+    else:
+        hcahps_top_quantile = hcahps_bottom_quantile = None
+
+    print("Summary Star Ratings Quantiles")
+    print(f"Top Quantile: {hcahps_top_quantile}")
+    print(f"Bottom Quantile: {hcahps_bottom_quantile}")
     
     name_filtered_providers = []
     if search_string:
@@ -123,7 +138,6 @@ def index(request, path=None):
             if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
-    #pprint.pprint(filtered_providers)
 
     places_data['results'] = filtered_providers
     # Context for the front end
@@ -134,10 +148,7 @@ def index(request, path=None):
             'hai_bottom_quantile' : hai_bottom_quantile,
             'hcahps_top_quantile' : hcahps_top_quantile,
             'hcahps_bottom_quantile' : hcahps_bottom_quantile
-
         }
     }
     print("context", context["metric_quantiles"])
     return render(request, "index.html", context)
-
-

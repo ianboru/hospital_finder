@@ -49,7 +49,7 @@ class Address(TimeStamp):
     longitude = models.FloatField(null=True, blank=True)
     
     def __str__(self):
-        return f"{self.street} {self.city} {self.zip}"
+        return f"{self.street} {self.city} {self.zip} {self.latitude} {self.longitude}"
     
 
 

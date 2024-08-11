@@ -49,6 +49,7 @@ def find_providers_in_radius(search_location, radius, care_type):
 
     for facility in provider_list:
         address = facility.address 
+        #print(f"Facility: {facility.facility_name}, Latitude: {address.latitude}, Longitude: {address.longitude}")
         provider_location_tuple = (address.latitude, address.longitude) 
         if math.isnan(provider_location_tuple[0]):
             continue

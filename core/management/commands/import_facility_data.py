@@ -244,6 +244,35 @@ class Command(BaseCommand):
 
                 hai_metrics.save()
 
+    def load_lat_long_to_address_model(self, export_path):
+        lat_long_path = os.path.join(export_path, "all_providers_by_CMS_3_24.csv")
+        lat_long_df = pd.read_csv(lat_long_path, low_memory=False, encoding='unicode_escape')
+        print("Latitude and Longitude DataFrame:\n", lat_long_df.head())
+        lat_long_df = lat_long_df[['Facility ID', 'latitude', 'longitude']]
+
+        for index, row in lat_long_df.iterrows():
+            facility_id = row['Facility ID']
+            latitude = row['latitude']
+            longitude = row['longitude']
+
+            # Print the data being processed
+            print(f"Processing Facility ID: {facility_id}, Latitude: {latitude}, Longitude: {longitude}")
+
+            facility = Facility.objects.filter(facility_id=facility_id).first()
+            if facility and facility.address:
+
+                # Print before updating
+                print(f"Updating Facility ID: {facility_id} - Old Latitude: {facility.address.latitude}, Old Longitude: {facility.address.longitude}")
+
+                facility.address.latitude = latitude
+                facility.address.longitude = longitude
+                facility.address.save()
+
+                # Print after updating
+                print(f"Updated Facility ID: {facility_id} - New Latitude: {facility.address.latitude}, New Longitude: {facility.address.longitude}")
+            
+            else:
+                print(f"Facility with ID {facility_id} not found or has no address.")
 
     def handle(self, *args, **options):
         export_path = DATA_DIR
@@ -276,3 +305,4 @@ class Command(BaseCommand):
         all_cahps_df = all_cahps_df.reset_index(drop=True)
 
         self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
+        self.load_lat_long_to_address_model(export_path)

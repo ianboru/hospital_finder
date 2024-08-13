@@ -20,6 +20,7 @@ import pprint
 pd.set_option('display.max_columns', None)
 from core.models.facility import Facility, Address
 from core.models.facility_data import HAIMetrics, CAPHSMetrics
+from django.db.models.fields.json import KeyTextTransform
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -39,6 +40,7 @@ def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
     print("search loca ", search_location, radius, care_type)
     filtered_provider_list = []
+    nan_lat_long_count = 0
 
     if care_type and care_type != "All":
         provider_list = Facility.objects.filter(care_types__contains=[care_type])
@@ -51,6 +53,10 @@ def find_providers_in_radius(search_location, radius, care_type):
         address = facility.address 
         #print(f"Facility: {facility.facility_name}, Latitude: {address.latitude}, Longitude: {address.longitude}")
         provider_location_tuple = (address.latitude, address.longitude) 
+        if provider_location_tuple[0] is None or provider_location_tuple[1] is None:
+            # If lat or lon is None, skip this facility
+            nan_lat_long_count += 1
+            continue
         if math.isnan(provider_location_tuple[0]):
             continue
         try:
@@ -68,7 +74,7 @@ def find_providers_in_radius(search_location, radius, care_type):
             }
 
             filtered_provider_list.append(cur_provider)
-    
+    print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}")
     return filtered_provider_list, provider_list
 
 #first part landing page
@@ -82,6 +88,7 @@ def index(request, path=None):
     print("current location",location_string)
     care_type = request.GET.get("careType")
     print('careType backend', care_type)
+    
 
     # Query google maps for places
     places_data = {}
@@ -103,7 +110,7 @@ def index(request, path=None):
     lower_quantile = .5
 #replace pandas infection quantile calulations here
     all_hai_metrics = HAIMetrics.objects.all()
-    all_infection_ratings = [metric.infection_rating for metric in all_hai_metrics if metric.infection_rating is not None]  
+    all_infection_ratings = [metric.hai_metric_json.get('Infection Rating') for metric in all_hai_metrics if metric.hai_metric_json.get('Infection Rating') is not None]
     if all_infection_ratings:
         sorted_ratings = sorted(all_infection_ratings)
         hai_top_quantile = sorted_ratings[int(upper_quantile * len(sorted_ratings)) - 1]
@@ -116,8 +123,12 @@ def index(request, path=None):
     print(f"Bottom Quantile: {hai_bottom_quantile}")
         
 #replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
-    all_summary_star_ratings = Facility.objects.exclude(summary_star_rating__isnull=True).exclude(summary_star_rating="Not Available").values_list('summary_star_rating', flat=True)
-    all_summary_star_ratings = list(map(int, all_summary_star_ratings))
+    all_summary_star_ratings = CAPHSMetrics.objects.annotate(
+        summary_star_rating=KeyTextTransform('Summary star rating', 'caphs_metric_json')
+    ).values_list('summary_star_rating', flat=True)
+    
+    all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()]
+    
     if all_summary_star_ratings:
         sorted_summary_ratings = sorted(all_summary_star_ratings)
         hcahps_top_quantile = sorted_summary_ratings[int(upper_quantile * len(sorted_summary_ratings)) - 1]
@@ -139,7 +150,9 @@ def index(request, path=None):
             if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
-
+    print("NAMEFILTEREDPROVIDERS")
+    print(name_filtered_providers)
+    
     places_data['results'] = filtered_providers
     # Context for the front end
     context = {
@@ -152,4 +165,5 @@ def index(request, path=None):
         }
     }
     print("context", context["metric_quantiles"])
+    print(filtered_providers)
     return render(request, "index.html", context)

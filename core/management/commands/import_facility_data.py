@@ -7,6 +7,7 @@ from core.models.facility import Facility, Address
 from core.models.facility_data import HAIMetrics
 from hospital_finder.settings import DATA_DIR
 
+
 class Command(BaseCommand):
     help = 'Import Patient Data'
 
@@ -245,8 +246,10 @@ class Command(BaseCommand):
                 hai_metrics.save()
 
     def load_lat_long_to_address_model(self, export_path):
-        lat_long_path = os.path.join(export_path, "all_providers_by_CMS_3_24.csv")
+        lat_long_path = os.path.join(export_path, "all_providers_by_CMS_with_name.csv")
         lat_long_df = pd.read_csv(lat_long_path, low_memory=False, encoding='unicode_escape')
+        length_df = len(lat_long_df.index)
+        facility_num = 0
         print("Latitude and Longitude DataFrame:\n", lat_long_df.head())
         lat_long_df = lat_long_df[['Facility ID', 'latitude', 'longitude']]
 
@@ -254,55 +257,67 @@ class Command(BaseCommand):
             facility_id = row['Facility ID']
             latitude = row['latitude']
             longitude = row['longitude']
+            percentage = round(100 * facility_num / length_df)
 
             # Print the data being processed
-            print(f"Processing Facility ID: {facility_id}, Latitude: {latitude}, Longitude: {longitude}")
+            #print(f"Processing Facility ID: {facility_id}, Latitude: {latitude}, Longitude: {longitude}")
 
             facility = Facility.objects.filter(facility_id=facility_id).first()
             if facility and facility.address:
 
                 # Print before updating
-                print(f"Updating Facility ID: {facility_id} - Old Latitude: {facility.address.latitude}, Old Longitude: {facility.address.longitude}")
+                #print(f"Updating Facility ID: {facility_id} - Old Latitude: {facility.address.latitude}, Old Longitude: {facility.address.longitude}")
 
                 facility.address.latitude = latitude
                 facility.address.longitude = longitude
                 facility.address.save()
+                facility_num = facility_num + 1
+
 
                 # Print after updating
-                print(f"Updated Facility ID: {facility_id} - New Latitude: {facility.address.latitude}, New Longitude: {facility.address.longitude}")
+                #print(f"Updated Facility ID: {facility_id} - New Latitude: {facility.address.latitude}, New Longitude: {facility.address.longitude}")
+
             
             else:
                 print(f"Facility with ID {facility_id} not found or has no address.")
 
+            if facility_num % 500 == 0:
+                print(f"Current Percentage: {percentage}, {facility_num} / {length_df}")
+            
+        
+    
+
     def handle(self, *args, **options):
+        run_start_of_pipeline = False
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
-        ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
-        for care_type in ccn_care_types:
-            print('ccn care_type', care_type)
-            self.load_ccn_data_to_facility_model(export_path, care_type)
+        if run_start_of_pipeline == True:
+            ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
+            for care_type in ccn_care_types:
+                print('ccn care_type', care_type)
+                self.load_ccn_data_to_facility_model(export_path, care_type)
 
-        #load_hai must be after the facility has already loaded
-        self.load_hai_data_to_facility_model(export_path)
-        
-        caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
-        files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
-        all_cahps_df = pd.DataFrame()
-        #load all caphs data and merge them into one df
-        for care_type in caphs_care_types:
-            print('caphs care_type', care_type)
-            cur_cahps_df = self.load_caphs_data(export_path, care_type)
+            #load_hai must be after the facility has already loaded
+            self.load_hai_data_to_facility_model(export_path)
             
-            #combine caph df into all_caphs_df
-            if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
-                all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
-            else:
-                if all_cahps_df.empty:
-                    all_cahps_df = cur_cahps_df
+            caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+            files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+            all_cahps_df = pd.DataFrame()
+            #load all caphs data and merge them into one df
+            for care_type in caphs_care_types:
+                print('caphs care_type', care_type)
+                cur_cahps_df = self.load_caphs_data(export_path, care_type)
+                
+                #combine caph df into all_caphs_df
+                if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
+                    all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
                 else:
-                    all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
-                    
-        all_cahps_df = all_cahps_df.reset_index(drop=True)
+                    if all_cahps_df.empty:
+                        all_cahps_df = cur_cahps_df
+                    else:
+                        all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
+                        
+            all_cahps_df = all_cahps_df.reset_index(drop=True)
 
-        self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
+            self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
         self.load_lat_long_to_address_model(export_path)

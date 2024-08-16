@@ -21,6 +21,8 @@ pd.set_option('display.max_columns', None)
 from core.models.facility import Facility, Address
 from core.models.facility_data import HAIMetrics, CAPHSMetrics
 from django.db.models.fields.json import KeyTextTransform
+import math
+from django.db.models import F
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -36,9 +38,10 @@ provider_list = load_provider_list() #delete
 #hai_metrics = HAIMetrics.objects.all()
 #caphs_metrics = CAPHSMetrics.objects.all()
 
+
 def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
-    print("search loca ", search_location, radius, care_type)
+    print("Search Location: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
 
@@ -53,11 +56,9 @@ def find_providers_in_radius(search_location, radius, care_type):
         address = facility.address 
         #print(f"Facility: {facility.facility_name}, Latitude: {address.latitude}, Longitude: {address.longitude}")
         provider_location_tuple = (address.latitude, address.longitude) 
-        if provider_location_tuple[0] is None or provider_location_tuple[1] is None:
+        if provider_location_tuple[0] is None or provider_location_tuple[1] is None or math.isnan(provider_location_tuple[0]) or math.isnan(provider_location_tuple[1]):
             # If lat or lon is None, skip this facility
-            nan_lat_long_count += 1
-            continue
-        if math.isnan(provider_location_tuple[0]):
+            nan_lat_long_count += 1 #counter for facilities without lat and long
             continue
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
@@ -72,7 +73,6 @@ def find_providers_in_radius(search_location, radius, care_type):
                 },
                 "address": f"{address.street}, {address.city}, {address.zip}" 
             }
-
             filtered_provider_list.append(cur_provider)
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}")
     return filtered_provider_list, provider_list
@@ -85,26 +85,26 @@ def index(request, path=None):
     search_string = request.GET.get("search")
     location_string = request.GET.get("location")
     radius = request.GET.get("radius") # in meters
-    print("current location",location_string)
+    print("Current Location: ",location_string)
     care_type = request.GET.get("careType")
-    print('careType backend', care_type)
+    print("CareType Backend: ", care_type)
     
 
     # Query google maps for places
     places_data = {}
-    print("location string", location_string)
+    print("Location String :", location_string)
     if not location_string or 'Na' in location_string:
         location_string = "32.7853263,-117.2407347"
     if not radius:
         radius = 80
     split_location_string = location_string.strip().split(",")
     search_location = (float(split_location_string[0]), float(split_location_string[1]))
-    print('parsed location', split_location_string)
+    print('Parsed Location: ', split_location_string)
     search_match_threshold = 70
 #replace the pandas dataframe here
 #provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
-    filtered_providers = find_providers_in_radius(search_location, radius, care_type)
-    print("search string", search_string)
+    filtered_providers, provider_list = find_providers_in_radius(search_location, radius, care_type)
+    print("Search String: ", search_string)
 #replace pandas quantile calculations here
     upper_quantile = .9
     lower_quantile = .5
@@ -127,6 +127,9 @@ def index(request, path=None):
         summary_star_rating=KeyTextTransform('Summary star rating', 'caphs_metric_json')
     ).values_list('summary_star_rating', flat=True)
     
+    #for metric in CAPHSMetrics.objects.all():
+        #print(metric.caphs_metric_json)
+    
     all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()]
     
     if all_summary_star_ratings:
@@ -135,7 +138,7 @@ def index(request, path=None):
         hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
     else:
         hcahps_top_quantile = hcahps_bottom_quantile = None
-
+    
     print("Summary Star Ratings Quantiles")
     print(f"Top Quantile: {hcahps_top_quantile}")
     print(f"Bottom Quantile: {hcahps_bottom_quantile}")
@@ -150,7 +153,7 @@ def index(request, path=None):
             if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
-    print("NAMEFILTEREDPROVIDERS")
+    print("NAME_FILTERED_PROVIDERS")
     print(name_filtered_providers)
     
     places_data['results'] = filtered_providers
@@ -165,5 +168,6 @@ def index(request, path=None):
         }
     }
     print("context", context["metric_quantiles"])
-    print(filtered_providers)
+    
+    print(f"FILTERED_PROVIDERS_LIST: {filtered_providers}")
     return render(request, "index.html", context)

@@ -15,6 +15,9 @@ function App() {
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
 
+  console.log("placesData in App.js:", placesData); 
+  //console.log("Number of Providers:", placesData.results.length);
+
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
 
@@ -76,6 +79,7 @@ function App() {
     flexDirection: 'column'
   }
   console.log("initial map location", initialLocation)
+
   return (
     <div className="app">
       <HeaderInformation />

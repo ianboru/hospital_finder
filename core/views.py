@@ -23,6 +23,7 @@ from core.models.facility_data import HAIMetrics, CAPHSMetrics
 from django.db.models.fields.json import KeyTextTransform
 import math
 from django.db.models import F
+from django.template.loader import render_to_string
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -53,27 +54,32 @@ def find_providers_in_radius(search_location, radius, care_type):
     print(provider_list)
 
     for facility in provider_list:
-        address = facility.address 
-        #print(f"Facility: {facility.facility_name}, Latitude: {address.latitude}, Longitude: {address.longitude}")
-        provider_location_tuple = (address.latitude, address.longitude) 
+        address = facility.address
+        provider_location_tuple = (address.latitude, address.longitude)
+        
+        # Check for NaN or None lat/lng and skip invalid entries
         if provider_location_tuple[0] is None or provider_location_tuple[1] is None or math.isnan(provider_location_tuple[0]) or math.isnan(provider_location_tuple[1]):
-            # If lat or lon is None, skip this facility
-            nan_lat_long_count += 1 #counter for facilities without lat and long
+            nan_lat_long_count += 1
+            print(f"Skipping facility due to invalid lat/lng: {facility.facility_name}")
             continue
+        
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         except:
+            print(f"Error calculating distance for facility: {facility.facility_name}")
             continue
+        
         if provider_distance.km < radius:
             cur_provider = {
-                "name": facility.facility_name, 
+                "name": facility.facility_name,
                 "location": {
-                    "latitude": address.latitude, 
+                    "latitude": address.latitude,
                     "longitude": address.longitude,
                 },
-                "address": f"{address.street}, {address.city}, {address.zip}" 
+                "address": f"{address.street}, {address.city}, {address.zip}"
             }
             filtered_provider_list.append(cur_provider)
+    
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}")
     return filtered_provider_list, provider_list
 
@@ -167,7 +173,8 @@ def index(request, path=None):
             'hcahps_bottom_quantile' : hcahps_bottom_quantile
         }
     }
-    print("context", context["metric_quantiles"])
-    
+    print("CONTEXT: ", context["metric_quantiles"])
     print(f"FILTERED_PROVIDERS_LIST: {filtered_providers}")
+    print("Django places_data['results']:", places_data['results'])
+    
     return render(request, "index.html", context)

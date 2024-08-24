@@ -11,13 +11,13 @@ import CareTypeFilter from "./components/CareTypeFilter"
 import './App.css'
 
 function App() {
-  console.log("version 0.1.1")
+  console.log("version 0.1.2")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
-
+  
   const initialSearchParam = url.searchParams.get("search")
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
@@ -76,6 +76,7 @@ function App() {
     flexDirection: 'column'
   }
   console.log("initial map location", initialLocation)
+
   return (
     <div className="app">
       <HeaderInformation />

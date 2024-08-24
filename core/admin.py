@@ -9,7 +9,7 @@ class CAPHSMetricsAdmin(admin.ModelAdmin):
         "caphs_metric_json",
         "facility"
     ]
-    
+    search_fields = ['facility__facility_id']
     raw_id_fields = ['facility']
 
 admin.site.register(CAPHSMetrics, CAPHSMetricsAdmin)
@@ -19,7 +19,7 @@ class HAIMetricsAdmin(admin.ModelAdmin):
         "hai_metric_json",
         "facility"
     ]
-    
+    search_fields = ['facility__facility_id']
     raw_id_fields = ['facility']
 
 admin.site.register(HAIMetrics, HAIMetricsAdmin)

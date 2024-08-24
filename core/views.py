@@ -57,10 +57,11 @@ def find_providers_in_radius(search_location, radius, care_type):
         address = facility.address
         provider_location_tuple = (address.latitude, address.longitude)
         
+        facility.facility_name = facility.facility_name.replace("'","")
+
         # Check for NaN or None lat/lng and skip invalid entries
         if provider_location_tuple[0] is None or provider_location_tuple[1] is None or math.isnan(provider_location_tuple[0]) or math.isnan(provider_location_tuple[1]):
             nan_lat_long_count += 1
-            print(f"Skipping facility due to invalid lat/lng: {facility.facility_name}")
             continue
         
         try:
@@ -80,7 +81,7 @@ def find_providers_in_radius(search_location, radius, care_type):
             }
             filtered_provider_list.append(cur_provider)
     
-    print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}")
+    print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
     return filtered_provider_list, provider_list
 
 #first part landing page
@@ -129,14 +130,13 @@ def index(request, path=None):
     print(f"Bottom Quantile: {hai_bottom_quantile}")
         
 #replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
-    all_summary_star_ratings = CAPHSMetrics.objects.annotate(
-        summary_star_rating=KeyTextTransform('Summary star rating', 'caphs_metric_json')
-    ).values_list('summary_star_rating', flat=True)
+    all_summary_star_ratings = CAPHSMetrics.objects.all()
+    print(f"allsummarystarratings: {all_summary_star_ratings}")
+    all_caphs_ratings = [metric.caphs_metric_json.get('Caphs Rating') for metric in all_summary_star_ratings if metric.caphs_metric_json.get('Caphs Rating') is not None]
+
     
-    #for metric in CAPHSMetrics.objects.all():
-        #print(metric.caphs_metric_json)
+    #all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()]
     
-    all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()]
     
     if all_summary_star_ratings:
         sorted_summary_ratings = sorted(all_summary_star_ratings)
@@ -144,6 +144,7 @@ def index(request, path=None):
         hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
     else:
         hcahps_top_quantile = hcahps_bottom_quantile = None
+
     
     print("Summary Star Ratings Quantiles")
     print(f"Top Quantile: {hcahps_top_quantile}")
@@ -159,10 +160,8 @@ def index(request, path=None):
             if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
-    print("NAME_FILTERED_PROVIDERS")
-    print(name_filtered_providers)
     
-    places_data['results'] = filtered_providers
+    places_data = filtered_providers
     # Context for the front end
     context = {
         'google_places_data' : places_data,
@@ -174,7 +173,6 @@ def index(request, path=None):
         }
     }
     print("CONTEXT: ", context["metric_quantiles"])
-    print(f"FILTERED_PROVIDERS_LIST: {filtered_providers}")
-    print("Django places_data['results']:", places_data['results'])
+    pprint.pprint(places_data)
     
     return render(request, "index.html", context)

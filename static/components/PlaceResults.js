@@ -2,8 +2,6 @@ import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars } from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
 
-    console.log("placesData in PlaceResults:", placesData); //TO CHECK THE RENDERED PLACES
-
     const placeTileStyles = {
       "border" : "1px solid gray",
       "height" : "150px",
@@ -15,17 +13,17 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     if(!selectedPlace){
         selectedPlace = {}
     }
-    if (placesData.results && placesData.results.length){
+    if (placesData && placesData.length){
       //sort by existence of cms metrics
-      placesData.results = [...new Map(placesData.results.map(item => [item["Facility ID"], item])).values()]
-      placesData.results = placesData.results.sort(function(left, right) {
+      //placesData = [...new Map(placesData.map(item => [item["Facility ID"], item])).values()] //fucking up rendering
+      placesData = placesData.sort(function(left, right) {
         const leftHasCMSMetric = left['Infection Rating']||left['Infection Rating'] === 0||left['Summary star rating']||left['Summary star rating'] === 0
         const rightHasCMSMetric = right['Infection Rating']||right['Infection Rating'] === 0||right['Summary star rating']||right['Summary star rating'] === 0
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
     console.log("re-rendering results")
-    const placeTiles = (placesData.results && placesData.results.length) > 0 ? placesData.results.map((place, i)=>{
+    const placeTiles = (placesData && placesData.length) > 0 ? placesData.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles}
       if(place['Facility ID'] == selectedPlace['Facility ID']){
         selectedPlaceStyle.border = "2px solid black"

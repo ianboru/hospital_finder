@@ -288,7 +288,7 @@ class Command(BaseCommand):
     
 
     def handle(self, *args, **options):
-        run_start_of_pipeline = False
+        run_start_of_pipeline = True
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
         if run_start_of_pipeline == True:

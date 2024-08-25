@@ -10,4 +10,4 @@
 {{ metric_quantiles | json_script:'metric_quantiles' }}
 <script type="module" src="{% static "App.js" %}"></script>
 <div id="root"></div>  
-  {{ request.user.id|json_script:"user_id" }}
+{{ request.user.id|json_script:"user_id" }}

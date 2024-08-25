@@ -45,9 +45,11 @@ class Address(TimeStamp):
     zip = models.IntegerField()
     street = models.CharField(max_length=100, blank=True) 
     city = models.CharField(max_length=100, blank=True) 
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     
     def __str__(self):
-        return f"{self.street} {self.city} {self.zip}"
+        return f"{self.street} {self.city} {self.zip} {self.latitude} {self.longitude}"
     
 
 

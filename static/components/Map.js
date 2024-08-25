@@ -14,7 +14,6 @@ const Map = (props) => {
     const setZoomRadius = props.setZoomRadius
     const currentGPSLocation = props.currentGPSLocation
 
-
     const getMarkerColor = (place, metricQuantiles) => {
         const gray = "rgb(128,128,128)"
         if(!place){
@@ -40,7 +39,8 @@ const Map = (props) => {
           return gray
         }
     }
-    const firstResult = (placesData.results && placesData.results.length > 0 && placesData.results[0].location) || {}
+    const firstResult = (placesData && placesData.length > 0 && placesData[0].location) || {}
+    console.log("placesdata", placesData)
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
@@ -50,10 +50,15 @@ const Map = (props) => {
       lng : selectedPlace ? selectedPlace.location.lng : null
     }
 
-    const markers = placesData.results && placesData.results.length > 0 && placesData.results.map((place, index)=>{
+    const markers = placesData && placesData.length > 0 && placesData.map((place, index)=>{
+
+      console.log("place", place)
+      console.log("metrics", metricQuantiles)
+      
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      const markerColor = getMarkerColor(place, metricQuantiles)
+      //const markerColor = getMarkerColor(place, metricQuantiles)
+      const markerColor = "#FFFFFFF"
       const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
       const strokeWeight = isSelectedPlace ? 1.4 : 1
       const scale = isSelectedPlace ? 1.3 : 1
@@ -68,6 +73,7 @@ const Map = (props) => {
         <Marker
           icon={{
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+              //fillColor: markerColor,
               fillColor: markerColor,
               strokeColor : strokeColor,
               strokeWeight: strokeWeight,

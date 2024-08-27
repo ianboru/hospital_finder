@@ -26,7 +26,7 @@ function App() {
   const initialCareTypeParam =  url.searchParams.get("careType") 
   const initialCareType = initialCareTypeParam ? initialCareTypeParam : "All"
   console.log("initial care type", initialCareType)
-
+  console.log("App load places", placesData)
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)

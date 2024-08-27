@@ -71,7 +71,19 @@ def find_providers_in_radius(search_location, radius, care_type):
             continue
         
         if provider_distance.km < radius:
+            hai_metrics = HAIMetrics.objects.filter(facility_id=facility.id)
+            if len(hai_metrics) > 0:
+                hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
+            caphs_metrics  = CAPHSMetrics.objects.filter(facility_id=facility.id)
+            
+            if len(caphs_metrics) > 0:
+                print("start cahps")
+                print(caphs_metrics.values())
+                caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
+      
             cur_provider = {
+                "Infection Rating" : hai_metrics["Infection Rating"] if "Infection Rating" in hai_metrics else None,
+                "Summary star rating" : caphs_metrics["Summary star rating"] if "Summary star rating" in caphs_metrics else None,
                 "name": facility.facility_name,
                 "location": {
                     "latitude": address.latitude,

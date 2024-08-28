@@ -17,7 +17,7 @@ function App() {
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   let url = new URL(window.location)
-  
+
   const initialSearchParam = url.searchParams.get("search")
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
@@ -85,14 +85,16 @@ function App() {
         <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
         <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
         <div>
-          <div style={{marginBottom: "1em", paddingLeft: "1em", marginTop: "1em"}}>Search Results</div>
           <div>
-            <PlaceResults placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
+            <PlaceResults 
+              placesData={placesData} 
+              selectedPlace={selectedPlace} 
+              setSelectedPlace={setSelectedPlace} 
+            />
           </div>
         </div>
       </div>
       <div className='map-container'>
-        <ColorLegend />
         {selectedPlace && (
           <div className='place-detail-overlay'>
             <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
@@ -108,6 +110,7 @@ function App() {
           setZoomRadius={setZoomRadius}
           currentGPSLocation={currentGPSLocation}
         />
+        <ColorLegend />
       </div>
     </div>
     </div>

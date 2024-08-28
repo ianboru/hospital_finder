@@ -40,7 +40,6 @@ const Map = (props) => {
         }
     }
     const firstResult = (placesData && placesData.length > 0 && placesData[0].location) || {}
-    console.log("placesdata", placesData)
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
@@ -51,10 +50,6 @@ const Map = (props) => {
     }
 
     const markers = placesData && placesData.length > 0 && placesData.map((place, index)=>{
-
-      console.log("place", place)
-      console.log("metrics", metricQuantiles)
-      
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       //const markerColor = getMarkerColor(place, metricQuantiles)

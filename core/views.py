@@ -130,20 +130,20 @@ def index(request, path=None):
     print(f"Bottom Quantile: {hai_bottom_quantile}")
         
 #replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
-    all_summary_star_ratings = CAPHSMetrics.objects.all()
-    print(f"allsummarystarratings: {all_summary_star_ratings}")
-    all_caphs_ratings = [metric.caphs_metric_json.get('Caphs Rating') for metric in all_summary_star_ratings if metric.caphs_metric_json.get('Caphs Rating') is not None]
+    #all_summary_star_ratings = CAPHSMetrics.objects.all()
+    #print(f"allsummarystarratings: {all_summary_star_ratings}")
+    #all_caphs_ratings = [metric.caphs_metric_json.get('Caphs Rating') for metric in all_summary_star_ratings if metric.caphs_metric_json.get('Caphs Rating') is not None]
 
     
-    #all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()]
+    #all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()] #not in use
     
     
-    if all_summary_star_ratings:
-        sorted_summary_ratings = sorted(all_summary_star_ratings)
-        hcahps_top_quantile = sorted_summary_ratings[int(upper_quantile * len(sorted_summary_ratings)) - 1]
-        hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
-    else:
-        hcahps_top_quantile = hcahps_bottom_quantile = None
+    #if all_summary_star_ratings:
+        #sorted_summary_ratings = sorted(all_summary_star_ratings)
+        #hcahps_top_quantile = sorted_summary_ratings[int(upper_quantile * len(sorted_summary_ratings)) - 1]
+        #hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
+    #else:
+    hcahps_top_quantile = hcahps_bottom_quantile = None
 
     
     print("Summary Star Ratings Quantiles")

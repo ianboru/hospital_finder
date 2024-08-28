@@ -35,10 +35,45 @@ gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 # Replace CSV loading with database queries below
 summary_metrics = load_summary_metrics() #delete
 provider_list = load_provider_list() #delete
-#facilities = Facility.objects.all()
-#hai_metrics = HAIMetrics.objects.all()
-#caphs_metrics = CAPHSMetrics.objects.all()
+def calculate_metric_quantiles(metric_name):
+    from django_pandas.io import read_frame
+    import numpy as np
+    import math
+ 
+    print(metric_name)
+    if metric_name == "hai":
+        all_metric_objects = HAIMetrics.objects.all()
+    else:
+        print("got cahps")
+        all_metric_objects = CAPHSMetrics.objects.all()
 
+    upper_quantile_percent = .9
+    lower_quantile_percent = .5
+    all_metric_values = []
+    for object in all_metric_objects:
+        if metric_name == "hai" and object.hai_metric_json["Infection Rating"] != None:
+            all_metric_values.append(object.hai_metric_json["Infection Rating"])
+        elif metric_name == "caphs":
+            #temporary fix because cahps data is string not json
+            if object.caphs_metric_json:
+                caphs_json = json.loads(object.caphs_metric_json)
+                if "Summary star rating" in caphs_json:
+                    if type(caphs_json["Summary star rating"]) != str and not math.isnan(caphs_json["Summary star rating"]):
+                        all_metric_values.append(caphs_json["Summary star rating"])
+        else:
+            continue
+    print(metric_name,all_metric_values[0:10])
+    if len(all_metric_values) > 0:
+        top_quantile = np.quantile(all_metric_values,upper_quantile_percent)
+        bottom_quantile = np.quantile(all_metric_values,lower_quantile_percent)
+    else:
+        top_quantile = 3.5
+        bottom_quantile = 2
+    print(top_quantile, bottom_quantile)
+
+    return top_quantile, bottom_quantile
+hai_top_quantile, hai_bottom_quantile = calculate_metric_quantiles('hai')
+hcahps_top_quantile, hcahps_bottom_quantile = calculate_metric_quantiles('caphs')
 
 def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
@@ -51,7 +86,6 @@ def find_providers_in_radius(search_location, radius, care_type):
         print("post filter", care_type)
     else:
         provider_list = Facility.objects.all()
-    print(provider_list)
 
     for facility in provider_list:
         address = facility.address
@@ -71,7 +105,19 @@ def find_providers_in_radius(search_location, radius, care_type):
             continue
         
         if provider_distance.km < radius:
+            hai_metrics = HAIMetrics.objects.filter(facility_id=facility.id)
+            if len(hai_metrics) > 0:
+                hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
+            caphs_metrics  = CAPHSMetrics.objects.filter(facility_id=facility.id)
+            
+            if len(caphs_metrics) > 0:
+                print("start cahps")
+                print(caphs_metrics.values())
+                caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
+      
             cur_provider = {
+                "Infection Rating" : hai_metrics["Infection Rating"] if "Infection Rating" in hai_metrics else None,
+                "Summary star rating" : caphs_metrics["Summary star rating"] if "Summary star rating" in caphs_metrics else None,
                 "name": facility.facility_name,
                 "location": {
                     "latitude": address.latitude,
@@ -108,44 +154,15 @@ def index(request, path=None):
     search_location = (float(split_location_string[0]), float(split_location_string[1]))
     print('Parsed Location: ', split_location_string)
     search_match_threshold = 70
-#replace the pandas dataframe here
-#provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
+    #replace the pandas dataframe here
+    #provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
     filtered_providers, provider_list = find_providers_in_radius(search_location, radius, care_type)
     print("Search String: ", search_string)
-#replace pandas quantile calculations here
-    upper_quantile = .9
-    lower_quantile = .5
-#replace pandas infection quantile calulations here
-    all_hai_metrics = HAIMetrics.objects.all()
-    all_infection_ratings = [metric.hai_metric_json.get('Infection Rating') for metric in all_hai_metrics if metric.hai_metric_json.get('Infection Rating') is not None]
-    if all_infection_ratings:
-        sorted_ratings = sorted(all_infection_ratings)
-        hai_top_quantile = sorted_ratings[int(upper_quantile * len(sorted_ratings)) - 1]
-        hai_bottom_quantile = sorted_ratings[int(lower_quantile * len(sorted_ratings)) - 1]
-    else:
-        hai_top_quantile = hai_bottom_quantile = None
 
     print("HAI Metrics Quantiles")
     print(f"Top Quantile: {hai_top_quantile}")
     print(f"Bottom Quantile: {hai_bottom_quantile}")
         
-#replace pandas operations to calculate quantiles for summary star rating, filter not avaialble, and convert to integers
-    #all_summary_star_ratings = CAPHSMetrics.objects.all()
-    #print(f"allsummarystarratings: {all_summary_star_ratings}")
-    #all_caphs_ratings = [metric.caphs_metric_json.get('Caphs Rating') for metric in all_summary_star_ratings if metric.caphs_metric_json.get('Caphs Rating') is not None]
-
-    
-    #all_summary_star_ratings = [int(rating) for rating in all_summary_star_ratings if rating and rating.isdigit()] #not in use
-    
-    
-    #if all_summary_star_ratings:
-        #sorted_summary_ratings = sorted(all_summary_star_ratings)
-        #hcahps_top_quantile = sorted_summary_ratings[int(upper_quantile * len(sorted_summary_ratings)) - 1]
-        #hcahps_bottom_quantile = sorted_summary_ratings[int(lower_quantile * len(sorted_summary_ratings)) - 1]
-    #else:
-    hcahps_top_quantile = hcahps_bottom_quantile = None
-
-    
     print("Summary Star Ratings Quantiles")
     print(f"Top Quantile: {hcahps_top_quantile}")
     print(f"Bottom Quantile: {hcahps_bottom_quantile}")

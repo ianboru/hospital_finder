@@ -126,17 +126,19 @@ const Map = (props) => {
       curCenter.lat = tempCenter.lng
       curCenter.lng = tempCenter.lat
     }
+    console.log("selected place", selectedPlace)
+
     if(curCenter && !curCenter.lat && selectedPlace){
       //sets lat and long from selected place (maybe best done earlier in the flow)
       const mapBounds =  map.getBounds()
       const swCornerLatLng = mapBounds.getSouthWest()
       const leftMostLong =  swCornerLatLng.lng()
 
-      curCenter.lat = selectedPlace.latitude
+      curCenter.lat = selectedPlace.location.latitude
       //average between selected place and left edge 
       //to ensure marker isn't blocked by place detail card
-      curCenter.lng = selectedPlace.longitude - (selectedPlace.longitude - leftMostLong)/3
-      console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
+      curCenter.lng = selectedPlace.location.longitude - (selectedPlace.location.longitude - leftMostLong)/3
+      console.log("selected place long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 
     //translucent background circle for the CurrentLocationMarker

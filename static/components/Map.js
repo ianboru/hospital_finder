@@ -27,7 +27,6 @@ const Map = (props) => {
         // Use average of the two metrics
         const min_combined_metric_quantile = (metricQuantiles['hai_bottom_quantile'] + metricQuantiles['hcahps_bottom_quantile'])
         const max_combined_metric_quantile = (metricQuantiles['hai_top_quantile'] + metricQuantiles['hcahps_top_quantile'])
-        console.log("has em", place['Infection Rating'], place['Summary star rating'],  min_combined_metric_quantile, max_combined_metric_quantile)
         if(has_infection_rating && has_summary_star_rating){
           marker_metric = (place['Infection Rating'] + place['Summary star rating'])*1
           return numberToRGB(marker_metric,min_combined_metric_quantile,max_combined_metric_quantile)
@@ -61,9 +60,6 @@ const Map = (props) => {
       const fillOpacity = isSelectedPlace ? 1 : .8
       const zindex = isSelectedPlace ? 999 : 1
 
-      if(isSelectedPlace){
-        console.log("marker data", isSelectedPlace, place["Facility Name"], strokeWeight, scale, strokeColor)
-      }
       return (
         <Marker
           icon={{

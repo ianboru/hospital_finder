@@ -113,10 +113,8 @@ def find_providers_in_radius(search_location, radius, care_type):
             caphs_metrics  = CAPHSMetrics.objects.filter(facility_id=facility.id)
             if len(caphs_metrics) > 0:
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
-      
+
             cur_provider = {
-                "Infection Rating" : hai_metrics["Infection Rating"] if "Infection Rating" in hai_metrics else '',
-                "Summary star rating" : caphs_metrics["Summary star rating"] if "Summary star rating" in caphs_metrics else '',
                 "name": facility.facility_name,
                 "location": {
                     "latitude": address.latitude,
@@ -124,11 +122,33 @@ def find_providers_in_radius(search_location, radius, care_type):
                 },
                 "address": f"{address.street}, {address.city}, {address.zip}"
             }
-            if type(cur_provider["Summary star rating"]) != str and math.isnan(cur_provider["Summary star rating"]):
-                cur_provider["Summary star rating"] = ''
 
+            for key in hai_metrics:
+                cur_provider[key] = hai_metrics[key]
+                cur_value = cur_provider[key]
+
+                print(key, cur_value)
+                print(type(cur_value))
+                if type(cur_value) == dict:
+                    if "Compared to National" in cur_value:
+                        cur_value = cur_value["Compared to National"]
+                    else:
+                        continue
+                elif type(cur_value) != str and cur_value is not None and math.isnan(cur_value) :
+                    cur_value = ""
+                else:
+                    continue
+                cur_provider[key] = cur_value
+            
+            for key in caphs_metrics:
+                cur_provider[key] = caphs_metrics[key]
+                print(key, cur_provider[key])
+                print(type(cur_provider[key]))
+                if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
+                    cur_provider[key] = ''
+            print("total provider")
+            print(cur_provider)
             filtered_provider_list.append(cur_provider)
-    
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
     return filtered_provider_list, provider_list
 

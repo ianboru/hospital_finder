@@ -24,6 +24,7 @@ from django.db.models.fields.json import KeyTextTransform
 import math
 from django.db.models import F
 from django.template.loader import render_to_string
+import numpy as np
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -108,16 +109,14 @@ def find_providers_in_radius(search_location, radius, care_type):
             hai_metrics = HAIMetrics.objects.filter(facility_id=facility.id)
             if len(hai_metrics) > 0:
                 hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
+
             caphs_metrics  = CAPHSMetrics.objects.filter(facility_id=facility.id)
-            
             if len(caphs_metrics) > 0:
-                print("start cahps")
-                print(caphs_metrics.values())
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
       
             cur_provider = {
-                "Infection Rating" : hai_metrics["Infection Rating"] if "Infection Rating" in hai_metrics else None,
-                "Summary star rating" : caphs_metrics["Summary star rating"] if "Summary star rating" in caphs_metrics else None,
+                "Infection Rating" : hai_metrics["Infection Rating"] if "Infection Rating" in hai_metrics else '',
+                "Summary star rating" : caphs_metrics["Summary star rating"] if "Summary star rating" in caphs_metrics else '',
                 "name": facility.facility_name,
                 "location": {
                     "latitude": address.latitude,
@@ -125,6 +124,9 @@ def find_providers_in_radius(search_location, radius, care_type):
                 },
                 "address": f"{address.street}, {address.city}, {address.zip}"
             }
+            if type(cur_provider["Summary star rating"]) != str and math.isnan(cur_provider["Summary star rating"]):
+                cur_provider["Summary star rating"] = ''
+
             filtered_provider_list.append(cur_provider)
     
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
@@ -189,7 +191,7 @@ def index(request, path=None):
             'hcahps_bottom_quantile' : hcahps_bottom_quantile
         }
     }
-    print("CONTEXT: ", context["metric_quantiles"])
+
     pprint.pprint(places_data)
     
     return render(request, "index.html", context)

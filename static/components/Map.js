@@ -52,8 +52,8 @@ const Map = (props) => {
     const markers = placesData && placesData.length > 0 && placesData.map((place, index)=>{
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      //const markerColor = getMarkerColor(place, metricQuantiles)
-      const markerColor = "#FFFFFFF"
+      const markerColor = getMarkerColor(place, metricQuantiles)
+      //const markerColor = "#FFFFFFF"
       const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
       const strokeWeight = isSelectedPlace ? 1.4 : 1
       const scale = isSelectedPlace ? 1.3 : 1

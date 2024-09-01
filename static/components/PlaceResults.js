@@ -31,7 +31,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             <div style={{ color: "black", fontWeight: "bold", fontSize: "16px", fontFamily: "'Roboto', sans-serif", paddingTop : "10px", paddingBottom : "10px"}}>{place.name}</div>
             <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575" }}>
               <div style={{ display: 'inline-block' }}> 
-                  Facility Caretype {place.caretype} 
+                  {place.caretype} 
               </div>
               <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle" }}>·</span>
               <div style={{ display: 'inline-block' }}>

@@ -3,12 +3,13 @@ import { getHaiEmoji, getHCAHPSStars } from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
 
     const placeTileStyles = {
-      "border" : "1px solid gray",
-      "height" : "150px",
-      "color" : "gray",
-      "padding" : 10,
-      "width" : "350px",
-      cursor: 'pointer'
+      "borderTop": "1px solid #e0e0e0", // Light gray line at the top
+      "borderBottom": "1px solid #e0e0e0", // Light gray line at the bottom
+      "padding": "16px", // Spacing inside the tile
+      "color": "#333", // Dark gray text color
+      "backgroundColor": "white", // White background
+      "width": "100%", // Full width
+      "cursor": "pointer" // Pointer cursor on hover
     }
     if(!selectedPlace){
         selectedPlace = {}
@@ -25,14 +26,36 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     console.log("re-rendering results")
     const placeTiles = (placesData && placesData.length) > 0 ? placesData.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles}
-      if(place['Facility ID'] == selectedPlace['Facility ID']){
-        selectedPlaceStyle.border = "2px solid black"
-      }
       return (
         <div id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
-            <div style={{color : "black"}}><b>{place.name}</b></div>
-            <div>{place.address}</div>
-            <div>{place.phone_number}</div>
+            <div style={{ color: "black", fontWeight: "bold", fontSize: "16px", fontFamily: "'Roboto', sans-serif", paddingTop : "10px", paddingBottom : "10px"}}>{place.name}</div>
+            <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575" }}>
+              <div style={{ display: 'inline-block' }}> 
+                  Facility Caretype {place.caretype} 
+              </div>
+              <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle" }}>·</span>
+              <div style={{ display: 'inline-block' }}>
+                  {place.address}
+              </div>
+          </div>
+          <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575", marginTop: '5px' }}>
+              <div style={{ display: 'inline-block' }}> 
+                  Hours of operation {place.hoursofoperation} 
+              </div>
+              <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle"}}>·</span>
+              <div style={{ display: 'inline-block' }}>
+                  Phone Number {place.phone_number}
+              </div>
+          </div>
+          <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575", marginTop: '5px' }}>
+              <div style={{ display: 'inline-block' }}> 
+                  Distance {place.distance} 
+              </div>
+              <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle" }}>·</span>
+              <div style={{ display: 'inline-block' }}>
+                  Time to Drive {place.timetodrive}
+              </div>
+          </div>
             {
               place['Infection Rating']||place['Infection Rating'] === 0 ?
                 <div>
@@ -51,7 +74,18 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
     }) : <div style={{marginLeft: '1em'}}>No valid results</div>
 
     return (
-      <div style={{width : "250px", marginRight : "15px"}}>
+      <div style={{
+        width : "98%", 
+        marginRight : "15px", 
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '16px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e0e0e0',
+        marginBottom: '16px',
+        alignItems: 'stretch'}}>
         {placeTiles}
       </div>
     )

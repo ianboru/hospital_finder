@@ -52,13 +52,20 @@ class Command(BaseCommand):
             
         if care_type == "Hospice":
             provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
-            
-        if care_type == "Home Health":
+          
+        if care_type == "Nursing Homes":
+            provider_df.rename(columns={"Provider Address" : "Address"}, inplace=True)
+              
+        if care_type in ["Home Health", "Nursing Homes"]:
             provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
-        
+    
         ccn_facility_df = self.filter_columns(facility_type, provider_df)
+        percentage = 0
         for index, row in ccn_facility_df.iterrows():
             facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
+            ccn_facility_df[facility_id] = ccn_facility_df[facility_id].str.replace('"',"")
+            ccn_facility_df[facility_id] = ccn_facility_df[facility_id].str.lstrip('0')
+            
             if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
                 # we don't want to create duplicate facility data so if facility exists then go to the next row
                 pass
@@ -80,7 +87,10 @@ class Command(BaseCommand):
                         )
                 current_facility.address = address
                 current_facility.save()
-    
+            percentage = round(100 * index / len(ccn_facility_df))
+            if index % 500 == 0:
+                print(f"Current Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
+                
     def extract_questions_as_rows(self, df, care_type): 
         measure_name_column_by_care_type = {
         "Hospitals" : "HCAHPS Question",
@@ -151,6 +161,7 @@ class Command(BaseCommand):
                 ],
                 "Nursing Homes" : [
                     "Overall Rating",
+                    "Staffing Rating"
                 ]
             }   
             caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
@@ -175,8 +186,6 @@ class Command(BaseCommand):
                 caphs_metrics.save()
             else:
                 pass
-        
-
 
     def load_hai_data_to_facility_model(self, export_path):
         hai_path = os.path.join(export_path, "hai_summary_metrics.csv")
@@ -257,7 +266,7 @@ class Command(BaseCommand):
             facility_id = row['Facility ID']
             latitude = row['latitude']
             longitude = row['longitude']
-            percentage = round(100 * facility_num / length_df)
+            
 
             # Print the data being processed
             #print(f"Processing Facility ID: {facility_id}, Latitude: {latitude}, Longitude: {longitude}")
@@ -280,7 +289,8 @@ class Command(BaseCommand):
             
             else:
                 print(f"Facility with ID {facility_id} not found or has no address.")
-
+                
+            percentage = round(100 * facility_num / length_df)
             if facility_num % 500 == 0:
                 print(f"Current Percentage: {percentage}, {facility_num} / {length_df}")
             
@@ -292,7 +302,7 @@ class Command(BaseCommand):
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
         if run_start_of_pipeline == True:
-            ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
+            ccn_care_types = ["Nursing Homes"]#["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
             for care_type in ccn_care_types:
                 print('ccn care_type', care_type)
                 self.load_ccn_data_to_facility_model(export_path, care_type)
@@ -301,12 +311,16 @@ class Command(BaseCommand):
             self.load_hai_data_to_facility_model(export_path)
             
             caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+            caphs_care_types = [ "Nursing Homes"]
             files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
             all_cahps_df = pd.DataFrame()
             #load all caphs data and merge them into one df
             for care_type in caphs_care_types:
                 print('caphs care_type', care_type)
                 cur_cahps_df = self.load_caphs_data(export_path, care_type)
+                print("head cur caphs df",cur_cahps_df.head(20))
+                print("tail cur caphs df",cur_cahps_df.tail(20))
+                print('first check cur_cahps_df row for faiclity id 35268', cur_cahps_df[cur_cahps_df["Facility ID"]==15012])
                 
                 #combine caph df into all_caphs_df
                 if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
@@ -316,7 +330,10 @@ class Command(BaseCommand):
                         all_cahps_df = cur_cahps_df
                     else:
                         all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
-                        
+                
+                print('done creating caphs df')
+                print('find row for faiclity id 35268', all_cahps_df[all_cahps_df["Facility ID"]==15012])
+                print("head cur caphs df",all_cahps_df.head(20))
             all_cahps_df = all_cahps_df.reset_index(drop=True)
 
             self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)

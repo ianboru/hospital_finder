@@ -27,7 +27,6 @@ const Map = (props) => {
         // Use average of the two metrics
         const min_combined_metric_quantile = (metricQuantiles['hai_bottom_quantile'] + metricQuantiles['hcahps_bottom_quantile'])
         const max_combined_metric_quantile = (metricQuantiles['hai_top_quantile'] + metricQuantiles['hcahps_top_quantile'])
-        console.log("has em", place['Infection Rating'], place['Summary star rating'],  min_combined_metric_quantile, max_combined_metric_quantile)
         if(has_infection_rating && has_summary_star_rating){
           marker_metric = (place['Infection Rating'] + place['Summary star rating'])*1
           return numberToRGB(marker_metric,min_combined_metric_quantile,max_combined_metric_quantile)
@@ -40,7 +39,6 @@ const Map = (props) => {
         }
     }
     const firstResult = (placesData && placesData.length > 0 && placesData[0].location) || {}
-    console.log("placesdata", placesData)
     //check if initial location has been loaded/is relevant else use first google place result
     const firstLocation = initialLocation["lat"] ? initialLocation : firstResult
     console.log("first location", firstLocation)
@@ -51,14 +49,10 @@ const Map = (props) => {
     }
 
     const markers = placesData && placesData.length > 0 && placesData.map((place, index)=>{
-
-      console.log("place", place)
-      console.log("metrics", metricQuantiles)
-      
       const location = place.location
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
-      //const markerColor = getMarkerColor(place, metricQuantiles)
-      const markerColor = "#FFFFFFF"
+      const markerColor = getMarkerColor(place, metricQuantiles)
+      //const markerColor = "#FFFFFFF"
       const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
       const strokeWeight = isSelectedPlace ? 1.4 : 1
       const scale = isSelectedPlace ? 1.3 : 1
@@ -66,9 +60,6 @@ const Map = (props) => {
       const fillOpacity = isSelectedPlace ? 1 : .8
       const zindex = isSelectedPlace ? 999 : 1
 
-      if(isSelectedPlace){
-        console.log("marker data", isSelectedPlace, place["Facility Name"], strokeWeight, scale, strokeColor)
-      }
       return (
         <Marker
           icon={{
@@ -135,17 +126,19 @@ const Map = (props) => {
       curCenter.lat = tempCenter.lng
       curCenter.lng = tempCenter.lat
     }
+    console.log("selected place", selectedPlace)
+
     if(curCenter && !curCenter.lat && selectedPlace){
       //sets lat and long from selected place (maybe best done earlier in the flow)
       const mapBounds =  map.getBounds()
       const swCornerLatLng = mapBounds.getSouthWest()
       const leftMostLong =  swCornerLatLng.lng()
 
-      curCenter.lat = selectedPlace.latitude
+      curCenter.lat = selectedPlace.location.latitude
       //average between selected place and left edge 
       //to ensure marker isn't blocked by place detail card
-      curCenter.lng = selectedPlace.longitude - (selectedPlace.longitude - leftMostLong)/3
-      console.log("long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
+      curCenter.lng = selectedPlace.location.longitude - (selectedPlace.location.longitude - leftMostLong)/3
+      console.log("selected place long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 
     //translucent background circle for the CurrentLocationMarker

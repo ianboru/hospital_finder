@@ -4,15 +4,15 @@ import React from 'react'
    return (
      <div
        style={{
-         border: '2px solid black',
-         width: '100%',
-         backgroundColor: '#0073E6',
-         display: 'flex',
-         flexDirection: 'column',
-         justifyContent: 'center',
-         alignItems: 'center',
-         color: 'white',
-         padding: '5px'
+        border: '2px solid black',
+        width: '100%',
+        backgroundColor: '#0073E6',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: 'white',
+        padding: '5px'
        }}
      >
        <div

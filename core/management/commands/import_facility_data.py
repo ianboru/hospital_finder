@@ -60,8 +60,7 @@ class Command(BaseCommand):
             provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
     
         ccn_facility_df = self.filter_columns(facility_type, provider_df)
-        print("CCN head")
-        print(ccn_facility_df.head(10))
+
         percentage = 0
         for index, row in ccn_facility_df.iterrows():
             facility_id_column = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
@@ -91,9 +90,7 @@ class Command(BaseCommand):
                         )
                 current_facility.address = address
                 current_facility.save()
-            if "15010" in str(facility_id) or "15009" in str(facility_id) or facility_id == 15010:
-                print("match in load ccn")
-                print(current_facility)
+
             percentage = round(100 * index / len(ccn_facility_df))
             if index % 500 == 0:
                 print(f"Current CCN loading Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
@@ -331,8 +328,6 @@ class Command(BaseCommand):
             for care_type in caphs_care_types:
                 print('load CAPHS care_type', care_type)
                 cur_cahps_df = self.load_caphs_data(export_path, care_type)
-                print("head cur caphs df",cur_cahps_df.head(5))
-                print('first check cur_cahps_df row for faiclity id 35268', cur_cahps_df[cur_cahps_df["Facility ID"]==15012])
                 
                 #combine caph df into all_caphs_df
                 if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
@@ -344,8 +339,7 @@ class Command(BaseCommand):
                         all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
                 
                 print('done creating caphs df')
-                print('find row for faiclity id 35268', all_cahps_df[all_cahps_df["Facility ID"]==15012])
-                print("head cur caphs df",all_cahps_df.head(20))
+
             all_cahps_df = all_cahps_df.reset_index(drop=True)
 
             self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)

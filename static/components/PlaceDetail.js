@@ -32,12 +32,12 @@ const PlaceDetail = (props) => {
     }
     // Map infection rating metrics to their respective labels
     const detailedInfectionMetricsMap = {
-      "Central Line Associated Bloodstream Infection (ICU + select Wards) Compared to National" : "CLBAI",
-      "Catheter Associated Urinary Tract Infections (ICU + select Wards) Compared to National" : "CAUTI",
-      "SSI - Abdominal Hysterectomy Compared to National" : "SSI Abdominal Hysterectomy",
-      "SSI - Colon Surgery Compared to National" : "SSI Colon Surgery",
-      "MRSA Bacteremia Compared to National" : "MRSA Bacteremia",
-      "Clostridium Difficile (C.Diff) Compared to National" : "C.Diff"
+      "Central Line Associated Bloodstream Infection" : "CLBAI",
+      "Catheter Associated Urinary Tract Infections" : "CAUTI",
+      "SSI - Abdominal Hysterectomy" : "SSI Abdominal Hysterectomy",
+      "SSI - Colon Surgery" : "SSI Colon Surgery",
+      "MRSA Bacteremia" : "MRSA Bacteremia",
+      "Clostridium Difficile (C.Diff)" : "C.Diff"
     }
 
     const detailedInfectionMetricStars = Object.keys(detailedInfectionMetricsMap).map((metricName)=>{

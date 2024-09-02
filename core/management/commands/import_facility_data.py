@@ -60,24 +60,27 @@ class Command(BaseCommand):
             provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
     
         ccn_facility_df = self.filter_columns(facility_type, provider_df)
+
         percentage = 0
         for index, row in ccn_facility_df.iterrows():
-            facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
-            ccn_facility_df[facility_id] = ccn_facility_df[facility_id].str.replace('"',"")
-            ccn_facility_df[facility_id] = ccn_facility_df[facility_id].str.lstrip('0')
-            
-            if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
+            facility_id_column = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
+            ccn_facility_df[facility_id_column] = ccn_facility_df[facility_id_column].str.replace('"',"")
+            ccn_facility_df[facility_id_column] = ccn_facility_df[facility_id_column].str.lstrip('0')
+            #print(ccn_facility_df[facility_id])
+            facility_id = ccn_facility_df[facility_id_column][index]
+            current_facility = None
+            if Facility.objects.filter(facility_id=facility_id, care_types__contains=[care_type]):
                 # we don't want to create duplicate facility data so if facility exists then go to the next row
                 pass
-            elif Facility.objects.filter(facility_id=row[facility_id]):
+            elif Facility.objects.filter(facility_id=facility_id):
                 # if one facility has more than one care type we want to add it to the care types list 
-                facility = Facility.objects.filter(facility_id=row[facility_id]).first()
-                facility.care_types.append(care_type)
-                facility.save()
+                current_facility = Facility.objects.filter(facility_id=facility_id).first()
+                current_facility.care_types.append(care_type)
+                current_facility.save()
             else:
                 current_facility = Facility.objects.create(
                     facility_name = row['Facility Name'],
-                    facility_id = row[facility_id],
+                    facility_id = facility_id,
                     care_types = [care_type],
                 )
                 address = Address.objects.create(
@@ -87,9 +90,10 @@ class Command(BaseCommand):
                         )
                 current_facility.address = address
                 current_facility.save()
+
             percentage = round(100 * index / len(ccn_facility_df))
             if index % 500 == 0:
-                print(f"Current Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
+                print(f"Current CCN loading Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
                 
     def extract_questions_as_rows(self, df, care_type): 
         measure_name_column_by_care_type = {
@@ -165,6 +169,7 @@ class Command(BaseCommand):
                 ]
             }   
             caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
+    
         else:
             caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
         
@@ -188,9 +193,11 @@ class Command(BaseCommand):
                 pass
 
     def load_hai_data_to_facility_model(self, export_path):
+        print("loading HAI data")
         hai_path = os.path.join(export_path, "hai_summary_metrics.csv")
         hai_df = pd.read_csv(hai_path, low_memory=False, encoding='unicode_escape')
-
+        hai_df["Facility ID"] = hai_df["Facility ID"].str.lstrip('0')
+            
         # Replace NaN values
         hai_df = hai_df.replace({np.nan: None})
 
@@ -238,8 +245,9 @@ class Command(BaseCommand):
                 "Mean Compared to National": row['Mean Compared to National'],
                 "Infection Rating": row['Infection Rating']
             }
-
+            
             facility = Facility.objects.filter(facility_id=facility_id).first()
+
             if facility:
                 hai_metrics, created = HAIMetrics.objects.get_or_create(
                     facility=facility,
@@ -288,11 +296,11 @@ class Command(BaseCommand):
 
             
             else:
-                print(f"Facility with ID {facility_id} not found or has no address.")
-                
+                #print(f"Facility with ID {facility_id} not found or has no address.")
+                pass
             percentage = round(100 * facility_num / length_df)
             if facility_num % 500 == 0:
-                print(f"Current Percentage: {percentage}, {facility_num} / {length_df}")
+                print(f"Current Lat/Long Percentage: {percentage}, {facility_num} / {length_df}")
             
         
     
@@ -304,7 +312,7 @@ class Command(BaseCommand):
         if run_start_of_pipeline == True:
             ccn_care_types = ["Nursing Homes"]#["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
             for care_type in ccn_care_types:
-                print('ccn care_type', care_type)
+                print('load ccn care_type', care_type)
                 self.load_ccn_data_to_facility_model(export_path, care_type)
 
             #load_hai must be after the facility has already loaded
@@ -316,11 +324,8 @@ class Command(BaseCommand):
             all_cahps_df = pd.DataFrame()
             #load all caphs data and merge them into one df
             for care_type in caphs_care_types:
-                print('caphs care_type', care_type)
+                print('load CAPHS care_type', care_type)
                 cur_cahps_df = self.load_caphs_data(export_path, care_type)
-                print("head cur caphs df",cur_cahps_df.head(20))
-                print("tail cur caphs df",cur_cahps_df.tail(20))
-                print('first check cur_cahps_df row for faiclity id 35268', cur_cahps_df[cur_cahps_df["Facility ID"]==15012])
                 
                 #combine caph df into all_caphs_df
                 if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
@@ -332,8 +337,7 @@ class Command(BaseCommand):
                         all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
                 
                 print('done creating caphs df')
-                print('find row for faiclity id 35268', all_cahps_df[all_cahps_df["Facility ID"]==15012])
-                print("head cur caphs df",all_cahps_df.head(20))
+
             all_cahps_df = all_cahps_df.reset_index(drop=True)
 
             self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)

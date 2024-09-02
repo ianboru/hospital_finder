@@ -247,9 +247,7 @@ class Command(BaseCommand):
             }
             
             facility = Facility.objects.filter(facility_id=facility_id).first()
-            if "15009" in str(facility_id) or "150010" in str(facility_id):
-                print("CAHPS match")
-                print(facility)
+
             if facility:
                 hai_metrics, created = HAIMetrics.objects.get_or_create(
                     facility=facility,

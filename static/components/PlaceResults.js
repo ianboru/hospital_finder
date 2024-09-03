@@ -57,17 +57,37 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
               </div>
           </div>
             {
-              place['Infection Rating']||place['Infection Rating'] === 0 ?
+              //adjust && to || and > to === if you want metrics to show even if 0
+              place['Infection Rating']&&place['Infection Rating'] > 0 ?
                 <div>
                   <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'],3)}</span></b>
                 </div> : <></>
             }
             {
-              place['Summary star rating']||place['Summary star rating'] === 0 ?
+              place['Summary star rating']&&place['Summary star rating'] > 0 ?
                 <div>
                   <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
                 </div> : <></>
             }
+            {
+              place['Doctor communication - star rating']&&place['Doctor communication - star rating'] > 0 ?
+                <div>
+                  <b>Doctor Communication: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Doctor communication - star rating'],5)}</span></b>
+                </div> : <></>
+            }
+            {
+              place['Communication about medicines - star rating']&&place['Communication about medicines - star rating'] > 0 ?
+                <div>
+                  <b>Medicine Communication: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Communication about medicines - star rating'],5)}</span></b>
+                </div> : <></>
+            }
+            {
+              place['Nurse communication - star rating']&&place['Nurse communication - star rating'] > 0 ?
+                <div>
+                  <b>Nurse Communication: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Nurse communication - star rating'],5)}</span></b>
+                </div> : <></>
+            }
+            
         </div>
       )
       //how am i structuring the data from the backend so i can do lookup by name on the FE

@@ -208,8 +208,9 @@ def extract_questions_as_columns(df, care_type):
             # "Star Rating team discussed medicines, pain, and home safety",
             # "Star Rating for how patients rated overall care from agency"
         ],
-        "Outpatient" : [
+        "Outpatient Ambulatory Services" : [
             "Facilities and staff linear mean score",
+            "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
             # "Communication about your procedure linear mean score",
             # "Patients' rating of the facility linear mean score",
             # "Patients recommending the facility linear mean score"
@@ -231,6 +232,9 @@ def extract_questions_as_columns(df, care_type):
             # "Long-Stay QM Rating",
             # "Short-Stay QM Rating",
             # "Staffing Rating"
+        ],
+        "Hospice" : [
+            "Family caregiver survey rating",
         ]
     }   
 
@@ -254,14 +258,12 @@ def extract_questions_as_rows(df, care_type):
         "Ambulatory Quality Measures - Mean Linear Scores",
         "Emergency department volume",
         "Summary star rating",
-        "Nurse communication - star rating",
-        "Doctor communication - star rating",
         "Staff responsiveness - star rating",
-        "Communication about medicines - star rating",
         "Discharge information - star raing",
         "Care transition - star rating",
         "Cleanliness - star rating",
         "Quietness - star rating" 
+        "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
     ]
     measure_name_column = measure_name_column_by_care_type[care_type]
     measure_value_column = measure_value_column_by_care_type[care_type]

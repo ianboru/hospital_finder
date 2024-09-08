@@ -56,13 +56,10 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
                   Time to Drive {place.timetodrive}
               </div>
           </div>
-            {
-              //adjust && to || and > to === if you want metrics to show even if 0
-              place['Infection Rating']&&place['Infection Rating'] > 0 ?
-                <div>
-                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'],3)}</span></b>
-                </div> : <></>
-            }
+
+          {
+            place.caretype && place.caretype.includes('Hospital') && ( //for hospital facilities
+              <>
             {
               place['Summary star rating']&&place['Summary star rating'] > 0 ?
                 <div>
@@ -70,24 +67,68 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
                 </div> : <></>
             }
             {
-              place['Doctor communication - star rating']&&place['Doctor communication - star rating'] > 0 ?
+              place['Infection Rating']&&place['Infection Rating'] > 0 ?
                 <div>
-                  <b>Doctor Communication: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Doctor communication - star rating'],5)}</span></b>
+                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'],3)}</span></b>
+                </div> : <></>
+            }
+            </>
+            )
+          }
+          {
+            place.caretype && place.caretype.includes('Outpatient') && ( //for outpatient facilites
+              <>
+            {
+              place['Summary star rating']&&place['Summary star rating'] > 0 ?
+                <div>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
                 </div> : <></>
             }
             {
-              place['Communication about medicines - star rating']&&place['Communication about medicines - star rating'] > 0 ?
+              place['Patients who reported that staff definitely communicated about what to expect during and after the procedure']&&place['Patients who reported that staff definitely communicated about what to expect during and after the procedure'] > 0 ?
                 <div>
-                  <b>Medicine Communication: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Communication about medicines - star rating'],5)}</span></b>
+                  <b>Communication: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Patients who reported that staff definitely communicated about what to expect during and after the procedure'],3)}</span></b>
+                </div> : <></>
+            }
+            </>
+            )
+          } 
+          {
+            place.caretype && place.caretype.includes('Nursing Homes') && ( //for outpatient facilites
+              <>
+            {
+              place['Overall Rating']&&place['Overall Rating'] > 0 ?
+                <div>
+                  <b>Overall Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Overall Rating'],5)}</span></b>
                 </div> : <></>
             }
             {
-              place['Nurse communication - star rating']&&place['Nurse communication - star rating'] > 0 ?
+              place['Abuse Icon']&&place['Abuse Icon'] > 0 ?
                 <div>
-                  <b>Nurse Communication: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Nurse communication - star rating'],5)}</span></b>
+                  <b>Potential Abuse: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Abuse Icon'],3)}</span></b>
                 </div> : <></>
             }
-            
+            </>
+            )
+          }
+          {
+            place.caretype && place.caretype.includes('Hospice') && ( //for outpatient facilites
+              <>
+            {
+              place['Family caregiver survey rating']&&place['Family caregiver survey rating'] > 0 ?
+                <div>
+                  <b>Caregiver Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Family caregiver survey rating'],5)}</span></b>
+                </div> : <></>
+            }
+            {
+              place['Abuse Icon']&&place['Abuse Icon'] > 0 ?
+                <div>
+                  <b>Potential Abuse: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Abuse Icon'],3)}</span></b>
+                </div> : <></>
+            }
+            </>
+            )
+          }
         </div>
       )
       //how am i structuring the data from the backend so i can do lookup by name on the FE

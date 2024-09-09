@@ -11,6 +11,7 @@ const PlaceDetail = (props) => {
       "Care transition - star rating" : "Care transition",
       "Cleanliness - star rating" : "Cleanliness",
       "Quietness - star rating" : "Quietness",
+      "Facilities and staff linear mean score" : "Patient Rating",
       "Patients who reported that staff definitely communicated about what to expect during and after the procedure" : "Communication",
     }
 

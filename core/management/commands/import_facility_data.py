@@ -89,27 +89,43 @@ class Command(BaseCommand):
         "Hospitals" : "HCAHPS Question",
         "Hospice" : "Measure Name",
         "ED + Others" : "Measure Name",
-        "Outpatientx" : "Measure Name"
+        "Outpatient" : "Measure Name"
         }   
          
         measure_value_column_by_care_type = {
             "Hospitals" : "Patient Survey Star Rating",
             "Hospice" : "Score",
             "ED + Others" : "Score",
-            "Outpatientx" : "Score"
+            "Outpatient" : "Score"
         }
         column_name_from_values = [
             #"Family caregiver survey rating",
             "Ambulatory Quality Measures - Mean Linear Scores",
             "Emergency department volume",
-            "Summary star rating",
             "Staff responsiveness - star rating",
-            "Discharge information - star rating",
             "Care transition - star rating",
             "Cleanliness - star rating",
             "Quietness - star rating",
-            "Facilities and staff linear mean score"
-            "Patients who reported that staff definitely communicated about what to expect during and after the procedure"
+            "Facilities and staff linear mean score",
+            "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
+            "The hospice team provided the right amount of emotional and spiritual support",
+            "YES, they would definitely recommend the hospice",
+            "The hospice team always treated the patient with respect",
+            "The patient always got the help they needed for pain and symptoms",
+            "The hospice team always communicated well",
+            "The hospice team always provided timely help",
+            "They definitely received the training they needed",
+            "Family caregiver survey rating",
+            "Nurse communication - star rating",
+            "Doctor communication - star rating",
+            "Staff responsiveness - star rating",
+            "Communication about medicines - star rating",
+            "Discharge information - star rating",
+            "Summary star rating",
+            "Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better",
+            "Left before being seen",
+            "Head CT results",
+            "Emergency department volume",
         ]
         
         # measure_name_column value is a column name 
@@ -133,26 +149,17 @@ class Command(BaseCommand):
         
     def load_caphs_data(self, export_path, care_type):
         cahps_files = [os.path.join(export_path, f"CAHPS - {care_type}.csv")]
-        ccn_files = [os.path.join(export_path, f"CCN - {care_type}.csv")]
-
+    
         provider_path = None
         for file_path in cahps_files:
             if os.path.exists(file_path):
                 provider_path = file_path
                 break
-        if provider_path is None:
-            for file_path in ccn_files:
-                if os.path.exists(file_path):
-                    provider_path = file_path
-                    break
-        files_with_measures_as_columns = ["Home Health", "Outpatientx", "Nursing Homes", "In-Center Hemodialysis", "Hospice"]
+        
+        files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis", "Hospice"]
         
         caphs_df = pd.read_csv(provider_path, low_memory=False, encoding='unicode_escape')
-        
-        if "CMS Certification Number (CCN)" in caphs_df.columns:
-            caphs_df = caphs_df.rename(columns={"CMS Certification Number (CCN)": "Facility ID"})
 
-        
         if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
             # filter column
             measure_columns_by_care_type = {
@@ -160,18 +167,31 @@ class Command(BaseCommand):
                     "HHCAHPS Survey Summary Star Rating",
                 ],
                 "Outpatient" : [
+                    "Patients' rating of the facility linear mean score",
+                    "Patients who reported YES they would DEFINITELY recommend the facility to family or friends",
                     "Facilities and staff linear mean score",
                     "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
-                ],
-                "In-Center Hemodialysis" : [
-                    #"Patient Hospital Readmission Category",
+                    "Patients who reported that staff definitely gave care in a professional way and the facility was clean",
                 ],
                 "Nursing Homes" : [
-                    #"Overall Rating",
+                    "Overall Rating",
+                    "Health Inspection Rating",
+                    "QM Rating",
+                    "Long-Stay QM Rating",
+                    "Short-Stay QM Rating",
+                    "Staffing Rating",
+                    "Abuse Icon",
                 ],
-                "Hospice" : [
-                    #"Family caregiver survey rating",
+                "In-Center Hemodialysis" : [
+                    "Five Star",
+                    "Patient Infection category text",
+                    "Patient Survival Category Text",
+                    "Patient hospitalization category text",
+                    "Patient Hospital Readmission Category",
+                    "Patient Transfusion category text",
+                    "Fistula Category Text",
                 ]
+
             }   
             caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
         else:
@@ -323,8 +343,8 @@ class Command(BaseCommand):
             #load_hai must be after the facility has already loaded
             self.load_hai_data_to_facility_model(export_path)
             
-            caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes", "Outpatientx"]  # Updated list
-            files_with_measures_as_columns = ["Home Health", "Outpatientx", "Nursing Homes", "In-Center Hemodialysis"]
+            caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes", "Outpatient Ambulatory Services"]  # Updated list
+            files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
             all_cahps_df = pd.DataFrame()
             #load all caphs data and merge them into one df
             for care_type in caphs_care_types:

@@ -2,9 +2,8 @@ from django.core.management.base import BaseCommand
 import os, json
 import pandas as pd
 import numpy as np
-from core.models.facility_data import CAPHSMetrics
+from core.models.facility_data import CAPHSMetrics, HAIMetrics 
 from core.models.facility import Facility, Address
-from core.models.facility_data import HAIMetrics
 from hospital_finder.settings import DATA_DIR
 
 
@@ -149,7 +148,7 @@ class Command(BaseCommand):
         files_with_measures_as_columns = ["Home Health", "Outpatient Ambulatory Services", "Nursing Homes", "In-Center Hemodialysis"]
 
         caphs_df = pd.read_csv(provider_path, low_memory=False, encoding='unicode_escape')
-        
+        print('Starting Extraction')
         if "CMS Certification Number (CCN)" in caphs_df.columns:
             caphs_df = caphs_df.rename(columns={"CMS Certification Number (CCN)": "Facility ID"})
 
@@ -186,12 +185,22 @@ class Command(BaseCommand):
                 ]
 
             }   
-            caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
+            final_caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
         else:
-            caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
+            final_caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
         
-        caphs_df = caphs_df.drop_duplicates()
-        return caphs_df
+        final_caphs_df = final_caphs_df.drop_duplicates()
+        print('Measure Extraction Complete')
+        if 'Address' in caphs_df.columns:
+            print('Merging Metadata to caphs_df')
+            facility_metadata_df = caphs_df[["Address", "Facility Name", "City/Town", "State", "ZIP Code", "Facility ID"]]
+            facility_metadata_df = facility_metadata_df.drop_duplicates()
+            final_caphs_df = pd.merge(final_caphs_df, facility_metadata_df, on="Facility ID") 
+        else:
+            print('No Existing Address Metric for caretype') 
+            print(care_type)
+        final_caphs_df['Care Type'] = care_type
+        return final_caphs_df
         
     def create_caphs_json_by_row_of_all_caphs_df(self, all_cahps_df):
         for index, row in all_cahps_df.iterrows():
@@ -199,17 +208,24 @@ class Command(BaseCommand):
             hospital = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             hospital = json.dumps(hospital) 
+            facility = None
             if Facility.objects.filter(facility_id=row["Facility ID"]):
                 facility = Facility.objects.filter(facility_id=row["Facility ID"]).first()
                 caphs_metrics = CAPHSMetrics(
-                                    caphs_metric_json=hospital,
-                                    facility=facility
-                                    )
+                    caphs_metric_json=hospital,
+                    facility=facility
+                    )
                 caphs_metrics.save()
             else:
-                pass
-        
-
+                if 'Address' in row:
+                    address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
+                    facility = Facility.objects.create(facility_id=row["Facility ID"], care_types=[row["Care Type"]], address=row["Address"])
+            if facility:
+                caphs_metrics = CAPHSMetrics(
+                    caphs_metric_json=hospital,
+                    facility=facility
+                )
+                caphs_metrics.save()
 
     def load_hai_data_to_facility_model(self, export_path):
         hai_path = os.path.join(export_path, "hai_summary_metrics.csv")
@@ -322,35 +338,43 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         run_start_of_pipeline = True
+        run_load_ccn_data = False
+        run_load_hai_data = False
+        run_load_caphs_data = True
+
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
-        if run_start_of_pipeline == True:
-            ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
-            for care_type in ccn_care_types:
-                print('ccn care_type', care_type)
-                self.load_ccn_data_to_facility_model(export_path, care_type)
 
-            # load_hai must be after the facility has already loaded
-            self.load_hai_data_to_facility_model(export_path)
+        if run_start_of_pipeline == True:
+            if run_load_ccn_data == True:
+                ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
+                for care_type in ccn_care_types:
+                    print('ccn care_type', care_type)
+                    self.load_ccn_data_to_facility_model(export_path, care_type)
+
+            if run_load_hai_data == True:
+                # load_hai must be after the facility has already loaded
+                self.load_hai_data_to_facility_model(export_path)
             
-            caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes", "Outpatient Ambulatory Services"]  # Updated list
-            files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
-            all_cahps_df = pd.DataFrame()
-            #load all caphs data and merge them into one df
-            for care_type in caphs_care_types:
-                print('caphs care_type', care_type)
-                cur_cahps_df = self.load_caphs_data(export_path, care_type)
-                
-                #combine caph df into all_caphs_df
-                if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
-                    all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
-                else:
-                    if all_cahps_df.empty:
-                        all_cahps_df = cur_cahps_df
+            if run_load_caphs_data == True:
+                caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes", "Outpatient Ambulatory Services"]  # Updated list
+                files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+                all_cahps_df = pd.DataFrame()
+                #load all caphs data and merge them into one df
+                for care_type in caphs_care_types:
+                    print('caphs care_type', care_type)
+                    cur_cahps_df = self.load_caphs_data(export_path, care_type)
+                    
+                    #combine caph df into all_caphs_df
+                    if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
+                        all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
                     else:
-                        all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
-                        
-            all_cahps_df = all_cahps_df.reset_index(drop=True)
-            
-            self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
+                        if all_cahps_df.empty:
+                            all_cahps_df = cur_cahps_df
+                        else:
+                            all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
+                            
+                all_cahps_df = all_cahps_df.reset_index(drop=True)
+                
+                self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
         self.load_lat_long_to_address_model(export_path)

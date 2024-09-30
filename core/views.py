@@ -73,6 +73,8 @@ def calculate_metric_quantiles(metric_name):
     print(top_quantile, bottom_quantile)
 
     return top_quantile, bottom_quantile
+
+#comment out for first migration 
 hai_top_quantile, hai_bottom_quantile = calculate_metric_quantiles('hai')
 hcahps_top_quantile, hcahps_bottom_quantile = calculate_metric_quantiles('caphs')
 

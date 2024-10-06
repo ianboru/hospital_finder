@@ -1,7 +1,7 @@
 from core import models
 # from core.models.favorite import Favorite
 from core.models.facility import Facility, Address
-from core.models.facility_data import CAPHSMetrics, HAIMetrics
+from core.models.facility_data import CAPHSMetrics, HAIMetrics 
 from django.contrib import admin
 
 class CAPHSMetricsAdmin(admin.ModelAdmin):

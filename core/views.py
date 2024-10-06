@@ -73,6 +73,8 @@ def calculate_metric_quantiles(metric_name):
     print(top_quantile, bottom_quantile)
 
     return top_quantile, bottom_quantile
+
+#comment out for first migration 
 hai_top_quantile, hai_bottom_quantile = calculate_metric_quantiles('hai')
 hcahps_top_quantile, hcahps_bottom_quantile = calculate_metric_quantiles('caphs')
 
@@ -114,13 +116,18 @@ def find_providers_in_radius(search_location, radius, care_type):
             if len(caphs_metrics) > 0:
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
 
+            facility = Facility.objects.get(id=facility.id)
+            care_types = facility.care_types
+            care_types_str = ', '.join(facility.care_types)
+
             cur_provider = {
                 "name": facility.facility_name,
                 "location": {
                     "latitude": address.latitude,
                     "longitude": address.longitude,
                 },
-                "address": f"{address.street}, {address.city}, {address.zip}"
+                "address": f"{address.street}, {address.city}, {address.zip}",
+                "caretype": care_types_str
             }
 
             for key in hai_metrics:

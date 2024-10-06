@@ -2,9 +2,8 @@ from django.core.management.base import BaseCommand
 import os, json
 import pandas as pd
 import numpy as np
-from core.models.facility_data import CAPHSMetrics
+from core.models.facility_data import CAPHSMetrics, HAIMetrics 
 from core.models.facility import Facility, Address
-from core.models.facility_data import HAIMetrics
 from hospital_finder.settings import DATA_DIR
 
 
@@ -50,35 +49,38 @@ class Command(BaseCommand):
                 "Rndrng_Prvdr_Zip5" : "ZIP Code"
             }, inplace=True)
             
-        if care_type == "Hospice":
+        if care_type in ["Hospice", "In-Center Hemodialysis"] :
             provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
           
-        if care_type == "Nursing Homes":
+        if care_type in ["Nursing Homes"] :
             provider_df.rename(columns={"Provider Address" : "Address"}, inplace=True)
               
         if care_type in ["Home Health", "Nursing Homes"]:
             provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
     
         ccn_facility_df = self.filter_columns(facility_type, provider_df)
+
         percentage = 0
         for index, row in ccn_facility_df.iterrows():
-            facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
-            ccn_facility_df[facility_id] = ccn_facility_df[facility_id].str.replace('"',"")
-            ccn_facility_df[facility_id] = ccn_facility_df[facility_id].str.lstrip('0')
-            
-            if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
+            facility_id_column = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
+            ccn_facility_df[facility_id_column] = ccn_facility_df[facility_id_column].str.replace('"',"")
+            ccn_facility_df[facility_id_column] = ccn_facility_df[facility_id_column].str.lstrip('0')
+            #print(ccn_facility_df[facility_id])
+            facility_id = ccn_facility_df[facility_id_column][index]
+            current_facility = None
+            if Facility.objects.filter(facility_id=facility_id, care_types__contains=[care_type]):
                 # we don't want to create duplicate facility data so if facility exists then go to the next row
                 pass
-            elif Facility.objects.filter(facility_id=row[facility_id]):
+            elif Facility.objects.filter(facility_id=facility_id):
                 # if one facility has more than one care type we want to add it to the care types list 
-                facility = Facility.objects.filter(facility_id=row[facility_id]).first()
-                facility.care_types.append(care_type)
-                facility.save()
+                current_facility = Facility.objects.filter(facility_id=facility_id).first()
+                current_facility.care_types.append(care_type)
+                current_facility.save()
             else:
                 current_facility = Facility.objects.create(
                     facility_name = row['Facility Name'],
                     facility_id = row[facility_id],
-                    care_types = [care_type],
+                    care_types = [care_type]
                 )
                 address = Address.objects.create(
                         zip=row['ZIP Code'],
@@ -87,35 +89,53 @@ class Command(BaseCommand):
                         )
                 current_facility.address = address
                 current_facility.save()
+
             percentage = round(100 * index / len(ccn_facility_df))
             if index % 500 == 0:
-                print(f"Current Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
+                print(f"Current CCN loading Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
                 
     def extract_questions_as_rows(self, df, care_type): 
         measure_name_column_by_care_type = {
         "Hospitals" : "HCAHPS Question",
         "Hospice" : "Measure Name",
         "ED + Others" : "Measure Name",
+        "Outpatient" : "Measure Name"
         }   
          
         measure_value_column_by_care_type = {
-                "Hospitals" : "Patient Survey Star Rating",
-                "Hospice" : "Score",
-                "ED + Others" : "Score",
+            "Hospitals" : "Patient Survey Star Rating",
+            "Hospice" : "Score",
+            "ED + Others" : "Score",
+            "Outpatient" : "Score"
         }
         column_name_from_values = [
-            "Family caregiver survey rating",
+            #"Family caregiver survey rating",
             "Ambulatory Quality Measures - Mean Linear Scores",
             "Emergency department volume",
-            "Summary star rating",
+            "Staff responsiveness - star rating",
+            "Care transition - star rating",
+            "Cleanliness - star rating",
+            "Quietness - star rating",
+            "Facilities and staff linear mean score",
+            "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
+            "The hospice team provided the right amount of emotional and spiritual support",
+            "YES, they would definitely recommend the hospice",
+            "The hospice team always treated the patient with respect",
+            "The patient always got the help they needed for pain and symptoms",
+            "The hospice team always communicated well",
+            "The hospice team always provided timely help",
+            "They definitely received the training they needed",
+            "Family caregiver survey rating",
             "Nurse communication - star rating",
             "Doctor communication - star rating",
             "Staff responsiveness - star rating",
             "Communication about medicines - star rating",
             "Discharge information - star rating",
-            "Care transition - star rating",
-            "Cleanliness - star rating",
-            "Quietness - star rating" 
+            "Summary star rating",
+            "Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better",
+            "Left before being seen",
+            "Head CT results",
+            "Emergency department volume",
         ]
         
         # measure_name_column value is a column name 
@@ -139,37 +159,63 @@ class Command(BaseCommand):
         
     def load_caphs_data(self, export_path, care_type):
         provider_path = os.path.join(export_path, f"CAHPS - {care_type}.csv")
-        files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
-        
+        files_with_measures_as_columns = ["Home Health", "Outpatient Ambulatory Services", "Nursing Homes", "In-Center Hemodialysis"]
+
         caphs_df = pd.read_csv(provider_path, low_memory=False, encoding='unicode_escape')
-        
+        print('Starting Extraction')
         if "CMS Certification Number (CCN)" in caphs_df.columns:
             caphs_df = caphs_df.rename(columns={"CMS Certification Number (CCN)": "Facility ID"})
 
-        
         if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
             # filter column
             measure_columns_by_care_type = {
                 "Home Health" : [
                     "HHCAHPS Survey Summary Star Rating",
                 ],
-                "Outpatient" : [
+                "Outpatient Ambulatory Services" : [
+                    "Patients' rating of the facility linear mean score",
+                    "Patients who reported YES they would DEFINITELY recommend the facility to family or friends",
                     "Facilities and staff linear mean score",
-                ],
-                "In-Center Hemodialysis" : [
-                    "Patient Hospital Readmission Category",
+                    "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
+                    "Patients who reported that staff definitely gave care in a professional way and the facility was clean",
                 ],
                 "Nursing Homes" : [
                     "Overall Rating",
+                    "Health Inspection Rating",
+                    "QM Rating",
+                    "Long-Stay QM Rating",
+                    "Short-Stay QM Rating",
+                    "Staffing Rating",
+                    "Abuse Icon",
+                ],
+                "In-Center Hemodialysis" : [
+                    "Five Star",
+                    "Patient Infection category text",
+                    "Patient Survival Category Text",
+                    "Patient hospitalization category text",
+                    "Patient Hospital Readmission Category",
+                    "Patient Transfusion category text",
+                    "Fistula Category Text",
                     "Staffing Rating"
                 ]
+
             }   
-            caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
+            final_caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
         else:
-            caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
+            final_caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
         
-        caphs_df = caphs_df.drop_duplicates()
-        return caphs_df
+        final_caphs_df = final_caphs_df.drop_duplicates()
+        print('Measure Extraction Complete')
+        if 'Address' in caphs_df.columns:
+            print('Merging Metadata to caphs_df')
+            facility_metadata_df = caphs_df[["Address", "Facility Name", "City/Town", "State", "ZIP Code", "Facility ID"]]
+            facility_metadata_df = facility_metadata_df.drop_duplicates()
+            final_caphs_df = pd.merge(final_caphs_df, facility_metadata_df, on="Facility ID") 
+        else:
+            print('No Existing Address Metric for caretype') 
+            print(care_type)
+        final_caphs_df['Care Type'] = care_type
+        return final_caphs_df
         
     def create_caphs_json_by_row_of_all_caphs_df(self, all_cahps_df):
         for index, row in all_cahps_df.iterrows():
@@ -177,20 +223,32 @@ class Command(BaseCommand):
             hospital = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             hospital = json.dumps(hospital) 
+            facility = None
             if Facility.objects.filter(facility_id=row["Facility ID"]):
                 facility = Facility.objects.filter(facility_id=row["Facility ID"]).first()
                 caphs_metrics = CAPHSMetrics(
-                                    caphs_metric_json=hospital,
-                                    facility=facility
-                                    )
+                    caphs_metric_json=hospital,
+                    facility=facility
+                    )
                 caphs_metrics.save()
             else:
-                pass
+                if 'Address' in row:
+                    address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
+                    facility = Facility.objects.create(facility_id=row["Facility ID"], care_types=[row["Care Type"]], address=row["Address"])
+            if facility:
+                caphs_metrics = CAPHSMetrics(
+                    caphs_metric_json=hospital,
+                    facility=facility
+                )
+                caphs_metrics.save()
+
 
     def load_hai_data_to_facility_model(self, export_path):
+        print("loading HAI data")
         hai_path = os.path.join(export_path, "hai_summary_metrics.csv")
         hai_df = pd.read_csv(hai_path, low_memory=False, encoding='unicode_escape')
-
+        hai_df["Facility ID"] = hai_df["Facility ID"].str.lstrip('0')
+            
         # Replace NaN values
         hai_df = hai_df.replace({np.nan: None})
 
@@ -238,8 +296,9 @@ class Command(BaseCommand):
                 "Mean Compared to National": row['Mean Compared to National'],
                 "Infection Rating": row['Infection Rating']
             }
-
+            
             facility = Facility.objects.filter(facility_id=facility_id).first()
+
             if facility:
                 hai_metrics, created = HAIMetrics.objects.get_or_create(
                     facility=facility,
@@ -288,53 +347,56 @@ class Command(BaseCommand):
 
             
             else:
-                print(f"Facility with ID {facility_id} not found or has no address.")
-                
+                #print(f"Facility with ID {facility_id} not found or has no address.")
+                pass
             percentage = round(100 * facility_num / length_df)
             if facility_num % 500 == 0:
-                print(f"Current Percentage: {percentage}, {facility_num} / {length_df}")
+                print(f"Current Lat/Long Percentage: {percentage}, {facility_num} / {length_df}")
             
         
     
 
     def handle(self, *args, **options):
         run_start_of_pipeline = True
+        run_load_ccn_data = False
+        run_load_hai_data = False
+        run_load_caphs_data = True
+
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
+
         if run_start_of_pipeline == True:
-            ccn_care_types = ["Nursing Homes"]#["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
-            for care_type in ccn_care_types:
-                print('ccn care_type', care_type)
-                self.load_ccn_data_to_facility_model(export_path, care_type)
+            if run_load_ccn_data == True:
+                ccn_care_types = ["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
+                for care_type in ccn_care_types:
+                    print('ccn care_type', care_type)
+                    self.load_ccn_data_to_facility_model(export_path, care_type)
 
-            #load_hai must be after the facility has already loaded
-            self.load_hai_data_to_facility_model(export_path)
+
+            if run_load_hai_data == True:
+                # load_hai must be after the facility has already loaded
+                self.load_hai_data_to_facility_model(export_path)
             
-            caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
-            caphs_care_types = [ "Nursing Homes"]
-            files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
-            all_cahps_df = pd.DataFrame()
-            #load all caphs data and merge them into one df
-            for care_type in caphs_care_types:
-                print('caphs care_type', care_type)
-                cur_cahps_df = self.load_caphs_data(export_path, care_type)
-                print("head cur caphs df",cur_cahps_df.head(20))
-                print("tail cur caphs df",cur_cahps_df.tail(20))
-                print('first check cur_cahps_df row for faiclity id 35268', cur_cahps_df[cur_cahps_df["Facility ID"]==15012])
-                
-                #combine caph df into all_caphs_df
-                if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
-                    all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
-                else:
-                    if all_cahps_df.empty:
-                        all_cahps_df = cur_cahps_df
+            if run_load_caphs_data == True:
+                caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes", "Outpatient Ambulatory Services"]  # Updated list
+                files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
+                all_cahps_df = pd.DataFrame()
+                #load all caphs data and merge them into one df
+                for care_type in caphs_care_types:
+                    print('caphs care_type', care_type)
+                    cur_cahps_df = self.load_caphs_data(export_path, care_type)
+                    
+                    #combine caph df into all_caphs_df
+                    if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
+                        all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
                     else:
-                        all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
+                        if all_cahps_df.empty:
+                            all_cahps_df = cur_cahps_df
+                        else:
+                            all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
+                            
+                all_cahps_df = all_cahps_df.reset_index(drop=True)
                 
-                print('done creating caphs df')
-                print('find row for faiclity id 35268', all_cahps_df[all_cahps_df["Facility ID"]==15012])
-                print("head cur caphs df",all_cahps_df.head(20))
-            all_cahps_df = all_cahps_df.reset_index(drop=True)
-
-            self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
+                self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
         self.load_lat_long_to_address_model(export_path)
+

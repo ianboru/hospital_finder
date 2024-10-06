@@ -6,14 +6,13 @@ const PlaceDetail = (props) => {
 
     // Map patient rating metrics to their respective labels
     const detailedExperienceMetricsMap = {
-      "Nurse communication - star rating" : "Nurse communication",
-      "Doctor communication - star rating" : "Doctor communication",
       "Staff responsiveness - star rating" : "Staff responsiveness",
-      "Communication about medicines - star rating" : "Medicine communication",
       "Discharge information - star raing" : "Discharge information",
       "Care transition - star rating" : "Care transition",
       "Cleanliness - star rating" : "Cleanliness",
       "Quietness - star rating" : "Quietness",
+      "Facilities and staff linear mean score" : "Patient Rating",
+      "Patients who reported that staff definitely communicated about what to expect during and after the procedure" : "Communication",
     }
 
     const detailedExperienceMetricStars = Object.keys(detailedExperienceMetricsMap).map((metricName)=>{

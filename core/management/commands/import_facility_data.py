@@ -50,10 +50,10 @@ class Command(BaseCommand):
                 "Rndrng_Prvdr_Zip5" : "ZIP Code"
             }, inplace=True)
             
-        if care_type == "Hospice":
+        if care_type in ["Hospice", "In-Center Hemodialysis"] :
             provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
           
-        if care_type == "Nursing Homes":
+        if care_type in ["Nursing Homes"] :
             provider_df.rename(columns={"Provider Address" : "Address"}, inplace=True)
               
         if care_type in ["Home Health", "Nursing Homes"]:
@@ -310,7 +310,7 @@ class Command(BaseCommand):
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
         if run_start_of_pipeline == True:
-            ccn_care_types = ["Nursing Homes"]#["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
+            ccn_care_types = ["In-Center Hemodialysis"]#"Nursing Homes"]#["ED", "Home Health", "Hospice", "Hospital", "Outpatient"]
             for care_type in ccn_care_types:
                 print('load ccn care_type', care_type)
                 self.load_ccn_data_to_facility_model(export_path, care_type)

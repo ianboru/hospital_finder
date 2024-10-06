@@ -49,23 +49,33 @@ class Command(BaseCommand):
                 "Rndrng_Prvdr_Zip5" : "ZIP Code"
             }, inplace=True)
             
-        if care_type == "Hospice":
+        if care_type in ["Hospice", "In-Center Hemodialysis"] :
             provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
-            
-        if care_type == "Home Health":
+          
+        if care_type in ["Nursing Homes"] :
+            provider_df.rename(columns={"Provider Address" : "Address"}, inplace=True)
+              
+        if care_type in ["Home Health", "Nursing Homes"]:
             provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
-        
+    
         ccn_facility_df = self.filter_columns(facility_type, provider_df)
+
+        percentage = 0
         for index, row in ccn_facility_df.iterrows():
-            facility_id = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
-            if Facility.objects.filter(facility_id=row[facility_id], care_types__contains=[care_type]):
+            facility_id_column = "Facility ID" if "Facility ID" in ccn_facility_df.columns else "CMS Certification Number (CCN)"
+            ccn_facility_df[facility_id_column] = ccn_facility_df[facility_id_column].str.replace('"',"")
+            ccn_facility_df[facility_id_column] = ccn_facility_df[facility_id_column].str.lstrip('0')
+            #print(ccn_facility_df[facility_id])
+            facility_id = ccn_facility_df[facility_id_column][index]
+            current_facility = None
+            if Facility.objects.filter(facility_id=facility_id, care_types__contains=[care_type]):
                 # we don't want to create duplicate facility data so if facility exists then go to the next row
                 pass
-            elif Facility.objects.filter(facility_id=row[facility_id]):
+            elif Facility.objects.filter(facility_id=facility_id):
                 # if one facility has more than one care type we want to add it to the care types list 
-                facility = Facility.objects.filter(facility_id=row[facility_id]).first()
-                facility.care_types.append(care_type)
-                facility.save()
+                current_facility = Facility.objects.filter(facility_id=facility_id).first()
+                current_facility.care_types.append(care_type)
+                current_facility.save()
             else:
                 current_facility = Facility.objects.create(
                     facility_name = row['Facility Name'],
@@ -79,7 +89,11 @@ class Command(BaseCommand):
                         )
                 current_facility.address = address
                 current_facility.save()
-    
+
+            percentage = round(100 * index / len(ccn_facility_df))
+            if index % 500 == 0:
+                print(f"Current CCN loading Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
+                
     def extract_questions_as_rows(self, df, care_type): 
         measure_name_column_by_care_type = {
         "Hospitals" : "HCAHPS Question",
@@ -182,6 +196,7 @@ class Command(BaseCommand):
                     "Patient Hospital Readmission Category",
                     "Patient Transfusion category text",
                     "Fistula Category Text",
+                    "Staffing Rating"
                 ]
 
             }   
@@ -227,10 +242,13 @@ class Command(BaseCommand):
                 )
                 caphs_metrics.save()
 
+
     def load_hai_data_to_facility_model(self, export_path):
+        print("loading HAI data")
         hai_path = os.path.join(export_path, "hai_summary_metrics.csv")
         hai_df = pd.read_csv(hai_path, low_memory=False, encoding='unicode_escape')
-
+        hai_df["Facility ID"] = hai_df["Facility ID"].str.lstrip('0')
+            
         # Replace NaN values
         hai_df = hai_df.replace({np.nan: None})
 
@@ -278,8 +296,9 @@ class Command(BaseCommand):
                 "Mean Compared to National": row['Mean Compared to National'],
                 "Infection Rating": row['Infection Rating']
             }
-
+            
             facility = Facility.objects.filter(facility_id=facility_id).first()
+
             if facility:
                 hai_metrics, created = HAIMetrics.objects.get_or_create(
                     facility=facility,
@@ -306,7 +325,7 @@ class Command(BaseCommand):
             facility_id = row['Facility ID']
             latitude = row['latitude']
             longitude = row['longitude']
-            percentage = round(100 * facility_num / length_df)
+            
 
             # Print the data being processed
             #print(f"Processing Facility ID: {facility_id}, Latitude: {latitude}, Longitude: {longitude}")
@@ -328,10 +347,11 @@ class Command(BaseCommand):
 
             
             else:
-                print(f"Facility with ID {facility_id} not found or has no address.")
-
+                #print(f"Facility with ID {facility_id} not found or has no address.")
+                pass
+            percentage = round(100 * facility_num / length_df)
             if facility_num % 500 == 0:
-                print(f"Current Percentage: {percentage}, {facility_num} / {length_df}")
+                print(f"Current Lat/Long Percentage: {percentage}, {facility_num} / {length_df}")
             
         
     
@@ -351,6 +371,7 @@ class Command(BaseCommand):
                 for care_type in ccn_care_types:
                     print('ccn care_type', care_type)
                     self.load_ccn_data_to_facility_model(export_path, care_type)
+
 
             if run_load_hai_data == True:
                 # load_hai must be after the facility has already loaded
@@ -378,3 +399,4 @@ class Command(BaseCommand):
                 
                 self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
         self.load_lat_long_to_address_model(export_path)
+

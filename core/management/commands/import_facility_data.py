@@ -49,15 +49,15 @@ class Command(BaseCommand):
                 "Rndrng_Prvdr_Zip5" : "ZIP Code"
             }, inplace=True)
             
-        if care_type in ["Hospice", "In-Center Hemodialysis"] :
-            provider_df.rename(columns={"Address Line 1" : "Address"}, inplace=True)
+        cur_columns = provider_df.columns
+        rename_address_map = None
+        if "Address Line 1" in cur_columns:
+            rename_address_map = {"Address Line 1" : "Address"}    
+        if "Provider Address" in cur_columns:
+            rename_address_map = {"Provider Address" : "Address"}   
+        if rename_address_map:
+            provider_df.rename(columns=rename_address_map, inplace=True)
           
-        if care_type in ["Nursing Homes"] :
-            provider_df.rename(columns={"Provider Address" : "Address"}, inplace=True)
-              
-        if care_type in ["Home Health", "Nursing Homes"]:
-            provider_df.rename(columns={"Provider Name" : "Facility Name"}, inplace=True)
-    
         ccn_facility_df = self.filter_columns(facility_type, provider_df)
 
         percentage = 0
@@ -145,7 +145,7 @@ class Command(BaseCommand):
         individual_measures = list(set(column_name_from_values).intersection(set(individual_measures)))
         measures_per_facility = pd.DataFrame()
         for measure in individual_measures:
-            measure_values = df[[measure_value_column, "Facility ID"]].loc[df[measure_name_column] == measure]
+            measure_values = df[[measure_value_column, "Facility ID","Address"]].loc[df[measure_name_column] == measure]
             column_map = {}
             column_map[measure_value_column] = measure
             measure_values = measure_values.rename(columns=column_map)
@@ -153,7 +153,10 @@ class Command(BaseCommand):
                 print("was empty")
                 measures_per_facility = measure_values
             else:
-                measures_per_facility = pd.merge(measures_per_facility, measure_values, on="Facility ID")
+                cols_to_use = measure_values.columns.difference(measures_per_facility.columns)
+                measures_per_facility = pd.merge(measures_per_facility, measure_values[cols_to_use], left_index=True, right_index=True, how='outer')
+
+                #measures_per_facility = pd.merge(measures_per_facility, measure_values, on="Facility ID")
         measures_per_facility = measures_per_facility.reset_index(drop=True)
         return measures_per_facility
         
@@ -166,6 +169,16 @@ class Command(BaseCommand):
         if "CMS Certification Number (CCN)" in caphs_df.columns:
             caphs_df = caphs_df.rename(columns={"CMS Certification Number (CCN)": "Facility ID"})
 
+        rename_address_map = None
+        cur_columns = caphs_df.columns
+        if "Address Line 1" in cur_columns:
+            rename_address_map = {"Address Line 1" : "Address"}    
+        if "Provider Address" in cur_columns:
+            rename_address_map = {"Provider Address" : "Address"}   
+        if rename_address_map:
+            caphs_df.rename(columns=rename_address_map, inplace=True)
+
+        
         if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
             # filter column
             measure_columns_by_care_type = {
@@ -196,51 +209,75 @@ class Command(BaseCommand):
                     "Patient Hospital Readmission Category",
                     "Patient Transfusion category text",
                     "Fistula Category Text",
-                    "Staffing Rating"
                 ]
 
             }   
+
             final_caphs_df = caphs_df[measure_columns_by_care_type[care_type] + ["Facility ID"]]
+            if 'Address' in caphs_df.columns and 'Facility Name' in caphs_df.columns:
+                print('Merging Metadata to caphs_df')
+                facility_metadata_df = caphs_df[["Address", "Facility Name", "City/Town", "State", "ZIP Code", "Facility ID"]]
+                facility_metadata_df = facility_metadata_df.drop_duplicates()
+                final_caphs_df = pd.merge(final_caphs_df, facility_metadata_df, on="Facility ID") 
+            else:
+                print('No Existing Address Metric for caretype') 
+                print(care_type)
         else:
             final_caphs_df = self.extract_questions_as_rows(caphs_df, care_type)
         
         final_caphs_df = final_caphs_df.drop_duplicates()
         print('Measure Extraction Complete')
-        if 'Address' in caphs_df.columns:
-            print('Merging Metadata to caphs_df')
-            facility_metadata_df = caphs_df[["Address", "Facility Name", "City/Town", "State", "ZIP Code", "Facility ID"]]
-            facility_metadata_df = facility_metadata_df.drop_duplicates()
-            final_caphs_df = pd.merge(final_caphs_df, facility_metadata_df, on="Facility ID") 
-        else:
-            print('No Existing Address Metric for caretype') 
-            print(care_type)
+        
         final_caphs_df['Care Type'] = care_type
         return final_caphs_df
         
     def create_caphs_json_by_row_of_all_caphs_df(self, all_cahps_df):
+        num_rows = len(all_cahps_df)
+        last_progress_percent = 0
         for index, row in all_cahps_df.iterrows():
             # Convert the row to a dictionary
+            cur_facility_id = str(row["Facility ID"])
             hospital = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             hospital = json.dumps(hospital) 
             facility = None
-            if Facility.objects.filter(facility_id=row["Facility ID"]):
-                facility = Facility.objects.filter(facility_id=row["Facility ID"]).first()
+            if "12500" in cur_facility_id:
+                print("LOOKING HERE FOR 12500")
+                print(row)
+            if Facility.objects.filter(facility_id=cur_facility_id):
+                
+                facility = Facility.objects.filter(facility_id=cur_facility_id).first()
+                if "12500" in cur_facility_id:
+                    print("condition 1")
+                    print(facility)
                 caphs_metrics = CAPHSMetrics(
                     caphs_metric_json=hospital,
                     facility=facility
                     )
                 caphs_metrics.save()
-            else:
-                if 'Address' in row:
+                if not facility.address and 'Address' in row and 'ZIP Code' in row:
+                    
                     address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
-                    facility = Facility.objects.create(facility_id=row["Facility ID"], care_types=[row["Care Type"]], address=row["Address"])
+                    facility.address = address
+                    if "12500" in cur_facility_id:
+                        print("address condition 1")
+                        print(address)
+                    facility.save()
+            else:
+                if 'Address' in row and 'Zip Code' in row:
+                    address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
+                    facility = Facility.objects.create(cur_facility_id, care_types=[row["Care Type"]], address=address)
             if facility:
                 caphs_metrics = CAPHSMetrics(
                     caphs_metric_json=hospital,
                     facility=facility
                 )
                 caphs_metrics.save()
+            progress_percent = round(100*index/num_rows)
+            if progress_percent % 5 == 0 and progress_percent != last_progress_percent:
+                print("progress ", progress_percent)
+                last_progress_percent = progress_percent
+
 
 
     def load_hai_data_to_facility_model(self, export_path):
@@ -385,10 +422,15 @@ class Command(BaseCommand):
                 for care_type in caphs_care_types:
                     print('caphs care_type', care_type)
                     cur_cahps_df = self.load_caphs_data(export_path, care_type)
-                    
+                    cur_cahps_df = cur_cahps_df.reset_index(drop=True)
+                    all_cahps_df = all_cahps_df.reset_index(drop=True)
                     #combine caph df into all_caphs_df
+                    #cols_to_use = all_cahps_df.columns.difference(cur_cahps_df.columns)
+
                     if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
                         all_cahps_df = pd.concat([all_cahps_df, cur_cahps_df])
+                        #all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df[cols_to_use], how="outer", on="Facility ID")
+
                     else:
                         if all_cahps_df.empty:
                             all_cahps_df = cur_cahps_df
@@ -396,7 +438,7 @@ class Command(BaseCommand):
                             all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
                             
                 all_cahps_df = all_cahps_df.reset_index(drop=True)
-                
+                print("starting caphs db loading")
                 self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
         self.load_lat_long_to_address_model(export_path)
 

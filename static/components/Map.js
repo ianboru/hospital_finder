@@ -44,12 +44,12 @@ const Map = (props) => {
     console.log("first location", firstLocation)
     const firstLocationCenter = {lat : firstLocation.lat, lng : firstLocation.lng} //new google.maps.LatLng(parseFloat(firstLocation.lat),parseFloat(firstLocation.long))
     const selectedPlaceCenter = {
-      lat : selectedPlace ? selectedPlace.location.lat : null,
-      lng : selectedPlace ? selectedPlace.location.lng : null
+      lat : selectedPlace ? location.lat : null,
+      lng : selectedPlace ? location.lng : null
     }
 
     const markers = placesData && placesData.length > 0 && placesData.map((place, index)=>{
-      const location = place.location
+      const location = place.location[0]
       const latLng = {lat : location.latitude, lng : location.longitude} //new google.maps.LatLng(parseFloat(location.lat),parseFloat(location.long))
       const markerColor = getMarkerColor(place, metricQuantiles)
       //const markerColor = "#FFFFFFF"
@@ -133,11 +133,12 @@ const Map = (props) => {
       const mapBounds =  map.getBounds()
       const swCornerLatLng = mapBounds.getSouthWest()
       const leftMostLong =  swCornerLatLng.lng()
-
-      curCenter.lat = selectedPlace.location.latitude
+      const location = selectedPlace.location[0]
+      
+      curCenter.lat = location.latitude
       //average between selected place and left edge 
       //to ensure marker isn't blocked by place detail card
-      curCenter.lng = selectedPlace.location.longitude - (selectedPlace.location.longitude - leftMostLong)/3
+      curCenter.lng = location.longitude - (location.longitude - leftMostLong)/3
       console.log("selected place long coords", selectedPlace.longitude, leftMostLong, curCenter.lng)
     }
 

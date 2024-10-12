@@ -54,11 +54,13 @@ const PlaceDetail = (props) => {
     const ratingDivStyle = {display: "flex", justifyContent: "space-between", marginTop: "1em"}
 
     const addressToUrl = (address) => {
+      console.log("url convert",address)
       const urlAddress = address.replace(/\,/g, '');
       const url = urlAddress.replace(/\ /g, '%20');
       return  `http://maps.google.com/maps?q=${url}`
     }
-    const googleMapsUrl = addressToUrl(selectedPlace.address)
+    console.log("current seelcted place", selectedPlace)
+    const googleMapsUrl = addressToUrl(selectedPlace.address[0])
     return(
         <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
             <div onClick={closePlaceDetail} style={{

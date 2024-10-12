@@ -34,8 +34,8 @@ class SignUpView(generic.CreateView):
 # Initialize the data for the app
 gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 # Replace CSV loading with database queries below
-summary_metrics = load_summary_metrics() #delete
-provider_list = load_provider_list() #delete
+#summary_metrics = load_summary_metrics() #delete
+#provider_list = load_provider_list() #delete
 def calculate_metric_quantiles(metric_name):
     from django_pandas.io import read_frame
     import numpy as np
@@ -63,7 +63,6 @@ def calculate_metric_quantiles(metric_name):
                         all_metric_values.append(caphs_json["Summary star rating"])
         else:
             continue
-    print(metric_name,all_metric_values[0:10])
     if len(all_metric_values) > 0:
         top_quantile = np.quantile(all_metric_values,upper_quantile_percent)
         bottom_quantile = np.quantile(all_metric_values,lower_quantile_percent)
@@ -92,6 +91,8 @@ def find_providers_in_radius(search_location, radius, care_type):
 
     for facility in provider_list:
         address = facility.address
+        if not address:
+            print("no address", facility)
         provider_location_tuple = (address.latitude, address.longitude)
         
         facility.facility_name = facility.facility_name.replace("'","")
@@ -119,23 +120,22 @@ def find_providers_in_radius(search_location, radius, care_type):
             facility = Facility.objects.get(id=facility.id)
             care_types = facility.care_types
             care_types_str = ', '.join(facility.care_types)
-
+        
             cur_provider = {
                 "name": facility.facility_name,
-                "location": {
-                    "latitude": address.latitude,
-                    "longitude": address.longitude,
-                },
-                "address": f"{address.street}, {address.city}, {address.zip}",
                 "caretype": care_types_str
             }
+            if address:
+                cur_provider["location"] ={
+                    "latitude": getattr(address,'latitude', None),
+                    "longitude":  getattr(address,'longitude', None)
+                },
+                cur_provider["address"] = f"{address.street}, {address.city}, {address.zip}",
 
             for key in hai_metrics:
                 cur_provider[key] = hai_metrics[key]
                 cur_value = cur_provider[key]
 
-                print(key, cur_value)
-                print(type(cur_value))
                 if type(cur_value) == dict:
                     if "Compared to National" in cur_value:
                         cur_value = cur_value["Compared to National"]
@@ -149,12 +149,9 @@ def find_providers_in_radius(search_location, radius, care_type):
             
             for key in caphs_metrics:
                 cur_provider[key] = caphs_metrics[key]
-                print(key, cur_provider[key])
-                print(type(cur_provider[key]))
                 if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
                     cur_provider[key] = ''
-            print("total provider")
-            print(cur_provider)
+
             filtered_provider_list.append(cur_provider)
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
     return filtered_provider_list, provider_list

@@ -310,18 +310,18 @@ def load_cahps_data(export_path, care_type, files_with_measures_as_columns):
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 current_date = today = time.strftime("%m-%d-%Y")
-care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+care_types = ["Outpatient"]#, "ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
 regenerate_ccn_list = False
 all_providers_df = load_provider_cms_list()
 all_cahps_df = pd.DataFrame()
 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
 for care_type in care_types:
+    print("current cahps care type", care_type)
     cur_hcahps_df = load_cahps_data(export_path, care_type, files_with_measures_as_columns)
     if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
         print("pre concatening to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
         all_cahps_df = pd.concat([all_cahps_df, cur_hcahps_df])
         print("post concatening to all cahps df", cur_hcahps_df.shape, all_cahps_df.shape)
-
     else:
         if all_cahps_df.empty:
             all_cahps_df = cur_hcahps_df

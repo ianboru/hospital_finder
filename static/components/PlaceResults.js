@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars } from '../utils';
-const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
+const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCareType}) => {
 
     const placeTileStyles = {
       "borderTop": "1px solid #e0e0e0", // Light gray line at the top
@@ -23,7 +23,10 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
-    console.log("re-rendering results")
+    console.log("re-rendering place results caretype:", selectedCareType)
+    if(!selectedCareType){
+      selectedCareType = "Hospital"
+    }
     const placeTiles = (placesData && placesData.length) > 0 ? placesData.map((place, i)=>{
       const selectedPlaceStyle = {...placeTileStyles}
       return (
@@ -58,16 +61,16 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
           </div>
 
           {
-            place.caretype && place.caretype.includes('Hospital') && ( //for hospital facilities
+            selectedCareType.includes('Hospital') && ( //for hospital facilities
               <>
             {
-              place['Summary star rating']&&place['Summary star rating'] > 0 ?
+              place['Summary star rating'] && place['Summary star rating'] > 0 ?
                 <div>
                   <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
                 </div> : <></>
             }
             {
-              place['Infection Rating']&&place['Infection Rating'] > 0 ?
+              place['Infection Rating'] && place['Infection Rating'] > 0 ?
                 <div>
                   <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'],3)}</span></b>
                 </div> : <></>
@@ -76,16 +79,16 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             )
           }
           {
-            place.caretype && place.caretype.includes('Outpatient') && ( //for outpatient facilites
+            selectedCareType.includes('Outpatient') && ( //for outpatient facilites
               <>
             {
-              place['Summary star rating']&&place['Summary star rating'] > 0 ?
+              place['Summary star rating'] && place['Summary star rating'] > 0 ?
                 <div>
                   <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
                 </div> : <></>
             }
             {
-              place['Patients who reported that staff definitely communicated about what to expect during and after the procedure']&&place['Patients who reported that staff definitely communicated about what to expect during and after the procedure'] > 0 ?
+              place['Patients who reported that staff definitely communicated about what to expect during and after the procedure'] && place['Patients who reported that staff definitely communicated about what to expect during and after the procedure'] > 0 ?
                 <div>
                   <b>Communication: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Patients who reported that staff definitely communicated about what to expect during and after the procedure'],3)}</span></b>
                 </div> : <></>
@@ -94,16 +97,16 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             )
           } 
           {
-            place.caretype && place.caretype.includes('Nursing Homes') && ( //for outpatient facilites
+            selectedCareType.includes('Nursing Homes') && ( //for outpatient facilites
               <>
             {
-              place['Overall Rating']&&place['Overall Rating'] > 0 ?
+              place['Overall Rating'] && place['Overall Rating'] > 0 ?
                 <div>
                   <b>Overall Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Overall Rating'],5)}</span></b>
                 </div> : <></>
             }
             {
-              place['Abuse Icon']&&place['Abuse Icon'] > 0 ?
+              place['Abuse Icon'] && place['Abuse Icon'] > 0 ?
                 <div>
                   <b>Potential Abuse: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Abuse Icon'],3)}</span></b>
                 </div> : <></>
@@ -112,16 +115,16 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace}) => {
             )
           }
           {
-            place.caretype && place.caretype.includes('Hospice') && ( //for outpatient facilites
+            selectedCareType.includes('Hospice') && ( //for outpatient facilites
               <>
             {
-              place['Family caregiver survey rating']&&place['Family caregiver survey rating'] > 0 ?
+              place['Family caregiver survey rating'] && place['Family caregiver survey rating'] > 0 ?
                 <div>
                   <b>Caregiver Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Family caregiver survey rating'],5)}</span></b>
                 </div> : <></>
             }
             {
-              place['Abuse Icon']&&place['Abuse Icon'] > 0 ?
+              place['Abuse Icon'] && place['Abuse Icon'] > 0 ?
                 <div>
                   <b>Potential Abuse: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Abuse Icon'],3)}</span></b>
                 </div> : <></>

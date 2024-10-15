@@ -40,7 +40,7 @@ def calculate_metric_quantiles(metric_name):
     from django_pandas.io import read_frame
     import numpy as np
     import math
- 
+    return 3, 2
     print(metric_name)
     if metric_name == "hai":
         all_metric_objects = HAIMetrics.objects.all()
@@ -82,13 +82,12 @@ def find_providers_in_radius(search_location, radius, care_type):
     print("Search Location: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
+    if not care_type:
+        care_type = "Hospital"
+    provider_list = Facility.objects.filter(care_types__contains=[care_type]).prefetch_related("address")
 
-    if care_type and care_type != "All":
-        provider_list = Facility.objects.filter(care_types__contains=[care_type])
-        print("post filter", care_type)
-    else:
-        provider_list = Facility.objects.all()
 
+    print("iterating through hits")
     for facility in provider_list:
         address = facility.address
         if not address:
@@ -101,7 +100,6 @@ def find_providers_in_radius(search_location, radius, care_type):
         if provider_location_tuple[0] is None or provider_location_tuple[1] is None or math.isnan(provider_location_tuple[0]) or math.isnan(provider_location_tuple[1]):
             nan_lat_long_count += 1
             continue
-        
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         except:
@@ -118,7 +116,6 @@ def find_providers_in_radius(search_location, radius, care_type):
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
 
             facility = Facility.objects.get(id=facility.id)
-            care_types = facility.care_types
             care_types_str = ', '.join(facility.care_types)
         
             cur_provider = {
@@ -131,7 +128,6 @@ def find_providers_in_radius(search_location, radius, care_type):
                     "longitude":  getattr(address,'longitude', None)
                 },
                 cur_provider["address"] = f"{address.street}, {address.city}, {address.zip}",
-
             for key in hai_metrics:
                 cur_provider[key] = hai_metrics[key]
                 cur_value = cur_provider[key]

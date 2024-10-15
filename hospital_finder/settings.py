@@ -78,15 +78,19 @@ WSGI_APPLICATION = 'hospital_finder.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
+google_places_api_key = "AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o"
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_NAME="hospital_finder"
+DB_USER="ian"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', cast=int),
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        #'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
         }
 }
 

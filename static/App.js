@@ -24,9 +24,8 @@ function App() {
   const initialLocation = initialLocationSplit ?  {"lng" : parseFloat(initialLocationSplit[0]), "lat" : parseFloat(initialLocationSplit[1])} : {}
   const initialZoomRadius =  url.searchParams.get("radius")
   const initialCareTypeParam =  url.searchParams.get("careType") 
-  const initialCareType = initialCareTypeParam ? initialCareTypeParam : "All"
-  console.log("initial care type", initialCareType)
-  console.log("App load places", placesData)
+  const initialCareType = initialCareTypeParam ? initialCareTypeParam : "Hospital"
+  
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
@@ -75,6 +74,8 @@ function App() {
     alignContent : "flex-start",
     flexDirection: 'column'
   }
+  console.log("initial care type", initialCareType)
+  console.log("App load places", placesData)
   console.log("initial map location", initialLocation)
 
   return (
@@ -90,6 +91,7 @@ function App() {
               placesData={placesData} 
               selectedPlace={selectedPlace} 
               setSelectedPlace={setSelectedPlace} 
+              selectedCareType={initialCareTypeParam}
             />
           </div>
         </div>

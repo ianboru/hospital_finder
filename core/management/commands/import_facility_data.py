@@ -181,6 +181,7 @@ class Command(BaseCommand):
         
         if any(file_substring in care_type for file_substring in files_with_measures_as_columns):
             # filter column
+            print("measures as columns")
             measure_columns_by_care_type = {
                 "Home Health" : [
                     "HHCAHPS Survey Summary Star Rating",
@@ -237,10 +238,13 @@ class Command(BaseCommand):
         for index, row in all_cahps_df.iterrows():
             # Convert the row to a dictionary
             cur_facility_id = str(row["Facility ID"])
+            if "Outpatient" in row["Care Type"]:
+                row["Care Type"] = "Outpatient"
             hospital = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             hospital = json.dumps(hospital) 
             facility = None
+            print("json facility creator", cur_facility_id)
             if "12500" in cur_facility_id:
                 print("LOOKING HERE FOR 12500")
                 print(row)
@@ -253,20 +257,23 @@ class Command(BaseCommand):
                 caphs_metrics = CAPHSMetrics(
                     caphs_metric_json=hospital,
                     facility=facility
-                    )
+                )
                 caphs_metrics.save()
                 if not facility.address and 'Address' in row and 'ZIP Code' in row:
                     
                     address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
                     facility.address = address
-                    if "12500" in cur_facility_id:
-                        print("address condition 1")
-                        print(address)
-                    facility.save()
+                if not facility.facility_name:
+                    facility.facility_name = row["Facility Name"]
+                print(facility.care_types, row["Care Type"])
+                if facility.care_types:
+                    facility.care_types = [row["Care Type"]]
+                facility.save()
             else:
-                if 'Address' in row and 'Zip Code' in row:
+                print(row)
+                if 'Address' in row and 'ZIP Code' in row:
                     address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
-                    facility = Facility.objects.create(cur_facility_id, care_types=[row["Care Type"]], address=address)
+                    facility = Facility.objects.create(facility_name=row["Facility Name"], facility_id=cur_facility_id, care_types=[row["Care Type"]], address=address)
             if facility:
                 caphs_metrics = CAPHSMetrics(
                     caphs_metric_json=hospital,
@@ -355,7 +362,7 @@ class Command(BaseCommand):
         lat_long_df = pd.read_csv(lat_long_path, low_memory=False, encoding='unicode_escape')
         length_df = len(lat_long_df.index)
         facility_num = 0
-        print("Latitude and Longitude DataFrame:\n", lat_long_df.head())
+        print("Adding Latitude and Longitude :\n")
         lat_long_df = lat_long_df[['Facility ID', 'latitude', 'longitude']]
 
         for index, row in lat_long_df.iterrows():
@@ -398,7 +405,7 @@ class Command(BaseCommand):
         run_load_ccn_data = False
         run_load_hai_data = False
         run_load_caphs_data = True
-
+        run_load_lat_long_data = False 
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
 
@@ -415,7 +422,7 @@ class Command(BaseCommand):
                 self.load_hai_data_to_facility_model(export_path)
             
             if run_load_caphs_data == True:
-                caphs_care_types = ["ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes", "Outpatient Ambulatory Services"]  # Updated list
+                caphs_care_types = [ "Outpatient Ambulatory Services","ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]  # Updated list
                 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
                 all_cahps_df = pd.DataFrame()
                 #load all caphs data and merge them into one df
@@ -436,9 +443,9 @@ class Command(BaseCommand):
                             all_cahps_df = cur_cahps_df
                         else:
                             all_cahps_df = pd.merge(all_cahps_df, cur_cahps_df, how="outer", on="Facility ID")
-                            
                 all_cahps_df = all_cahps_df.reset_index(drop=True)
                 print("starting caphs db loading")
                 self.create_caphs_json_by_row_of_all_caphs_df(all_cahps_df)
-        self.load_lat_long_to_address_model(export_path)
+        if run_load_lat_long_data:
+            self.load_lat_long_to_address_model(export_path)
 

@@ -34,11 +34,17 @@ admin.site.register(HAIMetrics, HAIMetricsAdmin)
 # admin.site.register(Favorite, FavoriteAdmin)
 
 class FacilityAdmin(admin.ModelAdmin):
+    
+    
     list_display = [
         "facility_id",
         "facility_name",
         "care_types",
-        "address"
+        "get_city"
+    ]
+    list_filter = [
+        "care_types",
+        "address__city"
     ]
     search_fields = [
         "facility_id",

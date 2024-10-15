@@ -36,11 +36,13 @@ class Facility(TimeStamp):
     )
 
     def __str__(self):
-        return f"{self.facility_name}"
+        return f'{self.facility_id} - {self.facility_name}'
     
-    def __str__(self):
-        return self.facility_id
+    def get_city(object):
+        return object.address.city
     
+    def get_state(object):
+        return object.address.state
 class Address(TimeStamp):
     zip = models.IntegerField()
     street = models.CharField(max_length=100, blank=True) 

@@ -2,6 +2,7 @@ from core import models
 # from core.models.favorite import Favorite
 from core.models.facility import Facility, Address
 from core.models.facility_data import CAPHSMetrics, HAIMetrics 
+from core.models.data_dictionary import DataDictionaryModel 
 from django.contrib import admin
 
 class CAPHSMetricsAdmin(admin.ModelAdmin):
@@ -71,3 +72,24 @@ class AddressAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(Address, AddressAdmin)
+class DataDictionaryModelAdmin(admin.ModelAdmin):
+    list_display = [
+        "cms_term",
+        "term",
+        "care_types",
+        "source_file",
+        "definition",
+        "definition_confidence",
+        "location_in_website",
+    ]
+    search_fields = [
+        "cms_term",
+        "term",
+        "care_types",
+        "source_file",
+        "definition",
+        "definition_confidence",
+        "location_in_website",
+    ]
+    
+admin.site.register(DataDictionaryModel, DataDictionaryModelAdmin)

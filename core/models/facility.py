@@ -21,6 +21,7 @@ class ModifiedArrayField(ArrayField):
         }
         return super(ArrayField, self).formfield(**defaults)
 class Facility(TimeStamp):
+    search_fields = ["facility_name", "facility_id"]
     facility_name = models.CharField(max_length=100, blank=False) 
     facility_id = models.CharField(max_length=20, blank=False, unique=True) 
     care_types = ModifiedArrayField(ArrayField(
@@ -43,7 +44,9 @@ class Facility(TimeStamp):
     
     def get_state(object):
         return object.address.state
+
 class Address(TimeStamp):
+    search_fields = ["facility__facility_name", "facility__facility_id"]
     zip = models.IntegerField()
     street = models.CharField(max_length=100, blank=True) 
     city = models.CharField(max_length=100, blank=True) 

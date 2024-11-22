@@ -79,13 +79,16 @@ hcahps_top_quantile, hcahps_bottom_quantile = calculate_metric_quantiles('caphs'
 
 def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
-    print("Search Location: ", search_location, radius, care_type)
+    print("Search Location with care type: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
     if not care_type:
         care_type = "Hospital"
+    if care_type == "ED":
+        care_type = "ED + Others"
+    print(care_type)
     provider_list = Facility.objects.filter(care_types__contains=[care_type]).prefetch_related("address")
-
+    #provider_list = Facility.objects.all().prefetch_related("address")
 
     print("iterating through hits")
     for facility in provider_list:
@@ -111,11 +114,14 @@ def find_providers_in_radius(search_location, radius, care_type):
             if len(hai_metrics) > 0:
                 hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
 
-            caphs_metrics  = CAPHSMetrics.objects.filter(facility_id=facility.id)
+            caphs_metrics  = CAPHSMetrics.objects.filter(facility=facility)
+            print(facility.facility_id, facility.facility_name)
+            print(caphs_metrics)
+            if "scripps" in facility.facility_name.lower():
+                print("got facility")
+            
             if len(caphs_metrics) > 0:
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
-
-            facility = Facility.objects.get(id=facility.id)
             care_types_str = ', '.join(facility.care_types)
         
             cur_provider = {
@@ -147,8 +153,9 @@ def find_providers_in_radius(search_location, radius, care_type):
                 cur_provider[key] = caphs_metrics[key]
                 if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
                     cur_provider[key] = ''
-
+            
             filtered_provider_list.append(cur_provider)
+    print(filtered_provider_list)
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
     return filtered_provider_list, provider_list
 
@@ -193,14 +200,15 @@ def index(request, path=None):
     if search_string:
         # filter base on fuzzy match on facility name base on search string
         for provider in filtered_providers:
-            if fuzz.partial_ratio(provider['Facility Name'].lower(), search_string) > search_match_threshold:
+            if fuzz.partial_ratio(provider['name'].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
                 
-            if fuzz.partial_ratio(provider['Address'].lower(), search_string) > search_match_threshold:
+            if fuzz.partial_ratio(provider['address'][0].lower(), search_string) > search_match_threshold:
                 name_filtered_providers.append(provider)
         filtered_providers = name_filtered_providers 
     
     places_data = filtered_providers
+    #print("final filtered providers", places_data)
     # Context for the front end
     context = {
         'google_places_data' : places_data,
@@ -211,7 +219,5 @@ def index(request, path=None):
             'hcahps_bottom_quantile' : hcahps_bottom_quantile
         }
     }
-
-    pprint.pprint(places_data)
     
     return render(request, "index.html", context)

@@ -2,24 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from .timestamp import TimeStamp
 from django.contrib.postgres.fields import ArrayField
-from django import forms
+from .data_type import CARE_TYPE_CHOICES
+from .fields import ModifiedArrayField
 
-CARE_TYPE_CHOICES = [
-    ('ED', 'ED'),
-    ('Hospital', 'Hospital'),
-    ('Home Health', 'Home Health'),
-    ('Hospice', 'Hospice'),
-    ('Outpatient', 'Outpatient'),
-]
-class ModifiedArrayField(ArrayField):
-    def formfield(self, **kwargs):
-        defaults = {
-            "form_class": forms.MultipleChoiceField,
-            "choices": self.base_field.choices if self.base_field.choices else CARE_TYPE_CHOICES,
-            "widget": forms.CheckboxSelectMultiple,
-            **kwargs
-        }
-        return super(ArrayField, self).formfield(**defaults)
 class Facility(TimeStamp):
     search_fields = ["facility_name", "facility_id"]
     facility_name = models.CharField(max_length=100, blank=False) 

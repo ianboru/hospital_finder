@@ -28,6 +28,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
       selectedCareType = "Hospital"
     }
     const placeTiles = (placesData && placesData.length) > 0 ? placesData.map((place, i)=>{
+      const medianTimeTillDischarge = place["Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better"]
       const selectedPlaceStyle = {...placeTileStyles}
       return (
         <div id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
@@ -127,6 +128,24 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
               place['Abuse Icon'] && place['Abuse Icon'] > 0 ?
                 <div>
                   <b>Potential Abuse: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Abuse Icon'],3)}</span></b>
+                </div> : <></>
+            }
+            </>
+            )
+          }
+          {
+            selectedCareType.includes('ED') && ( //for outpatient facilites
+              <>
+            {
+                medianTimeTillDischarge ?
+                <div>
+                  <b>Median Arrival to Discharge: <span style={{color:"#fdcc0d"}}>{medianTimeTillDischarge}</span></b>
+                </div> : <></>
+            }
+            {
+              place['Left before being seen']  ?
+                <div>
+                  <b>Left before being seen: <span style={{color:"#fdcc0d"}}>{ place['Left before being seen'] }</span></b>
                 </div> : <></>
             }
             </>

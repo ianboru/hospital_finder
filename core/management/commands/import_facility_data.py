@@ -257,32 +257,21 @@ class Command(BaseCommand):
             cur_facility_id = str(row["Facility ID"])
             if not cur_facility_id:
                 continue 
+            #strip 0
             if cur_facility_id[0] == "0":
-                cur_facility_id = cur_facility_id[:1]
+                cur_facility_id = cur_facility_id[1:]
             if "Outpatient" in row["Care Type"]:
                 row["Care Type"] = "Outpatient"
             current_cahps_metrics_json = row.to_dict()  
             # changing dict to json we need json type to save in the instance
             current_cahps_metrics_json = json.dumps(current_cahps_metrics_json) 
             facility = None
-
+            if Facility.objects.filter(facility_id="0" + cur_facility_id):
+                Facility.objects.filter(facility_id="0" + cur_facility_id).delete()
+            
             if Facility.objects.filter(facility_id=cur_facility_id):
                 facility = Facility.objects.filter(facility_id=cur_facility_id).first()
-                try:
-                    caphs_metrics, created = CAPHSMetrics.objects.get_or_create(facility=facility)
-                except:
-                    created = False
-                    caphs_metrics = CAPHSMetrics.objects.filter(facility=facility).first()
-                if created:
-                    caphs_metrics.caphs_metric_json=current_cahps_metrics_json, 
-                else:
-                    if type(caphs_metrics.caphs_metric_json) == str:
-                        caphs_metrics.caphs_metric_json = json.loads(caphs_metrics.caphs_metric_json)
-                    final_json = json.dumps({**json.loads(current_cahps_metrics_json), **caphs_metrics.caphs_metric_json})
-                    caphs_metrics.caphs_metric_json = final_json
-                caphs_metrics.save()
-
-
+    
                 if not facility.address and 'Address' in row and 'ZIP Code' in row:
                     address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
                     facility.address = address
@@ -302,8 +291,35 @@ class Command(BaseCommand):
                     address = Address.objects.create(street=row["Address"], city=row["City/Town"], zip=row['ZIP Code'])
                     facility = Facility.objects.create(facility_name=row["Facility Name"], facility_id=cur_facility_id, care_types=[row["Care Type"]], address=address)
             if facility:
-                caphs_metrics, created = CAPHSMetrics.objects.get_or_create(caphs_metric_json=current_cahps_metrics_json, facility=facility)
+                '''
+                    if CAPHSMetrics.objects.filter(facility=facility).count() > 1:
+                        print("deleting")
+                        CAPHSMetrics.objects.filter(facility=facility).delete()
+                '''
+
+                try:
+                    caphs_metrics, created = CAPHSMetrics.objects.get_or_create(facility=facility)
+                except:
+                    created = False
+                    caphs_metrics = CAPHSMetrics.objects.filter(facility=facility).first()
+                if created:
+                    caphs_metrics.caphs_metric_json=current_cahps_metrics_json, 
+                else:
+                    
+                    if type(caphs_metrics.caphs_metric_json) == list:
+                        caphs_metrics.caphs_metric_json = caphs_metrics.caphs_metric_json[0]
+                    if type(caphs_metrics.caphs_metric_json) == str:
+                        caphs_metrics.caphs_metric_json = json.loads(caphs_metrics.caphs_metric_json)
+                    
+                    
+                    final_json = json.dumps({**json.loads(current_cahps_metrics_json), **caphs_metrics.caphs_metric_json})
+                    if "50077" in cur_facility_id:    
+                        print(current_cahps_metrics_json)
+                        print(caphs_metrics.caphs_metric_json)
+                        print("joined cahps", final_json )
+                    caphs_metrics.caphs_metric_json = final_json
                 caphs_metrics.save()
+
             progress_percent = round(100*index/num_rows)
             if progress_percent % 5 == 0 and progress_percent != last_progress_percent:
                 print("progress ", progress_percent)
@@ -391,6 +407,17 @@ class Command(BaseCommand):
 
         for index, row in lat_long_df.iterrows():
             facility_id = row['Facility ID']
+            check = False
+            if "50077" in facility_id:
+                print("git it")
+                print(row)
+                check = True
+            #strip 0
+            if facility_id[0] == "0":
+                facility_id = facility_id[1:]
+                
+            if check:
+                print(facility)
             latitude = row['latitude']
             longitude = row['longitude']
             
@@ -399,8 +426,10 @@ class Command(BaseCommand):
             #print(f"Processing Facility ID: {facility_id}, Latitude: {latitude}, Longitude: {longitude}")
 
             facility = Facility.objects.filter(facility_id=facility_id).first()
+            
             if facility and facility.address:
-
+                if "50077" in facility_id:
+                    print("updating address")
                 # Print before updating
                 #print(f"Updating Facility ID: {facility_id} - Old Latitude: {facility.address.latitude}, Old Longitude: {facility.address.longitude}")
 
@@ -447,7 +476,7 @@ class Command(BaseCommand):
             
             if run_load_caphs_data == True:
                 caphs_care_types = ["ED + Others", "Outpatient Ambulatory Services","ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]  # Updated list
-                caphs_care_types = ["Hospitals"  ]  # Updated list
+                #caphs_care_types = ["Hospitals"  ]  # Updated list
                 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
                 
                 #load all caphs data and merge them into one df

@@ -85,7 +85,7 @@ def find_providers_in_radius(search_location, radius, care_type):
     if not care_type:
         care_type = "Hospital"
     if care_type == "ED":
-        care_type = "ED + Others"
+        care_type = "ED"
     print(care_type)
     provider_list = Facility.objects.filter(care_types__contains=[care_type]).prefetch_related("address")
     #provider_list = Facility.objects.all().prefetch_related("address")
@@ -96,7 +96,6 @@ def find_providers_in_radius(search_location, radius, care_type):
         if not address:
             print("no address", facility)
         provider_location_tuple = (address.latitude, address.longitude)
-        
         facility.facility_name = facility.facility_name.replace("'","")
 
         # Check for NaN or None lat/lng and skip invalid entries
@@ -108,7 +107,9 @@ def find_providers_in_radius(search_location, radius, care_type):
         except:
             print(f"Error calculating distance for facility: {facility.facility_name}")
             continue
-        
+        if "scripps" in facility.facility_name.lower():
+                print("got facility", facility)
+
         if provider_distance.km < radius:
             hai_metrics = HAIMetrics.objects.filter(facility_id=facility.id)
             if len(hai_metrics) > 0:
@@ -117,8 +118,7 @@ def find_providers_in_radius(search_location, radius, care_type):
             caphs_metrics  = CAPHSMetrics.objects.filter(facility=facility)
             print(facility.facility_id, facility.facility_name)
             print(caphs_metrics)
-            if "scripps" in facility.facility_name.lower():
-                print("got facility")
+            
             
             if len(caphs_metrics) > 0:
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}

@@ -25,6 +25,7 @@ import math
 from django.db.models import F
 from django.template.loader import render_to_string
 import numpy as np
+from django.db.models import Q
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -82,17 +83,16 @@ def find_providers_in_radius(search_location, radius, care_type):
     print("Search Location with care type: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
-    care_types = [care_type]
+    print(care_type)
     if not care_type:
-        care_types = ["Hospital"]
+        care_type = ["Hospital"]
+
     if care_type == "ED":
         #currently these are not consistently loading in pipeline 
         #so we keep both till its fixed
-        care_types = ["ED", "ED + Others"]
-    
-    print(care_type)
-    provider_list = Facility.objects.filter(care_types__contains=care_types).prefetch_related("address")
-    #provider_list = Facility.objects.all().prefetch_related("address")
+        provider_list = Facility.objects.filter(Q(care_types__contains=["ED"])| Q(care_types__contains=["ED + Others"]))
+    else:
+        provider_list = Facility.objects.filter(care_types__contains = [care_type]).prefetch_related("address")
 
     print("iterating through hits")
     for facility in provider_list:

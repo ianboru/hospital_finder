@@ -82,12 +82,16 @@ def find_providers_in_radius(search_location, radius, care_type):
     print("Search Location with care type: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
+    care_types = [care_type]
     if not care_type:
-        care_type = "Hospital"
+        care_types = ["Hospital"]
     if care_type == "ED":
-        care_type = "ED"
+        #currently these are not consistently loading in pipeline 
+        #so we keep both till its fixed
+        care_types = ["ED", "ED + Others"]
+    
     print(care_type)
-    provider_list = Facility.objects.filter(care_types__contains=[care_type]).prefetch_related("address")
+    provider_list = Facility.objects.filter(care_types__contains=care_types).prefetch_related("address")
     #provider_list = Facility.objects.all().prefetch_related("address")
 
     print("iterating through hits")

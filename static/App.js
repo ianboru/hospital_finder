@@ -16,6 +16,8 @@ function App() {
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
+  const [mapLoaded, setMapLoaded] = React.useState(null)
+
   let url = new URL(window.location)
 
   const initialSearchParam = url.searchParams.get("search")
@@ -55,6 +57,9 @@ function App() {
     setSearchTerm(e.target.value)
   } 
   
+  const onMapLoad = () => {
+    serMapLoaded(true)
+  }
   const onSearchSubmit = (newCenter=null, newRadius=null, careType=careType) => {
     let url = new URL(window.location.origin + window.location.pathname)
     url.searchParams.set("search", searchTerm)
@@ -102,17 +107,24 @@ function App() {
             <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
           </div>
         )}
-        <Map
-          placesData={placesData}
-          initialLocation={initialLocation}
-          setSelectedPlace={setSelectedPlace}
-          selectedPlace={selectedPlace}
-          metricQuantiles={metricQuantiles}
-          onSearchSubmit={onSearchSubmit}
-          setZoomRadius={setZoomRadius}
-          currentGPSLocation={currentGPSLocation}
-        />
-        <ColorLegend />
+        {
+          mapLoaded ? 
+            <div>
+                <Map
+                placesData={placesData}
+                initialLocation={initialLocation}
+                setSelectedPlace={setSelectedPlace}
+                selectedPlace={selectedPlace}
+                metricQuantiles={metricQuantiles}
+                onSearchSubmit={onSearchSubmit}
+                setZoomRadius={setZoomRadius}
+                currentGPSLocation={currentGPSLocation}
+              />
+              <ColorLegend />
+            </div> : 
+            <div style={{marginTop : 15, display : "flex", alignItems : "center"}}> Map Loading </div>
+        }
+        
       </div>
     </div>
     </div>

@@ -86,7 +86,6 @@ def find_providers_in_radius(search_location, radius, care_type):
     print("Search Location with care type: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
-    print(care_type)
     if not care_type:
         care_type = ["Hospital"]
 
@@ -114,19 +113,13 @@ def find_providers_in_radius(search_location, radius, care_type):
         except:
             print(f"Error calculating distance for facility: {facility.facility_name}")
             continue
-        if "scripps" in facility.facility_name.lower():
-                print("got facility", facility)
 
         if provider_distance.km < radius:
             hai_metrics = HAIMetrics.objects.filter(facility_id=facility.id)
             if len(hai_metrics) > 0:
                 hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
 
-            caphs_metrics  = CAPHSMetrics.objects.filter(facility=facility)
-            print(facility.facility_id, facility.facility_name)
-            print(caphs_metrics)
-            
-            
+            caphs_metrics  = CAPHSMetrics.objects.filter(facility=facility)        
             if len(caphs_metrics) > 0:
                 caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
             care_types_str = ', '.join(facility.care_types)
@@ -162,7 +155,6 @@ def find_providers_in_radius(search_location, radius, care_type):
                     cur_provider[key] = ''
             
             filtered_provider_list.append(cur_provider)
-    print(filtered_provider_list)
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
     return filtered_provider_list, provider_list
 

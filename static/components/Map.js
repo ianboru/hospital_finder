@@ -13,7 +13,7 @@ const Map = (props) => {
     const onSearchSubmit = props.onSearchSubmit 
     const setZoomRadius = props.setZoomRadius
     const currentGPSLocation = props.currentGPSLocation
-
+  
     const getMarkerColor = (place, metricQuantiles) => {
         const gray = "rgb(128,128,128)"
         if(!place){
@@ -98,6 +98,7 @@ const Map = (props) => {
     const [map, setMap] = React.useState(null)
 
     const onLoad = React.useCallback(function callback(map) {
+      props.onMapLoad()
       // This is just an example of getting and using the map instance!!! don't just blindly copy!
       map.setZoom(10)
       setMap(map)

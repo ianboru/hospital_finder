@@ -16,7 +16,6 @@ function App() {
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
 
   const [selectedPlace, setSelectedPlace] = React.useState(null)
-  const [mapLoaded, setMapLoaded] = React.useState(null)
 
   let url = new URL(window.location)
 
@@ -56,10 +55,7 @@ function App() {
   const onSearchInputChange = (e) => {
     setSearchTerm(e.target.value)
   } 
-  
-  const onMapLoad = () => {
-    serMapLoaded(true)
-  }
+
   const onSearchSubmit = (newCenter=null, newRadius=null, careType=careType) => {
     let url = new URL(window.location.origin + window.location.pathname)
     url.searchParams.set("search", searchTerm)
@@ -87,46 +83,39 @@ function App() {
     <div className="app">
       <HeaderInformation />
       <div className='main-app'>
-      <div className='left-container'>
-        <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
-        <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
-        <div>
+        <div className='left-container'>
+          <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
+          <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
           <div>
-            <PlaceResults 
-              placesData={placesData} 
-              selectedPlace={selectedPlace} 
-              setSelectedPlace={setSelectedPlace} 
-              selectedCareType={initialCareTypeParam}
-            />
+            <div>
+              <PlaceResults 
+                placesData={placesData} 
+                selectedPlace={selectedPlace} 
+                setSelectedPlace={setSelectedPlace} 
+                selectedCareType={initialCareTypeParam}
+              />
+            </div>
           </div>
         </div>
+        <div className='map-container'>
+          {selectedPlace && (
+            <div className='place-detail-overlay'>
+              <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
+            </div>
+          )}
+          <Map
+            placesData={placesData}
+            initialLocation={initialLocation}
+            setSelectedPlace={setSelectedPlace}
+            selectedPlace={selectedPlace}
+            metricQuantiles={metricQuantiles}
+            onSearchSubmit={onSearchSubmit}
+            setZoomRadius={setZoomRadius}
+            currentGPSLocation={currentGPSLocation}
+          />
+          <ColorLegend />
+        </div>
       </div>
-      <div className='map-container'>
-        {selectedPlace && (
-          <div className='place-detail-overlay'>
-            <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
-          </div>
-        )}
-        {
-          mapLoaded ? 
-            <div>
-                <Map
-                placesData={placesData}
-                initialLocation={initialLocation}
-                setSelectedPlace={setSelectedPlace}
-                selectedPlace={selectedPlace}
-                metricQuantiles={metricQuantiles}
-                onSearchSubmit={onSearchSubmit}
-                setZoomRadius={setZoomRadius}
-                currentGPSLocation={currentGPSLocation}
-              />
-              <ColorLegend />
-            </div> : 
-            <div style={{marginTop : 15, display : "flex", alignItems : "center"}}> Map Loading </div>
-        }
-        
-      </div>
-    </div>
     </div>
   );
 }

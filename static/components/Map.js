@@ -98,8 +98,7 @@ const Map = (props) => {
     const [map, setMap] = React.useState(null)
 
     const onLoad = React.useCallback(function callback(map) {
-      props.onMapLoad()
-      // This is just an example of getting and using the map instance!!! don't just blindly copy!
+      console.log("map finished loading")
       map.setZoom(10)
       setMap(map)
     }, [])

@@ -41,7 +41,7 @@ def calculate_metric_quantiles(metric_name):
     from django_pandas.io import read_frame
     import numpy as np
     import math
-    return 3, 2
+    #return 3, 2
     print(metric_name)
     if metric_name == "hai":
         all_metric_objects = HAIMetrics.objects.all()
@@ -50,7 +50,7 @@ def calculate_metric_quantiles(metric_name):
         all_metric_objects = CAPHSMetrics.objects.all()
 
     upper_quantile_percent = .9
-    lower_quantile_percent = .5
+    lower_quantile_percent = .75
     all_metric_values = []
     for object in all_metric_objects:
         if metric_name == "hai" and object.hai_metric_json["Infection Rating"] != None:
@@ -58,7 +58,10 @@ def calculate_metric_quantiles(metric_name):
         elif metric_name == "caphs":
             #temporary fix because cahps data is string not json
             if object.caphs_metric_json:
-                caphs_json = json.loads(object.caphs_metric_json)
+                if type(object.caphs_metric_json) == list:
+                    caphs_json = json.loads(object.caphs_metric_json[0])
+                else:
+                    caphs_json = json.loads(object.caphs_metric_json)
                 if "Summary star rating" in caphs_json:
                     if type(caphs_json["Summary star rating"]) != str and not math.isnan(caphs_json["Summary star rating"]):
                         all_metric_values.append(caphs_json["Summary star rating"])

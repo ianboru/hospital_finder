@@ -8,6 +8,8 @@
 <!--passing places data to be available in react-->
 {{ google_places_data | json_script:'google_places_data' }}
 {{ metric_quantiles | json_script:'metric_quantiles' }}
+{{ data_dictionary | json_script:'data_dictionary' }}
+
 <script type="module" src="{% static "App.js" %}"></script>
 <div id="root"></div>  
 {{ request.user.id|json_script:"user_id" }}

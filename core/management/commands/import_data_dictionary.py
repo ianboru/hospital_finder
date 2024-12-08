@@ -19,14 +19,14 @@ class Command(BaseCommand):
             data_dictionary_df = pd.read_csv(data_dictionary_path, low_memory=False, encoding='unicode_escape', skiprows=2)
  
             # List of columns to keep (only include the columns that map to your DataDictionaryModel)
-            columns_to_keep = ['CMS Term', 'Term', 'Source (File)', 'Care Type', 'Definition', 'Definition Confidence', 'Location in website']
+            columns_to_keep = ['CMS Term', 'Our Term', 'Source (File)', 'Care Type', 'Definition', 'Definition Confidence', 'Location in website']
 
             # Drop unwanted columns by keeping only those that are in `columns_to_keep`
             data_dictionary_df = data_dictionary_df[columns_to_keep]
 
             for index, row in data_dictionary_df.iterrows():
                 cms_term = row['CMS Term']
-                term = row['Term']
+                term = row['Our Term']
                 source_file = row.get('Source (File)', None)
                 care_types = row['Care Type'].split(',')
                 definition = row['Definition']

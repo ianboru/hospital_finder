@@ -151,6 +151,24 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             </>
             )
           }
+          {
+            selectedCareType.includes('Home Health') && ( //for outpatient facilites
+              <>
+            {
+                medianTimeTillDischarge ?
+                <div>
+                  <b>Median Arrival to Discharge: <span style={{color:"#fdcc0d"}}>{medianTimeTillDischarge}</span></b>
+                </div> : <></>
+            }
+            {
+              place['Left before being seen']  ?
+                <div>
+                  <b>Left before being seen: <span style={{color:"#fdcc0d"}}>{ place['Left before being seen'] }</span></b>
+                </div> : <></>
+            }
+            </>
+            )
+          }
         </div>
       )
       //how am i structuring the data from the backend so i can do lookup by name on the FE

@@ -1,6 +1,5 @@
 import React from 'react'
 import { getHCAHPSStars, getHaiEmoji } from '../utils';
-
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
 
@@ -60,9 +59,50 @@ const PlaceDetail = (props) => {
       return  `http://maps.google.com/maps?q=${url}`
     }
     console.log("current seelcted place", selectedPlace)
+
+    
     const googleMapsUrl = addressToUrl(selectedPlace.address[0])
+    const nonMetricKeys = [
+      "Facility ID", "Facility Name", "address", "Address", "caretype", "name","location", 
+      "City/Town", "ZIP Code", "Care Type", "Mean SIR", "Infection Rating", "Mean Compared to National"
+    ]
+    const detailMetrics = Object.keys(selectedPlace).filter( (key) => {
+        return(!nonMetricKeys.includes(key) && !detailedInfectionMetricsMap[key])
+    }).map((key)=>{
+      const dataDictionaryEntry = props.dataDictionary[key.toLowerCase()]
+      const metricValue = selectedPlace[key]
+      const useStars = dataDictionaryEntry && detailedExperienceMetricsMap[dataDictionaryEntry.cms_term] ? true : false
+
+      return (
+      <div>
+          <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
+            <span style={{cursor: "pointer"}} onClick={()=>{
+              props.setShownDefinition(key.toLowerCase())
+            }}>{dataDictionaryEntry ? '\u24D8' : ''}</span>
+            <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> 
+            {
+              useStars ? 
+              <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> :
+              <span style={{color: "gold"}}>{metricValue}</span> 
+            }
+          </div>
+      </div>
+      )
+    })
+    console.log("shiowing definition")
+    
+    console.log("detail ", detailMetrics)
     return(
-        <div style={{border : 2, borderColor : 'black', width : 400, marginRight : 10, marginLeft : 10, marginBottom: 15}}>
+        <div style={{
+          border : 2, 
+          borderColor : 'black', 
+          width : 400, 
+          marginRight : 10,
+          marginLeft : 10, 
+          marginBottom: 15,
+          zIndex : 50,
+         
+        }}>
             <div onClick={closePlaceDetail} style={{
               display : 'flex', 
               justifyContent : 'flex-end', 
@@ -88,7 +128,7 @@ const PlaceDetail = (props) => {
                 </div>
                 <hr style={{marginTop: "0px"}}/>
                 <div style={metricDivStyle}>
-                  {detailedExperienceMetricStars}
+                  {detailMetrics}
                 </div>
               </> : <></>
             }

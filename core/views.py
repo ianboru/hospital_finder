@@ -20,13 +20,14 @@ import pprint
 pd.set_option('display.max_columns', None)
 from core.models.facility import Facility, Address
 from core.models.facility_data import HAIMetrics, CAPHSMetrics
+from core.models.data_dictionary import DataDictionaryModel
 from django.db.models.fields.json import KeyTextTransform
 import math
 from django.db.models import F
 from django.template.loader import render_to_string
 import numpy as np
 from django.db.models import Q
-
+from django.forms.models import model_to_dict
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
@@ -209,8 +210,14 @@ def index(request, path=None):
     places_data = filtered_providers
     #print("final filtered providers", places_data)
     # Context for the front end
+    data_dictionary_terms = DataDictionaryModel.objects.all()
+    data_dictionary_lookup = {}
+    for term in data_dictionary_terms:
+        data_dictionary_lookup[term.cms_term.lower()] = model_to_dict(term) 
+
     context = {
         'google_places_data' : places_data,
+        "data_dictionary" : data_dictionary_lookup,
         'metric_quantiles' : {
             'hai_top_quantile' : hai_top_quantile,
             'hai_bottom_quantile' : hai_bottom_quantile,

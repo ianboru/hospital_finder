@@ -11,10 +11,10 @@ import CareTypeFilter from "./components/CareTypeFilter"
 import './App.css'
 
 function App() {
-  console.log("version 0.1.2")
+  console.log("version 0.9")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
-
+  const dataDictionary = JSON.parse(document.getElementById("data_dictionary").textContent)
   const [selectedPlace, setSelectedPlace] = React.useState(null)
 
   let url = new URL(window.location)
@@ -30,6 +30,9 @@ function App() {
 
   const [searchTerm, setSearchTerm] = React.useState(initialSearchParam ? initialSearchParam : "")
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius)
+  const [shownDefinition, setShownDefinition] = React.useState(null)
+  
+
   const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
@@ -46,6 +49,16 @@ function App() {
         lng: position.coords.longitude
       })
     })
+
+    //hide definition modal
+    window.addEventListener("mousedown", function(element) {
+      // Code to execute when the window is resized
+      console.log(element.target.classList)
+      if(element.target.classList[0] != "definition-info-popup"){
+        setShownDefinition(null)
+      }
+    });
+
   }, [])
 
 
@@ -79,6 +92,17 @@ function App() {
   console.log("App load places", placesData)
   console.log("initial map location", initialLocation)
 
+  console.log("definition to show", shownDefinition, dataDictionary[shownDefinition])
+  const definitionInfoPopUp = shownDefinition && dataDictionary[shownDefinition] ? (
+    <div className="definition-info-popup">
+        <h3>{dataDictionary[shownDefinition].term}</h3>
+        <div>{dataDictionary[shownDefinition].definition}</div>
+    </div>
+  ) : <></>
+
+  const detailContainerOpacity = shownDefinition ? "0%" : "30%"
+    
+
   return (
     <div className="app">
       <HeaderInformation />
@@ -87,20 +111,32 @@ function App() {
           <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
           <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
           <div>
-            <div>
-              <PlaceResults 
-                placesData={placesData} 
-                selectedPlace={selectedPlace} 
-                setSelectedPlace={setSelectedPlace} 
-                selectedCareType={initialCareTypeParam}
-              />
-            </div>
+            <PlaceResults 
+              placesData={placesData} 
+              selectedPlace={selectedPlace} 
+              setSelectedPlace={setSelectedPlace} 
+              selectedCareType={initialCareTypeParam}
+            />
           </div>
         </div>
         <div className='map-container'>
           {selectedPlace && (
-            <div className='place-detail-overlay'>
-              <PlaceDetail selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} />
+            <div 
+              className='place-detail-overlay'
+            >
+              {definitionInfoPopUp}
+              <PlaceDetail 
+                style={{
+                    backgroundColor : 'black',
+                    opacity : detailContainerOpacity
+                }}
+                selectedPlace={selectedPlace} 
+                setSelectedPlace={setSelectedPlace} 
+                setShownDefinition={setShownDefinition}
+                shownDefinition={shownDefinition}
+                dataDictionary={dataDictionary}
+              >
+              </PlaceDetail>
             </div>
           )}
           <Map
@@ -112,12 +148,14 @@ function App() {
             onSearchSubmit={onSearchSubmit}
             setZoomRadius={setZoomRadius}
             currentGPSLocation={currentGPSLocation}
-          />
+          >
+          </Map>
           <ColorLegend />
         </div>
       </div>
     </div>
   );
 }
+
 
 ReactDOM.render(<App />,document.getElementById("root"))

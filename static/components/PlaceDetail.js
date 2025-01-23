@@ -2,7 +2,9 @@ import React from 'react'
 import { getHCAHPSStars, getHaiEmoji } from '../utils';
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
-
+    const metricQuantiles = props.metricQuantiles
+    const selectedCareType = props.selectedCareType
+    const dataDictionary = props.dataDictionary
     // Map patient rating metrics to their respective labels
     const detailedExperienceMetricsMap = {
       "Staff responsiveness - star rating" : "Staff responsiveness",
@@ -14,19 +16,20 @@ const PlaceDetail = (props) => {
       "Patients who reported that staff definitely communicated about what to expect during and after the procedure" : "Communication",
     }
 
-    const detailedExperienceMetricStars = Object.keys(detailedExperienceMetricsMap).map((metricName)=>{
-      const metricValue = selectedPlace[metricName]
-      const metricLabel = detailedExperienceMetricsMap[metricName]
-      return(
-        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between",}}>
-          <b>{metricLabel}</b>
-          <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> 
-        </div>
-      )
-    })
-
     const closePlaceDetail = () => {
       props.setSelectedPlace(null)
+    }
+    const getQualitativeEmoji = (value) => {
+      switch(value) {
+        case "High":
+          // code block
+          return ":/";
+        case "Very High":
+          // code block
+          return "://";
+        default:
+          return ":)"
+      }
     }
     // Map infection rating metrics to their respective labels
     const detailedInfectionMetricsMap = {
@@ -63,30 +66,45 @@ const PlaceDetail = (props) => {
     
     const googleMapsUrl = addressToUrl(selectedPlace.address[0])
     const nonMetricKeys = [
-      "Facility ID", "Facility Name", "address", "Address", "caretype", "name","location", 
+      "id","Facility ID", "Facility Name", "address", "Address", "caretype", "name","location", 
       "City/Town", "ZIP Code", "Care Type", "Mean SIR", "Infection Rating", "Mean Compared to National"
     ]
+    //console.log(selectedPlace.name, dataDictionary[key.toLowerCase()]["Care Type"], selectedCareType)
     const detailMetrics = Object.keys(selectedPlace).filter( (key) => {
-        return(!nonMetricKeys.includes(key) && !detailedInfectionMetricsMap[key])
+      //console.log("data dict entry", key, dataDictionary[key.toLowerCase()])
+      const matchesSelectedCareType = dataDictionary[key.toLowerCase()] && dataDictionary[key.toLowerCase()]["Care Type"] == selectedCareType
+        return(
+          !nonMetricKeys.includes(key) && !detailedInfectionMetricsMap[key] && matchesSelectedCareType
+        )
     }).map((key)=>{
-      const dataDictionaryEntry = props.dataDictionary[key.toLowerCase()]
+      const dataDictionaryEntry = dataDictionary[key.toLowerCase()]
       const metricValue = selectedPlace[key]
-      const useStars = dataDictionaryEntry && detailedExperienceMetricsMap[dataDictionaryEntry.cms_term] ? true : false
-
+      const useStars = dataDictionaryEntry["unit"].includes("Stars")
+      const useEmojis = dataDictionaryEntry["unit"].includes("Emojis")
+      const qualitativeMetric = dataDictionaryEntry["unit"].includes("High")
+      const emojiContent = ":P"
+      if(useEmojis && qualitativeMetric){
+        emojiContent = getQualitativeEmoji(metricValue)
+      }
+      console.log("just change seomthing")
+      console.log("stars",useStars, useEmojis, selectedPlace[key], key, metricValue)
       return (
-      <div>
-          <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
-            <span style={{cursor: "pointer"}} onClick={()=>{
-              props.setShownDefinition(key.toLowerCase())
-            }}>{dataDictionaryEntry ? '\u24D8' : ''}</span>
-            <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> 
-            {
-              useStars ? 
-              <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> :
-              <span style={{color: "gold"}}>{metricValue}</span> 
-            }
-          </div>
-      </div>
+        <div>
+            <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
+              <span style={{cursor: "pointer"}} onClick={()=>{
+                props.setShownDefinition(key.toLowerCase())
+              }}>{dataDictionaryEntry ? '\u24D8' : ''}</span>
+              <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> 
+              {
+                useStars ? 
+                <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> :
+                <span style={{color: "gold"}}>
+                  {useEmojis ? emojiContent : ""}
+                  {metricValue}
+                </span> 
+              }
+            </div>
+        </div>
       )
     })
     console.log("shiowing definition")

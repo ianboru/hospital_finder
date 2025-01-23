@@ -38,50 +38,126 @@ gmaps = GoogleMapsClient(key='AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o')
 # Replace CSV loading with database queries below
 #summary_metrics = load_summary_metrics() #delete
 #provider_list = load_provider_list() #delete
-def calculate_metric_quantiles(metric_name):
-    from django_pandas.io import read_frame
-    import numpy as np
-    import math
-    #return 3, 2
-    print(metric_name)
-    if metric_name == "hai":
-        all_metric_objects = HAIMetrics.objects.all()
-    else:
-        print("got cahps")
-        all_metric_objects = CAPHSMetrics.objects.all()
-
+def calculate_HAI_metric_quantiles():
+    all_metric_objects = HAIMetrics.objects.all()
     upper_quantile_percent = .9
     lower_quantile_percent = .75
     all_metric_values = []
     for object in all_metric_objects:
-        if metric_name == "hai" and object.hai_metric_json["Infection Rating"] != None:
+        if object.hai_metric_json["Infection Rating"] != None:
             all_metric_values.append(object.hai_metric_json["Infection Rating"])
-        elif metric_name == "caphs":
-            #temporary fix because cahps data is string not json
-            if object.caphs_metric_json:
-                if type(object.caphs_metric_json) == list:
-                    caphs_json = json.loads(object.caphs_metric_json[0])
-                else:
-                    caphs_json = json.loads(object.caphs_metric_json)
-                if "Summary star rating" in caphs_json:
-                    if type(caphs_json["Summary star rating"]) != str and not math.isnan(caphs_json["Summary star rating"]):
-                        all_metric_values.append(caphs_json["Summary star rating"])
         else:
             continue
     if len(all_metric_values) > 0:
         top_quantile = np.quantile(all_metric_values,upper_quantile_percent)
         bottom_quantile = np.quantile(all_metric_values,lower_quantile_percent)
     else:
+        #if db not initialized with data?
         top_quantile = 3.5
         bottom_quantile = 2
     print(top_quantile, bottom_quantile)
 
     return top_quantile, bottom_quantile
 
-#comment out for first migration 
-hai_top_quantile, hai_bottom_quantile = calculate_metric_quantiles('hai')
-hcahps_top_quantile, hcahps_bottom_quantile = calculate_metric_quantiles('caphs')
+def calculate_CAHPS_metric_quantiles(data_dictionary):
+    from django_pandas.io import read_frame
+    import numpy as np
+    import math
 
+    print("got cahps")
+    all_metric_objects = CAPHSMetrics.objects.all()
+
+    upper_quantile_percent = .9
+    lower_quantile_percent = .3
+    all_metric_values = {}
+    all_metric_quantiles = {}
+    rejected_keys = []
+    print("DD keys", data_dictionary.keys())
+    for object in all_metric_objects:
+        
+        #temporary fix because cahps data is string not json
+        if object.caphs_metric_json:
+            if type(object.caphs_metric_json) == list:
+                caphs_json = json.loads(object.caphs_metric_json[0])
+            else:
+                caphs_json = json.loads(object.caphs_metric_json)
+
+            for key, value in caphs_json.items():
+                #print("cahps keys", key)
+                lower_key = key.lower()
+                if lower_key in data_dictionary:
+                    print(lower_key, data_dictionary[lower_key]['unit'])
+                if "minutes" not in key:
+                    if type(value) != str and not math.isnan(value):
+                        if key not in all_metric_values:
+                            print("constructing", key)
+                            all_metric_values[key] = []
+                        else:
+                            all_metric_values[key].append(value)
+                else:
+                    if key not in rejected_keys:
+                        rejected_keys.append(key)
+    print("rejected", rejected_keys)
+    for key, value in all_metric_values.items():
+        print(key, len(value))
+        if len(all_metric_values) > 0:
+            top_quantile = np.quantile(value,upper_quantile_percent)
+            bottom_quantile = np.quantile(value,lower_quantile_percent)
+        else:
+            top_quantile = 3.5
+            bottom_quantile = 2
+        all_metric_quantiles[key] = {
+            "top_quantile" : top_quantile,
+            "bottom_quantile" : bottom_quantile
+        }
+        print(top_quantile, bottom_quantile)
+    return all_metric_quantiles
+
+#comment out for first migration 
+data_dictionary_terms = DataDictionaryModel.objects.all()
+data_dictionary_lookup = {}
+for term in data_dictionary_terms:
+    data_dictionary_lookup[term.cms_term.lower()] = model_to_dict(term) 
+
+hai_top_quantile, hai_bottom_quantile = calculate_HAI_metric_quantiles()
+metric_quantiles = calculate_CAHPS_metric_quantiles(data_dictionary_lookup)
+metric_quantiles["hai"] = {"top_quantile" : hai_top_quantile, "bottom_quantile" : hai_bottom_quantile }
+print("HAI METRICS", metric_quantiles)
+
+def add_metrics_to_providers(filtered_provider_json):
+    providers_with_metrics = []
+    print("adding metrics")
+    for cur_provider in filtered_provider_json:
+        hai_metrics = HAIMetrics.objects.filter(facility_id=cur_provider['id'])
+        if len(hai_metrics) > 0:
+            hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
+
+        caphs_metrics  = CAPHSMetrics.objects.filter(facility=cur_provider['id'])        
+        if len(caphs_metrics) > 0:
+            caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
+
+        for key in hai_metrics:
+            cur_provider[key] = hai_metrics[key]
+            cur_value = cur_provider[key]
+
+            if type(cur_value) == dict:
+                if "Compared to National" in cur_value:
+                    cur_value = cur_value["Compared to National"]
+                else:
+                    continue
+            elif type(cur_value) != str and cur_value is not None and math.isnan(cur_value) :
+                cur_value = ""
+            else:
+                continue
+            cur_provider[key] = cur_value
+        
+        for key in caphs_metrics:
+            cur_provider[key] = caphs_metrics[key]
+            if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
+                cur_provider[key] = ''
+        providers_with_metrics.append(cur_provider)
+    return providers_with_metrics
+         
 def find_providers_in_radius(search_location, radius, care_type):
     search_location_tuple = (search_location[0], search_location[1])
     print("Search Location with care type: ", search_location, radius, care_type)
@@ -116,18 +192,12 @@ def find_providers_in_radius(search_location, radius, care_type):
             continue
 
         if provider_distance.km < radius:
-            hai_metrics = HAIMetrics.objects.filter(facility_id=facility.id)
-            if len(hai_metrics) > 0:
-                hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
-
-            caphs_metrics  = CAPHSMetrics.objects.filter(facility=facility)        
-            if len(caphs_metrics) > 0:
-                caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
             care_types_str = ', '.join(facility.care_types)
         
             cur_provider = {
                 "name": facility.facility_name,
-                "caretype": care_types_str
+                "caretype": care_types_str,
+                "id" : facility.id
             }
             if address:
                 cur_provider["location"] ={
@@ -135,25 +205,6 @@ def find_providers_in_radius(search_location, radius, care_type):
                     "longitude":  getattr(address,'longitude', None)
                 },
                 cur_provider["address"] = f"{address.street}, {address.city}, {address.zip}",
-            for key in hai_metrics:
-                cur_provider[key] = hai_metrics[key]
-                cur_value = cur_provider[key]
-
-                if type(cur_value) == dict:
-                    if "Compared to National" in cur_value:
-                        cur_value = cur_value["Compared to National"]
-                    else:
-                        continue
-                elif type(cur_value) != str and cur_value is not None and math.isnan(cur_value) :
-                    cur_value = ""
-                else:
-                    continue
-                cur_provider[key] = cur_value
-            
-            for key in caphs_metrics:
-                cur_provider[key] = caphs_metrics[key]
-                if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
-                    cur_provider[key] = ''
             
             filtered_provider_list.append(cur_provider)
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
@@ -178,7 +229,7 @@ def index(request, path=None):
     if not location_string or 'Na' in location_string:
         location_string = "32.7853263,-117.2407347"
     if not radius:
-        radius = 80
+        radius = 100
     split_location_string = location_string.strip().split(",")
     search_location = (float(split_location_string[0]), float(split_location_string[1]))
     print('Parsed Location: ', split_location_string)
@@ -186,44 +237,29 @@ def index(request, path=None):
     #replace the pandas dataframe here
     #provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
     filtered_providers, provider_list = find_providers_in_radius(search_location, radius, care_type)
+    filtered_providers = add_metrics_to_providers(filtered_providers)
     print("Search String: ", search_string)
-
-    print("HAI Metrics Quantiles")
-    print(f"Top Quantile: {hai_top_quantile}")
-    print(f"Bottom Quantile: {hai_bottom_quantile}")
-        
-    print("Summary Star Ratings Quantiles")
-    print(f"Top Quantile: {hcahps_top_quantile}")
-    print(f"Bottom Quantile: {hcahps_bottom_quantile}")
     
-    name_filtered_providers = []
+    providers_after_name_filter = []
     if search_string:
         # filter base on fuzzy match on facility name base on search string
         for provider in filtered_providers:
             if fuzz.partial_ratio(provider['name'].lower(), search_string) > search_match_threshold:
-                name_filtered_providers.append(provider)
+                providers_after_name_filter.append(provider)
                 
             if fuzz.partial_ratio(provider['address'][0].lower(), search_string) > search_match_threshold:
-                name_filtered_providers.append(provider)
-        filtered_providers = name_filtered_providers 
+                providers_after_name_filter.append(provider)
+        filtered_providers = providers_after_name_filter 
     
     places_data = filtered_providers
     #print("final filtered providers", places_data)
     # Context for the front end
-    data_dictionary_terms = DataDictionaryModel.objects.all()
-    data_dictionary_lookup = {}
-    for term in data_dictionary_terms:
-        data_dictionary_lookup[term.cms_term.lower()] = model_to_dict(term) 
-
+    
+    
     context = {
         'google_places_data' : places_data,
         "data_dictionary" : data_dictionary_lookup,
-        'metric_quantiles' : {
-            'hai_top_quantile' : hai_top_quantile,
-            'hai_bottom_quantile' : hai_bottom_quantile,
-            'hcahps_top_quantile' : hcahps_top_quantile,
-            'hcahps_bottom_quantile' : hcahps_bottom_quantile
-        }
+        'metric_quantiles' : metric_quantiles
     }
     
     return render(request, "index.html", context)

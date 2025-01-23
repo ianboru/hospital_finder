@@ -15,6 +15,7 @@ class DataDictionaryModel(TimeStamp):
     definition = models.TextField(blank=True, null=True)
     definition_confidence = models.TextField(blank=True, null=True)
     location_in_website = models.TextField(blank=True, null=True)
-    
+    unit = models.CharField(max_length=255,blank=True, null=True)
+    unit_features = models.CharField(max_length=255,blank=True, null=True)
     def __str__(self):
         return self.term 

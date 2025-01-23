@@ -95,13 +95,10 @@ function App() {
   console.log("definition to show", shownDefinition, dataDictionary[shownDefinition])
   const definitionInfoPopUp = shownDefinition && dataDictionary[shownDefinition] ? (
     <div className="definition-info-popup">
-        <h3>{dataDictionary[shownDefinition].term}</h3>
-        <div>{dataDictionary[shownDefinition].definition}</div>
+      <h3>{dataDictionary[shownDefinition].term}</h3>
+      <div>{dataDictionary[shownDefinition].definition}</div>
     </div>
-  ) : <></>
-
-  const detailContainerOpacity = shownDefinition ? "0%" : "30%"
-    
+  ) : <></>    
 
   return (
     <div className="app">
@@ -126,16 +123,14 @@ function App() {
             >
               {definitionInfoPopUp}
               <PlaceDetail 
-                style={{
-                    backgroundColor : 'black',
-                    opacity : detailContainerOpacity
-                }}
                 selectedPlace={selectedPlace} 
                 setSelectedPlace={setSelectedPlace} 
                 setShownDefinition={setShownDefinition}
                 shownDefinition={shownDefinition}
+                selectedCareType={initialCareTypeParam}
                 dataDictionary={dataDictionary}
-              >
+                metricQuantiles={metricQuantiles}
+              > 
               </PlaceDetail>
             </div>
           )}

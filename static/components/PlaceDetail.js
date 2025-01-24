@@ -98,7 +98,7 @@ const PlaceDetail = (props) => {
               {
                 useStars ? 
                 <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> :
-                <span style={{color: "gold"}}>
+                <span style={{color: "black"}}>
                   {useEmojis ? emojiContent : ""}
                   {metricValue}
                 </span> 

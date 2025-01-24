@@ -16,7 +16,7 @@ function App() {
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
   const dataDictionary = JSON.parse(document.getElementById("data_dictionary").textContent)
   const [selectedPlace, setSelectedPlace] = React.useState(null)
-
+  console.log("initial quantiles", metricQuantiles)
   let url = new URL(window.location)
 
   const initialSearchParam = url.searchParams.get("search")

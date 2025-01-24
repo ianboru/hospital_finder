@@ -85,8 +85,8 @@ def calculate_CAHPS_metric_quantiles(data_dictionary):
             for key, value in caphs_json.items():
                 #print("cahps keys", key)
                 lower_key = key.lower()
-                if lower_key in data_dictionary:
-                    print(lower_key, data_dictionary[lower_key]['unit'])
+                #if lower_key in data_dictionary:
+                    #print(lower_key, data_dictionary[lower_key]['unit'])
                 if "minutes" not in key:
                     if type(value) != str and not math.isnan(value):
                         if key not in all_metric_values:

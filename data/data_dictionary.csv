@@ -1,6 +1,6 @@
 outpatie,,,,,,,,,,,,,,,,
 ,,Data Dictionary ,,,,,,,,,,,,**Remove color formatting when done,,
-,,CMS Term,Our Term,Display Type,Unit,Category Values,Unit Features,Source (File),Care Type,Definition,Definition Confidence,Location in website,,,,
+,,CMS Term,Our Term,Display Type,Units,Category Values,Unit Features,Source (File),Care Type,Definition,Definition Confidence,Location in website,,,,
 ,,Nurse communication - star rating,Nurse Communication,Stars,Stars,,Yellow and Grey,https://drive.google.com/file/d/1u8Y5FvQxzYwi-d82NGVAw_mb8yEkMPyk/view?usp=share_link,Hospitals,"Do nurses treat patients with courtesy, listen carefully, and explain things simply?",From survey itself,,,,FALSE,Hospitals
 ,,Doctor communication - star rating,Doctor Communication,Stars,Stars,,Yellow and Grey,,Hospitals,"Do doctors treat patients with courtesy, listen carefully, and explain things simply?",From survey itself,,,,FALSE,Nursing Homes 
 ,,Staff responsiveness - star rating,Saff Responsiveness,Stars,Stars,,Yellow and Grey,,Hospitals,"Do hospital staff stay up to date on their paitent's care, work well together for their patients, and respond timely to patient needs?",From survey itself,,,,FALSE,Hospice

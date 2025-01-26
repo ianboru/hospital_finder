@@ -18,7 +18,7 @@ function App() {
   const [selectedPlace, setSelectedPlace] = React.useState(null)
   console.log("initial quantiles", metricQuantiles)
   let url = new URL(window.location)
-
+  console.log("initial dictionary", dataDictionary)
   const initialSearchParam = url.searchParams.get("search")
   const initialLocationParam = url.searchParams.get("location")
   const initialLocationSplit = initialLocationParam ? initialLocationParam.split(",") : []
@@ -92,7 +92,6 @@ function App() {
   console.log("App load places", placesData)
   console.log("initial map location", initialLocation)
 
-  console.log("definition to show", shownDefinition, dataDictionary[shownDefinition])
   const definitionInfoPopUp = shownDefinition && dataDictionary[shownDefinition] ? (
     <div className="definition-info-popup">
       <h3>{dataDictionary[shownDefinition].term}</h3>

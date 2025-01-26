@@ -79,9 +79,10 @@ const PlaceDetail = (props) => {
     }).map((key)=>{
       const dataDictionaryEntry = dataDictionary[key.toLowerCase()]
       const metricValue = selectedPlace[key]
-      const useStars = dataDictionaryEntry["unit"].includes("Stars")
-      const useEmojis = dataDictionaryEntry["unit"].includes("Emojis")
-      const qualitativeMetric = dataDictionaryEntry["unit"].includes("High")
+      console.log("detail metric list", dataDictionaryEntry, metricValue)
+      const useStars = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Stars")
+      const useEmojis = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Emojis")
+      const qualitativeMetric = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("High")
       const emojiContent = ":P"
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)

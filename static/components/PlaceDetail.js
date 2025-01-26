@@ -3,7 +3,8 @@ import { getHCAHPSStars, getHaiEmoji } from '../utils';
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
     const metricQuantiles = props.metricQuantiles
-    const selectedCareType = props.selectedCareType
+    let selectedCareType = props.selectedCareType
+    selectedCareType = selectedCareType||"Hospital"
     const dataDictionary = props.dataDictionary
     // Map patient rating metrics to their respective labels
     const detailedExperienceMetricsMap = {
@@ -61,7 +62,6 @@ const PlaceDetail = (props) => {
       const url = urlAddress.replace(/\ /g, '%20');
       return  `http://maps.google.com/maps?q=${url}`
     }
-    console.log("current seelcted place", selectedPlace)
 
     
     const googleMapsUrl = addressToUrl(selectedPlace.address[0])
@@ -71,15 +71,18 @@ const PlaceDetail = (props) => {
     ]
     //console.log(selectedPlace.name, dataDictionary[key.toLowerCase()]["Care Type"], selectedCareType)
     const detailMetrics = Object.keys(selectedPlace).filter( (key) => {
-      //console.log("data dict entry", key, dataDictionary[key.toLowerCase()])
-      const matchesSelectedCareType = dataDictionary[key.toLowerCase()] && dataDictionary[key.toLowerCase()]["Care Type"] == selectedCareType
+      console.log("pre filter data dict entry", key, dataDictionary[key.toLowerCase()])
+      console.log("selected care type", selectedCareType)
+
+      const careTypesString = dataDictionary[key.toLowerCase()] ? dataDictionary[key.toLowerCase()]["care_types"].join(",") : ""
+      const matchesSelectedCareType = dataDictionary[key.toLowerCase()] && careTypesString.includes(selectedCareType)
         return(
           !nonMetricKeys.includes(key) && !detailedInfectionMetricsMap[key] && matchesSelectedCareType
         )
     }).map((key)=>{
       const dataDictionaryEntry = dataDictionary[key.toLowerCase()]
       const metricValue = selectedPlace[key]
-      console.log("detail metric list", dataDictionaryEntry, metricValue)
+      console.log("detail dictionary entry", dataDictionaryEntry)
       const useStars = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Stars")
       const useEmojis = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Emojis")
       const qualitativeMetric = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("High")
@@ -87,8 +90,7 @@ const PlaceDetail = (props) => {
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)
       }
-      console.log("just change seomthing")
-      console.log("stars",useStars, useEmojis, selectedPlace[key], key, metricValue)
+      
       return (
         <div>
             <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>

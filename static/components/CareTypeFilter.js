@@ -23,7 +23,6 @@ const CareTypeFilter = (props) => {
         const careType = careTypes.find(value => value.id == careTypeId) 
         onSelectCareType(careType)
     }
-    console.log("filter selected", selectedCareTypeId, selectedCareType)
     return(
     <div className="dropdown-container">
         <span className="dropdown-label">Care Type |</span>

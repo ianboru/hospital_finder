@@ -73,7 +73,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             {
               place['Infection Rating'] && place['Infection Rating'] > 0 ?
                 <div>
-                  <b>Infection Rating: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Infection Rating'],3)}</span></b>
+                  <b>Infection Rating: <span >{getHaiEmoji(place['Infection Rating'],3)}</span></b>
                 </div> : <></>
             }
             </>
@@ -139,13 +139,13 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             {
                 medianTimeTillDischarge ?
                 <div>
-                  <b>Median Arrival to Discharge: <span style={{color:"#fdcc0d"}}>{medianTimeTillDischarge}</span></b>
+                  <b>Median Arrival to Discharge: <span >{medianTimeTillDischarge}</span></b>
                 </div> : <></>
             }
             {
               place['Left before being seen']  ?
                 <div>
-                  <b>Left before being seen: <span style={{color:"#fdcc0d"}}>{ place['Left before being seen'] }</span></b>
+                  <b>Left before being seen: <span >{ place['Left before being seen'] }</span></b>
                 </div> : <></>
             }
             </>
@@ -157,13 +157,13 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             {
                 medianTimeTillDischarge ?
                 <div>
-                  <b>Median Arrival to Discharge: <span style={{color:"#fdcc0d"}}>{medianTimeTillDischarge}</span></b>
+                  <b>Median Arrival to Discharge: <span >{medianTimeTillDischarge}</span></b>
                 </div> : <></>
             }
             {
               place['Left before being seen']  ?
                 <div>
-                  <b>Left before being seen: <span style={{color:"#fdcc0d"}}>{ place['Left before being seen'] }</span></b>
+                  <b>Left before being seen: <span >{ place['Left before being seen'] }</span></b>
                 </div> : <></>
             }
             </>

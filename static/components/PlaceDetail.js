@@ -48,7 +48,7 @@ const PlaceDetail = (props) => {
       return(
         <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
           <b>{metricLabel}</b> 
-          <span style={{color: "gold"}}>{getHaiEmoji(metricValue,2)}</span> 
+          <span style={{color: "  "}}>{metricValue ? getHaiEmoji(metricValue,2) : "N/A"}</span> 
         </div>
       )
     })
@@ -86,6 +86,7 @@ const PlaceDetail = (props) => {
       const useStars = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Stars")
       const useEmojis = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Emojis")
       const qualitativeMetric = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("High")
+      const unitSuffix = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"] == "Minutes" ? "min" : ""
       const emojiContent = ":P"
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)
@@ -100,10 +101,10 @@ const PlaceDetail = (props) => {
               <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> 
               {
                 useStars ? 
-                <span style={{color: "gold"}}>{getHCAHPSStars(metricValue)}</span> :
+                <span style={{color: "gold"}}>{metricValue ? getHCAHPSStars(metricValue) : "N/A"}</span> :
                 <span style={{color: "black"}}>
                   {useEmojis ? emojiContent : ""}
-                  {metricValue}
+                  {metricValue}{unitSuffix}
                 </span> 
               }
             </div>

@@ -63,6 +63,7 @@ function App() {
 
 
   const onSelectCareType = (careType) => {
+    console.log("selected caretype", careType)
     onSearchSubmit(null,null,careType)
   }
   const onSearchInputChange = (e) => {

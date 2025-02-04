@@ -34,7 +34,7 @@ const PlaceDetail = (props) => {
     }
     // Map infection rating metrics to their respective labels
     const detailedInfectionMetricsMap = {
-      "Central Line Associated Bloodstream Infection" : "CLBAI",
+      "Central Line Associated Bloodstream Infection" : "CLABSI",
       "Catheter Associated Urinary Tract Infections" : "CAUTI",
       "SSI - Abdominal Hysterectomy" : "SSI Abdominal Hysterectomy",
       "SSI - Colon Surgery" : "SSI Colon Surgery",
@@ -71,8 +71,6 @@ const PlaceDetail = (props) => {
     ]
     //console.log(selectedPlace.name, dataDictionary[key.toLowerCase()]["Care Type"], selectedCareType)
     const detailMetrics = Object.keys(selectedPlace).filter( (key) => {
-      console.log("pre filter data dict entry", key, dataDictionary[key.toLowerCase()])
-      console.log("selected care type", selectedCareType)
 
       const careTypesString = dataDictionary[key.toLowerCase()] ? dataDictionary[key.toLowerCase()]["care_types"].join(",") : ""
       const matchesSelectedCareType = dataDictionary[key.toLowerCase()] && careTypesString.includes(selectedCareType)
@@ -81,30 +79,33 @@ const PlaceDetail = (props) => {
         )
     }).map((key)=>{
       const dataDictionaryEntry = dataDictionary[key.toLowerCase()]
-      const metricValue = selectedPlace[key]
-      console.log("detail dictionary entry", dataDictionaryEntry)
-      const useStars = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Stars")
+      let metricValue = selectedPlace[key]
+      if(metricValue == "N"){metricValue = "No"}if(metricValue == "Y"){metricValue = "Yes"}
+      const useStars = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Stars") && metricValue <= 5
       const useEmojis = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Emojis")
       const qualitativeMetric = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("High")
-      const unitSuffix = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"] == "Minutes" ? "min" : ""
+      const unitSuffix = dataDictionaryEntry["unit"] 
+        && dataDictionaryEntry["unit"].includes("Minutes") ? " min" : 
+           dataDictionaryEntry["unit"].includes("Percent") ? "%" : "" 
       const emojiContent = ":P"
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)
       }
-      
+      console.log("detail dictionary entry", metricValue,dataDictionaryEntry, key, useStars, useEmojis, qualitativeMetric)
+
       return (
         <div>
-            <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
-              <span style={{cursor: "pointer"}} onClick={()=>{
+            <div style={{marginTop : 5, marginBottom: 5, display: "flex",justifyContent: "space-around"}}>
+              <span style={{cursor: "pointer",}} onClick={()=>{
                 props.setShownDefinition(key.toLowerCase())
               }}>{dataDictionaryEntry ? '\u24D8' : ''}</span>
-              <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> 
+              <span style={{marginLeft : "10px", marginTop : "auto", marginBottom : "auto"}}><b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> </span>
               {
                 useStars ? 
-                <span style={{color: "gold"}}>{metricValue ? getHCAHPSStars(metricValue) : "N/A"}</span> :
-                <span style={{color: "black"}}>
+                <span style={{color: "gold", marginLeft : "auto"}}>{metricValue ? getHCAHPSStars(metricValue) : "N/A"}</span> :
+                <span style={{color: "black", marginLeft : "auto"}}>
                   {useEmojis ? emojiContent : ""}
-                  {metricValue}{unitSuffix}
+                  {metricValue}{metricValue.hasOwnProperty("includes") && !metricValue.includes("Not") && unitSuffix}
                 </span> 
               }
             </div>
@@ -142,11 +143,11 @@ const PlaceDetail = (props) => {
             <div>{selectedPlace.address}</div>
             <a href={googleMapsUrl} target="_blank">view on Google Maps</a>
             {
-              selectedPlace['Summary star rating'] ?
+              detailMetrics && Object.keys(detailMetrics).length > 0 ?
               <>
                 <div style={ratingDivStyle}>
                   <b>Patient Rating:</b>
-                  <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary star rating'])}</span>
+                  <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(selectedPlace['Summary star rating']||selectedCareType['Overall Rating'])}</span>
                 </div>
                 <hr style={{marginTop: "0px"}}/>
                 <div style={metricDivStyle}>
@@ -155,7 +156,7 @@ const PlaceDetail = (props) => {
               </> : <></>
             }
             {
-              selectedPlace['Infection Rating'] ?
+              selectedPlace['Infection Rating'] && ["Hospital", "ED"].includes(selectedCareType)?
               <>
                 <div style={ratingDivStyle}>
                   <b>Infection Rating:</b> 

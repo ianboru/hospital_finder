@@ -13,7 +13,7 @@ const CareTypeFilter = (props) => {
         { 'id': 4, 'name': 'Outpatient' },
         { 'id': 5, 'name': 'Hospice' },
         { 'id': 8, 'name': 'Home Health' },
-        { 'id': 8, 'name': 'Nursing Homes' }
+        { 'id': 9, 'name': 'Nursing Homes' }
     ]
     const selectedCareTypeId = careTypes.find(el =>
         el["name"] === selectedCareType

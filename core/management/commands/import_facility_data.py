@@ -69,9 +69,13 @@ class Command(BaseCommand):
             #print(ccn_facility_df[facility_id])
             facility_id = row[facility_id_column]
             current_facility = Facility.objects.filter(facility_id=facility_id).first()
+            if "55008" in facility_id:
+                print(facility_id, current_facility, row)
             #print("filtered", Facility.objects.filter(facility_id=facility_id).exists())
             if current_facility:
                 # if one facility has more than one care type we want to add it to the care types list 
+                if "55008" in facility_id:
+                    print(facility_id, current_facility.care_types, current_facility.address)
                 if care_type not in current_facility.care_types:
                     current_facility = Facility.objects.filter(facility_id=facility_id).first()
                     current_facility.care_types.append(care_type)
@@ -455,16 +459,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         run_start_of_pipeline = True
-        run_load_ccn_data = False
-        run_load_hai_data = True
+        run_load_ccn_data = True
+        run_load_hai_data = False
         run_load_caphs_data = True
-        run_load_lat_long_data = True 
+        run_load_lat_long_data = False 
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
 
         if run_start_of_pipeline == True:
             if run_load_ccn_data == True:
-                ccn_care_types = [ "Home Health", "Hospice", "Hospital", "Outpatient"]#"ED",
+                ccn_care_types = ["Nursing Homes"] #[ "Home Health", "Hospice", "Hospital", "Outpatient"]#"ED",
                 for care_type in ccn_care_types:
                     print('loading ccn care_type', care_type)
                     self.load_ccn_data_to_facility_model(export_path, care_type)

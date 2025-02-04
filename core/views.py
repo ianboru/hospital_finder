@@ -72,7 +72,6 @@ def calculate_CAHPS_metric_quantiles(data_dictionary):
     all_metric_values = {}
     all_metric_quantiles = {}
     rejected_keys = []
-    print("DD keys", data_dictionary.keys())
     for object in all_metric_objects:
         
         #temporary fix because cahps data is string not json
@@ -134,6 +133,15 @@ def add_metrics_to_providers(filtered_provider_json):
 
         caphs_metrics  = CAPHSMetrics.objects.filter(facility=cur_provider['id'])        
         if len(caphs_metrics) > 0:
+            print("BEFORE",caphs_metrics[0].caphs_metric_json, type(caphs_metrics[0].caphs_metric_json))
+            if type(caphs_metrics[0].caphs_metric_json) == list:
+                #fix exceptions from old data load
+                caphs_metrics[0].caphs_metric_json = str(caphs_metrics[0].caphs_metric_json)
+                caphs_metrics[0].caphs_metric_json = caphs_metrics[0].caphs_metric_json.replace("['","") 
+                caphs_metrics[0].caphs_metric_json = caphs_metrics[0].caphs_metric_json.replace("\\","") 
+                caphs_metrics[0].caphs_metric_json = caphs_metrics[0].caphs_metric_json.replace("']","") 
+            print(caphs_metrics[0].caphs_metric_json, type(caphs_metrics[0].caphs_metric_json))
+
             caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
 
         for key in hai_metrics:
@@ -190,7 +198,8 @@ def find_providers_in_radius(search_location, radius, care_type):
         except:
             print(f"Error calculating distance for facility: {facility.facility_name}")
             continue
-
+        if "scripps" in facility.facility_name.lower():
+            print(facility.facility_name, provider_distance.km )
         if provider_distance.km < radius:
             care_types_str = ', '.join(facility.care_types)
         
@@ -229,7 +238,7 @@ def index(request, path=None):
     if not location_string or 'Na' in location_string:
         location_string = "32.7853263,-117.2407347"
     if not radius:
-        radius = 100
+        radius = 150
     split_location_string = location_string.strip().split(",")
     search_location = (float(split_location_string[0]), float(split_location_string[1]))
     print('Parsed Location: ', split_location_string)

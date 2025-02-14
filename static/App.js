@@ -90,7 +90,6 @@ function App() {
     flexDirection: 'column'
   }
   console.log("initial care type", initialCareType)
-  console.log("App load places", placesData)
   console.log("initial map location", initialLocation)
 
   const definitionInfoPopUp = shownDefinition && dataDictionary[shownDefinition] ? (

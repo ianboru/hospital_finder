@@ -69,13 +69,14 @@ class Command(BaseCommand):
             #print(ccn_facility_df[facility_id])
             facility_id = row[facility_id_column]
             current_facility = Facility.objects.filter(facility_id=facility_id).first()
-            if "55008" in facility_id:
+            if "59749" in facility_id:
                 print(facility_id, current_facility, row)
             #print("filtered", Facility.objects.filter(facility_id=facility_id).exists())
             if current_facility:
                 # if one facility has more than one care type we want to add it to the care types list 
-                if "55008" in facility_id:
+                if "59749" in facility_id:
                     print(facility_id, current_facility.care_types, current_facility.address)
+                    print(row)
                 if care_type not in current_facility.care_types:
                     current_facility = Facility.objects.filter(facility_id=facility_id).first()
                     current_facility.care_types.append(care_type)
@@ -206,6 +207,10 @@ class Command(BaseCommand):
             measure_columns_by_care_type = {
                 "Home Health" : [
                     "HHCAHPS Survey Summary Star Rating",
+                    "Star Rating for how patients rated overall care from agency",
+                    "Star Rating for health team gave care in a professional way",
+                    "Star Rating for health team communicated well with them",
+                    "Star Rating team discussed medicines, pain, and home safety"
                 ],
                 "Outpatient Ambulatory Services" : [
                     "Patients' rating of the facility linear mean score",
@@ -459,7 +464,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         run_start_of_pipeline = True
-        run_load_ccn_data = True
+        run_load_ccn_data = False
         run_load_hai_data = False
         run_load_caphs_data = True
         run_load_lat_long_data = False 
@@ -479,7 +484,7 @@ class Command(BaseCommand):
                 self.load_hai_data_to_facility_model(export_path)
             
             if run_load_caphs_data == True:
-                caphs_care_types = ["ED + Others", "Outpatient Ambulatory Services","ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]  # Updated list
+                caphs_care_types = ["Home Health"]#["ED + Others", "Outpatient Ambulatory Services","ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]  # Updated list
                 #caphs_care_types = ["Hospitals"  ]  # Updated list
                 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
                 

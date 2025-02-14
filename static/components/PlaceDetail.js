@@ -45,11 +45,19 @@ const PlaceDetail = (props) => {
     const detailedInfectionMetricStars = Object.keys(detailedInfectionMetricsMap).map((metricName)=>{
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
+      const dataDictionaryEntry = dataDictionary[metricName.toLowerCase()]
+      console.log("infection metric", metricName.toLowerCase())
       return(
-        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-between"}}>
-          <b>{metricLabel}</b> 
-          <span style={{color: "  "}}>{metricValue ? getHaiEmoji(metricValue,2) : "N/A"}</span> 
-        </div>
+        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-around"}}>
+          <span style={{cursor: "pointer",}} onClick={
+            ()=>{
+              props.setShownDefinition(metricName.toLowerCase())
+            }}
+          >{dataDictionaryEntry ? '\u24D8' : ''}</span>
+          
+          <b style={{marginRight : 'auto', marginLeft : "5px", marginTop : "auto", marginBottom : "auto"}}>{metricLabel}</b> 
+          <span style={{marginLeft : 'auto', color: "  "}}>{metricValue ? getHaiEmoji(metricValue,2) : "N/A"}</span> 
+        </div>  
       )
     })
 
@@ -57,7 +65,6 @@ const PlaceDetail = (props) => {
     const ratingDivStyle = {display: "flex", justifyContent: "space-between", marginTop: "1em"}
 
     const addressToUrl = (address) => {
-      console.log("url convert",address)
       const urlAddress = address.replace(/\,/g, '');
       const url = urlAddress.replace(/\ /g, '%20');
       return  `http://maps.google.com/maps?q=${url}`
@@ -91,7 +98,6 @@ const PlaceDetail = (props) => {
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)
       }
-      console.log("detail dictionary entry", metricValue,dataDictionaryEntry, key, useStars, useEmojis, qualitativeMetric)
 
       return (
         <div>
@@ -103,7 +109,7 @@ const PlaceDetail = (props) => {
               {
                 useStars ? 
                 <span style={{color: "gold", marginLeft : "auto"}}>{metricValue ? getHCAHPSStars(metricValue) : "N/A"}</span> :
-                <span style={{color: "black", marginLeft : "auto"}}>
+                <span style={{color: "black", marginLeft : "auto", marginTop : "auto", marginBottom : "auto"}}>
                   {useEmojis ? emojiContent : ""}
                   {metricValue}{metricValue.hasOwnProperty("includes") && !metricValue.includes("Not") && unitSuffix}
                 </span> 
@@ -112,9 +118,7 @@ const PlaceDetail = (props) => {
         </div>
       )
     })
-    console.log("shiowing definition")
     
-    console.log("detail ", detailMetrics)
     return(
         <div style={{
           border : 2, 

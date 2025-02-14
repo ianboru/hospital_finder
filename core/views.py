@@ -115,6 +115,7 @@ def calculate_CAHPS_metric_quantiles(data_dictionary):
 #comment out for first migration 
 data_dictionary_terms = DataDictionaryModel.objects.all()
 data_dictionary_lookup = {}
+print("initial dictionary")
 for term in data_dictionary_terms:
     data_dictionary_lookup[term.cms_term.lower()] = model_to_dict(term) 
 
@@ -122,6 +123,14 @@ hai_top_quantile, hai_bottom_quantile = calculate_HAI_metric_quantiles()
 metric_quantiles = calculate_CAHPS_metric_quantiles(data_dictionary_lookup)
 metric_quantiles["hai"] = {"top_quantile" : hai_top_quantile, "bottom_quantile" : hai_bottom_quantile }
 print("HAI METRICS", metric_quantiles)
+def sanitize_json_list(json_list):
+    if type(json_list) == list:
+        #fix exceptions from old data load
+        json_list = str(json_list)
+        json_list = json_list.replace("['","") 
+        json_list = json_list.replace("\\","") 
+        json_list = json_list.caphs_metric_json.replace("']","") 
+    return json.loads(json_list) if json_list else {}
 
 def add_metrics_to_providers(filtered_provider_json):
     providers_with_metrics = []
@@ -131,19 +140,22 @@ def add_metrics_to_providers(filtered_provider_json):
         if len(hai_metrics) > 0:
             hai_metrics = hai_metrics[0].hai_metric_json if hai_metrics[0] else {}
 
-        caphs_metrics  = CAPHSMetrics.objects.filter(facility=cur_provider['id'])        
+        caphs_metrics  = CAPHSMetrics.objects.filter(facility=cur_provider['id'])   
+             
         if len(caphs_metrics) > 0:
-            print("BEFORE",caphs_metrics[0].caphs_metric_json, type(caphs_metrics[0].caphs_metric_json))
-            if type(caphs_metrics[0].caphs_metric_json) == list:
-                #fix exceptions from old data load
-                caphs_metrics[0].caphs_metric_json = str(caphs_metrics[0].caphs_metric_json)
-                caphs_metrics[0].caphs_metric_json = caphs_metrics[0].caphs_metric_json.replace("['","") 
-                caphs_metrics[0].caphs_metric_json = caphs_metrics[0].caphs_metric_json.replace("\\","") 
-                caphs_metrics[0].caphs_metric_json = caphs_metrics[0].caphs_metric_json.replace("']","") 
-            print(caphs_metrics[0].caphs_metric_json, type(caphs_metrics[0].caphs_metric_json))
+            cur_cahps_metrics_json = sanitize_json_list(caphs_metrics[0].caphs_metric_json)
 
-            caphs_metrics = json.loads(caphs_metrics[0].caphs_metric_json) if caphs_metrics[0] else {}
-
+            if len(caphs_metrics) == 2:
+                
+                second_cahps_metrics_json = sanitize_json_list(caphs_metrics[1].caphs_metric_json)
+        
+                #for duplicates (until i clean up)
+                if len(cur_cahps_metrics_json.keys()) < len(second_cahps_metrics_json.keys()):
+                    cur_cahps_metrics_json = second_cahps_metrics_json
+                if "merid" in cur_provider["name"].lower():
+                    print("found a second", caphs_metrics.values())
+                    print(len(cur_cahps_metrics_json.keys()), len(second_cahps_metrics_json.keys()))
+                    print(cur_cahps_metrics_json)
         for key in hai_metrics:
             cur_provider[key] = hai_metrics[key]
             cur_value = cur_provider[key]
@@ -159,8 +171,8 @@ def add_metrics_to_providers(filtered_provider_json):
                 continue
             cur_provider[key] = cur_value
         
-        for key in caphs_metrics:
-            cur_provider[key] = caphs_metrics[key]
+        for key in cur_cahps_metrics_json:
+            cur_provider[key] = cur_cahps_metrics_json[key]
             if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
                 cur_provider[key] = ''
         providers_with_metrics.append(cur_provider)

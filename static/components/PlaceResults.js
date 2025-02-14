@@ -67,7 +67,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             {
               place['Summary star rating'] && place['Summary star rating'] > 0 ?
                 <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d", marginLeft:"auto"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
                 </div> : <></>
             }
             {
@@ -155,15 +155,15 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             selectedCareType.includes('Home Health') && ( //for outpatient facilites
               <>
             {
-                medianTimeTillDischarge ?
+                place["Star Rating for how patients rated overall care from agency"] ?
                 <div>
-                  <b>Median Arrival to Discharge: <span >{medianTimeTillDischarge}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d", marginLeft:"auto"}}>{getHCAHPSStars(place["Star Rating for how patients rated overall care from agency"])}</span></b>
                 </div> : <></>
             }
             {
-              place['Left before being seen']  ?
+              place["Star Rating for health team communicated well with them"]  ?
                 <div>
-                  <b>Left before being seen: <span >{ place['Left before being seen'] }</span></b>
+                  <b>Provider Communication: <span style={{color:"#fdcc0d", marginLeft:"auto"}}>{ getHCAHPSStars(place["Star Rating for health team communicated well with them"]) }</span></b>
                 </div> : <></>
             }
             </>

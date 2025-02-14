@@ -16,8 +16,10 @@ const getHaiEmoji = (starCount, midPoint) => {
     }
 }
 const getHCAHPSStars = (starCount, maxCount=5) => {
-    if (starCount === null){
-        // TODO: Handle null values
+    console.log(starCount)
+    if (starCount === null||starCount == 'Not Available'){
+        
+        return "N/A"
     }
     return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
 }

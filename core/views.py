@@ -156,6 +156,11 @@ def add_metrics_to_providers(filtered_provider_json):
                     print("found a second", caphs_metrics.values())
                     print(len(cur_cahps_metrics_json.keys()), len(second_cahps_metrics_json.keys()))
                     print(cur_cahps_metrics_json)
+            for key in cur_cahps_metrics_json:
+                cur_provider[key] = cur_cahps_metrics_json[key]
+                if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
+                    cur_provider[key] = ''
+
         for key in hai_metrics:
             cur_provider[key] = hai_metrics[key]
             cur_value = cur_provider[key]
@@ -171,10 +176,7 @@ def add_metrics_to_providers(filtered_provider_json):
                 continue
             cur_provider[key] = cur_value
         
-        for key in cur_cahps_metrics_json:
-            cur_provider[key] = cur_cahps_metrics_json[key]
-            if type(cur_provider[key]) != str and cur_provider[key] is not None and math.isnan(cur_provider[key]):
-                cur_provider[key] = ''
+       
         providers_with_metrics.append(cur_provider)
     return providers_with_metrics
          

@@ -9,6 +9,7 @@ import HeaderInformation from './components/HeaderInformation'
 import Map from "./components/Map"
 import CareTypeFilter from "./components/CareTypeFilter"
 import './App.css'
+import StartingModal from "./components/StartingModal";
 
 function App() {
   console.log("version 0.9")
@@ -34,6 +35,7 @@ function App() {
   
 
   const [currentGPSLocation, setCurrentGPSLocation] = React.useState(null)
+
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition((position)=>{
       console.log("updating current position", position.coords, initialLocation)
@@ -103,48 +105,48 @@ function App() {
     <div className="app">
       <HeaderInformation />
       <div className='main-app'>
-        <div className='left-container'>
-          <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
-          <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
-          <div>
-            <PlaceResults 
-              placesData={placesData} 
-              selectedPlace={selectedPlace} 
-              setSelectedPlace={setSelectedPlace} 
-              selectedCareType={initialCareTypeParam}
-            />
-          </div>
-        </div>
-        <div className='map-container'>
-          {selectedPlace && (
-            <div 
-              className='place-detail-overlay'
-            >
-              {definitionInfoPopUp}
-              <PlaceDetail 
+          <div className='left-container'>
+            <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
+            <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
+            <div>
+              <PlaceResults 
+                placesData={placesData} 
                 selectedPlace={selectedPlace} 
                 setSelectedPlace={setSelectedPlace} 
-                setShownDefinition={setShownDefinition}
-                shownDefinition={shownDefinition}
                 selectedCareType={initialCareTypeParam}
-                dataDictionary={dataDictionary}
-                metricQuantiles={metricQuantiles}
-              > 
-              </PlaceDetail>
+              />
             </div>
-          )}
-          <Map
-            placesData={placesData}
-            initialLocation={initialLocation}
-            setSelectedPlace={setSelectedPlace}
-            selectedPlace={selectedPlace}
-            metricQuantiles={metricQuantiles}
-            onSearchSubmit={onSearchSubmit}
-            setZoomRadius={setZoomRadius}
-            currentGPSLocation={currentGPSLocation}
-          >
-          </Map>
-          <ColorLegend />
+          </div>
+          <div className='map-container'>
+            {selectedPlace && (
+              <div 
+                className='place-detail-overlay'
+              >
+                {definitionInfoPopUp}
+                <PlaceDetail 
+                  selectedPlace={selectedPlace} 
+                  setSelectedPlace={setSelectedPlace} 
+                  setShownDefinition={setShownDefinition}
+                  shownDefinition={shownDefinition}
+                  selectedCareType={initialCareTypeParam}
+                  dataDictionary={dataDictionary}
+                  metricQuantiles={metricQuantiles}
+                > 
+                </PlaceDetail>
+              </div>
+            )}
+            <Map
+              placesData={placesData}
+              initialLocation={initialLocation}
+              setSelectedPlace={setSelectedPlace}
+              selectedPlace={selectedPlace}
+              metricQuantiles={metricQuantiles}
+              onSearchSubmit={onSearchSubmit}
+              setZoomRadius={setZoomRadius}
+              currentGPSLocation={currentGPSLocation}
+            >
+            </Map>
+            <ColorLegend />
         </div>
       </div>
     </div>

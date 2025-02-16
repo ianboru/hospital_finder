@@ -83,9 +83,9 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             selectedCareType.includes('Outpatient') && ( //for outpatient facilites
               <>
             {
-              place['Summary star rating'] && place['Summary star rating'] > 0 ?
+              place["Patients' rating of the facility linear mean score"] ?
                 <div>
-                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Summary star rating'],5)}</span></b>
+                  <b>Patient Rating: <span style={{color:"#fdcc0d"}}>{place["Patients' rating of the facility linear mean score"]}</span></b>
                 </div> : <></>
             }
             {

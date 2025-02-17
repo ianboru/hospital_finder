@@ -464,7 +464,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         run_start_of_pipeline = True
-        run_load_ccn_data = False
+        run_load_ccn_data = True
         run_load_hai_data = False
         run_load_caphs_data = True
         run_load_lat_long_data = False 
@@ -473,7 +473,7 @@ class Command(BaseCommand):
 
         if run_start_of_pipeline == True:
             if run_load_ccn_data == True:
-                ccn_care_types = ["Nursing Homes"] #[ "Home Health", "Hospice", "Hospital", "Outpatient"]#"ED",
+                ccn_care_types = ["Nursing Homes",  "Home Health", "Hospice", "Outpatient"]#"ED",
                 for care_type in ccn_care_types:
                     print('loading ccn care_type', care_type)
                     self.load_ccn_data_to_facility_model(export_path, care_type)
@@ -484,7 +484,7 @@ class Command(BaseCommand):
                 self.load_hai_data_to_facility_model(export_path)
             
             if run_load_caphs_data == True:
-                caphs_care_types = ["Home Health"]#["ED + Others", "Outpatient Ambulatory Services","ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]  # Updated list
+                caphs_care_types = ["Home Health", "ED + Others", "Outpatient Ambulatory Services", "Hospice", "Nursing Homes"]  # Updated list
                 #caphs_care_types = ["Hospitals"  ]  # Updated list
                 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
                 

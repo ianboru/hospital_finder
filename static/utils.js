@@ -1,7 +1,12 @@
 import React from 'react';
-
 const filledStarUnicode = "\u2605"
-const empyStarUnicode = "\u2606"
+
+const addressToUrl = (address) => {
+    const urlAddress = address.replace(/\,/g, '');
+    const url = urlAddress.replace(/\ /g, '%20');
+    return  `http://maps.google.com/maps?q=${url}`
+}
+  
 const getHaiEmoji = (starCount, midPoint) => {
     if(!starCount){
         return ""
@@ -18,10 +23,14 @@ const getHaiEmoji = (starCount, midPoint) => {
 const getHCAHPSStars = (starCount, maxCount=5) => {
     console.log(starCount)
     if (starCount === null||starCount == 'Not Available'){
-        
         return "N/A"
     }
-    return filledStarUnicode.repeat(starCount) + empyStarUnicode.repeat(maxCount - starCount)
+    return (
+        <span>
+            <span style={{color : "gold"}}>{filledStarUnicode.repeat(starCount)}</span>
+            <span style={{color : "lightgray"}}>{filledStarUnicode.repeat(maxCount - starCount)}</span>
+        </span>
+    )
 }
 
 const scrollToPlaceResult = (id) => {
@@ -33,5 +42,7 @@ const scrollToPlaceResult = (id) => {
 export {
     getHaiEmoji,
     getHCAHPSStars,
-    scrollToPlaceResult
+    scrollToPlaceResult,
+    addressToUrl
+
 }

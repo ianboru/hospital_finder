@@ -1,18 +1,21 @@
 .header-info {
     background-color: #ffffff;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
     display: column;
-    margin-bottom: 20px;
+    margin-top: 0;
   }
   
 .header-info h1 {
-font-size: 1.5em;
+  font-size: 1.5em;
+  margin-top: 0;
+  margin-bottom: 5;
 }
 
 .header-info p {
-font-size: 1em;
-margin-top: 10px;
+  font-size: 1em;
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
 .infoStyle {

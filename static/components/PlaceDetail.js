@@ -1,5 +1,5 @@
 import React from 'react'
-import { getHCAHPSStars, getHaiEmoji } from '../utils';
+import { getHCAHPSStars, getHaiEmoji, addressToUrl} from '../utils';
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
     const metricQuantiles = props.metricQuantiles
@@ -64,11 +64,6 @@ const PlaceDetail = (props) => {
     const metricDivStyle = {marginLeft : 15, marginTop: "4px"}
     const ratingDivStyle = {display: "flex", justifyContent: "space-between", marginTop: "1em"}
 
-    const addressToUrl = (address) => {
-      const urlAddress = address.replace(/\,/g, '');
-      const url = urlAddress.replace(/\ /g, '%20');
-      return  `http://maps.google.com/maps?q=${url}`
-    }
 
     
     const googleMapsUrl = addressToUrl(selectedPlace.address[0])
@@ -98,7 +93,9 @@ const PlaceDetail = (props) => {
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)
       }
-
+      const showSuffix = (typeof metricValue == "string" && !metricValue.includes("Not"))|| typeof metricValue != "string"
+      console.log()
+      console.log(unitSuffix, key , showSuffix, metricValue, typeof metricValue,  )
       return (
         <div>
             <div style={{marginTop : 5, marginBottom: 5, display: "flex",justifyContent: "space-around"}}>
@@ -111,7 +108,7 @@ const PlaceDetail = (props) => {
                 <span style={{color: "gold", marginLeft : "auto"}}>{metricValue ? getHCAHPSStars(metricValue) : "N/A"}</span> :
                 <span style={{color: "black", marginLeft : "auto", marginTop : "auto", marginBottom : "auto"}}>
                   {useEmojis ? emojiContent : ""}
-                  {metricValue}{metricValue.hasOwnProperty("includes") && !metricValue.includes("Not") && unitSuffix}
+                  {metricValue}{ showSuffix ? unitSuffix : ""}
                 </span> 
               }
             </div>

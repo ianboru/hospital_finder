@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { getHaiEmoji, getHCAHPSStars } from '../utils';
+import { getHaiEmoji, getHCAHPSStars, addressToUrl} from '../utils';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCareType}) => {
 
     const placeTileStyles = {
@@ -27,6 +27,24 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
     if(!selectedCareType){
       selectedCareType = "Hospital"
     }
+
+    const renderViewOnGoogleMapsButton = (url) => {
+      const style={
+        border: "1px solid #7C51B2",
+        padding : 5, 
+        borderRadius : 10,
+        marginTop : 5,
+        marginBottom : 5,
+        width : "fit-content",
+        color: "#7C51B2"
+      }
+      return (
+        <div style={style}>
+          <a style={{textDecoration: "none", color:"inherit"}} href={url} target="_blank" >Google Maps</a>
+        </div>
+        
+      )
+    }
     const placeTiles = (placesData && placesData.length) > 0 ? placesData.map((place, i)=>{
       const medianTimeTillDischarge = place["Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better"]
       const selectedPlaceStyle = {...placeTileStyles}
@@ -34,19 +52,11 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
         <div id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
             <div style={{ color: "black", fontWeight: "bold", fontSize: "16px", fontFamily: "'Roboto', sans-serif", paddingTop : "10px", paddingBottom : "10px"}}>{place.name}</div>
             <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575" }}>
-              <div style={{ display: 'inline-block' }}> 
-                  {place.caretype} 
-              </div>
-              <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle" }}>·</span>
               <div style={{ display: 'inline-block' }}>
                   {place.address}
               </div>
           </div>
           <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575", marginTop: '5px' }}>
-              <div style={{ display: 'inline-block' }}> 
-                  Hours of operation {place.hoursofoperation} 
-              </div>
-              <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle"}}>·</span>
               <div style={{ display: 'inline-block' }}>
                   Phone Number {place.phone_number}
               </div>
@@ -55,11 +65,8 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
               <div style={{ display: 'inline-block' }}> 
                   Distance {place.distance} 
               </div>
-              <span style={{ margin: '0 4px', fontSize: "20px", lineHeight: "14px", verticalAlign: "middle" }}>·</span>
-              <div style={{ display: 'inline-block' }}>
-                  Time to Drive {place.timetodrive}
-              </div>
           </div>
+          {renderViewOnGoogleMapsButton(addressToUrl(place.address[0]))}
 
           {
             selectedCareType.includes('Hospital') && ( //for hospital facilities

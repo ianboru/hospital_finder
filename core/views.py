@@ -228,7 +228,7 @@ def find_providers_in_radius(search_location, radius, care_type):
                     "longitude":  getattr(address,'longitude', None)
                 },
                 cur_provider["address"] = f"{address.street}, {address.city}, {address.zip}",
-            
+            cur_provider["distance"] = str(round(provider_distance.km / 0.62137119,1)) + " mi"
             filtered_provider_list.append(cur_provider)
     print(f"Number of facilities with None/NaN latitude or longitude: {nan_lat_long_count}") #for absent long and lat values
     return filtered_provider_list, provider_list

@@ -106,8 +106,20 @@ function App() {
       <HeaderInformation />
       <div className='main-app'>
           <div className='left-container'>
-            <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
-            <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
+            <div style={{
+                position: "-webkit-sticky", // this is for all Safari (Desktop & iOS), not for Chrome
+                position: "sticky",
+                top: 0,
+                zIndex: 1, // any positive value, layer order is global
+                background: "#fff",
+                paddingRight : 15,
+                paddingLeft : 10,
+                width : "100%"
+            }}>
+              <CareTypeFilter selectedCareType={initialCareType} onSelectCareType={onSelectCareType}/>
+              <SearchButton onSearchSubmit={onSearchSubmit} searchTerm={searchTerm} onSearchInputChange={onSearchInputChange} setSearchTerm={setSearchTerm}/>
+            </div>
+            
             <div>
               <PlaceResults 
                 placesData={placesData} 
@@ -146,7 +158,6 @@ function App() {
               currentGPSLocation={currentGPSLocation}
             >
             </Map>
-            <ColorLegend />
         </div>
       </div>
     </div>

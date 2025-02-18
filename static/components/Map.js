@@ -54,8 +54,8 @@ const Map = (props) => {
       const markerColor = getMarkerColor(place, metricQuantiles)
       //const markerColor = "#FFFFFFF"
       const isSelectedPlace = selectedPlace && (selectedPlace["Facility ID"] == place["Facility ID"]) 
-      const strokeWeight = isSelectedPlace ? 1.4 : 1
-      const scale = isSelectedPlace ? 1.3 : 1
+      const strokeWeight = isSelectedPlace ? 1.8 : 1
+      const scale = isSelectedPlace ? 1.8 : 1
       const strokeColor = isSelectedPlace ? "black" : "white"
       const fillOpacity = isSelectedPlace ? 1 : .8
       const zindex = isSelectedPlace ? 999 : 1
@@ -64,8 +64,7 @@ const Map = (props) => {
         <Marker
           icon={{
               path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-              //fillColor: markerColor,
-              fillColor: markerColor,
+              fillColor: "#e30b74",
               strokeColor : strokeColor,
               strokeWeight: strokeWeight,
               fillOpacity: fillOpacity,
@@ -73,7 +72,7 @@ const Map = (props) => {
               labelOrigin: new google.maps.Point(0, -30)
           }}
           zIndex={zindex}
-          label={{color: 'white', text: 'H', strokeColor: 'black', strokeWeight: 2} }
+          label={{color: 'white', strokeColor: 'black', strokeWeight: 2} }
           position={latLng}
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)

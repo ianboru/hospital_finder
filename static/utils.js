@@ -11,6 +11,10 @@ const getHaiEmoji = (starCount, midPoint) => {
     if(!starCount){
         return ""
     }
+    if (starCount === null||starCount == 'Not Available'||starCount == 'NaN'){
+        return "No Data"
+    }
+    
     switch (true){
         case starCount > midPoint:
             return (<span style={{color:"green"}}>😄 Better Than Average</span>)
@@ -21,9 +25,10 @@ const getHaiEmoji = (starCount, midPoint) => {
     }
 }
 const getHCAHPSStars = (starCount, maxCount=5) => {
+    console.log("counting stars")
     console.log(starCount)
-    if (starCount === null||starCount == 'Not Available'){
-        return "N/A"
+    if (starCount === null||starCount == 'Not Available'||starCount == 'NaN'){
+        return "No Data"
     }
     return (
         <span>

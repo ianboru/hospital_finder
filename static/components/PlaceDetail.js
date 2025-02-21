@@ -56,7 +56,7 @@ const PlaceDetail = (props) => {
           >{dataDictionaryEntry ? '\u24D8' : ''}</span>
           
           <b style={{marginRight : 'auto', marginLeft : "5px", marginTop : "auto", marginBottom : "auto"}}>{metricLabel}</b> 
-          <span style={{marginLeft : 'auto', color: "  "}}>{metricValue ? getHaiEmoji(metricValue,2) : "N/A"}</span> 
+          <span style={{marginLeft : 'auto', color: "  "}}>{metricValue ? getHaiEmoji(metricValue,2) : "No Data"}</span> 
         </div>  
       )
     })
@@ -82,7 +82,16 @@ const PlaceDetail = (props) => {
     }).map((key)=>{
       const dataDictionaryEntry = dataDictionary[key.toLowerCase()]
       let metricValue = selectedPlace[key]
-      if(metricValue == "N"){metricValue = "No"}if(metricValue == "Y"){metricValue = "Yes"}
+      if (metricValue === "N") {
+        metricValue = "N";
+      } else if (metricValue === "Y") {
+        metricValue = "Y";
+      } else if (metricValue === "Not Available") {
+        metricValue = "No Data";
+      } else if (typeof metricValue === "number" && isNaN(metricValue)) {
+        metricValue = "No Data";
+      } else {
+      }
       const useStars = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Stars") && metricValue <= 5
       const useEmojis = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("Emojis")
       const qualitativeMetric = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("High")
@@ -94,7 +103,6 @@ const PlaceDetail = (props) => {
         emojiContent = getQualitativeEmoji(metricValue)
       }
       const showSuffix = (typeof metricValue == "string" && !metricValue.includes("Not"))|| typeof metricValue != "string"
-      console.log()
       console.log(unitSuffix, key , showSuffix, metricValue, typeof metricValue,  )
       return (
         <div>
@@ -105,7 +113,7 @@ const PlaceDetail = (props) => {
               <span style={{marginLeft : "10px", marginTop : "auto", marginBottom : "auto"}}><b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b> </span>
               {
                 useStars ? 
-                <span style={{color: "gold", marginLeft : "auto"}}>{metricValue ? getHCAHPSStars(metricValue) : "N/A"}</span> :
+                <span style={{color: "gold", marginLeft : "auto"}}>{metricValue ? getHCAHPSStars(metricValue) : "No Data"}</span> :
                 <span style={{color: "black", marginLeft : "auto", marginTop : "auto", marginBottom : "auto"}}>
                   {useEmojis ? emojiContent : ""}
                   {metricValue}{ showSuffix ? unitSuffix : ""}

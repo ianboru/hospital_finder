@@ -27,8 +27,12 @@ const getHaiEmoji = (starCount, midPoint) => {
 const getHCAHPSStars = (starCount, maxCount=5) => {
     console.log("counting stars")
     console.log(starCount)
-    if (starCount === null||starCount == 'Not Available'||starCount == 'NaN'){
+    if (starCount === null||starCount == 'Not Available'||starCount == 'NaN'||starCount == "Not Applicable"){
         return "No Data"
+    }
+    if(starCount > 5){
+        //hack if starcount is actuanlly a percentage value
+        return starCount + "%"
     }
     return (
         <span>

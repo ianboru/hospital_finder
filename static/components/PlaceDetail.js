@@ -86,7 +86,7 @@ const PlaceDetail = (props) => {
         metricValue = "N";
       } else if (metricValue === "Y") {
         metricValue = "Y";
-      } else if (metricValue === "Not Available") {
+      } else if (metricValue === "Not Available"||metricValue === "Not Applicable") {
         metricValue = "No Data";
       } else if (typeof metricValue === "number" && isNaN(metricValue)) {
         metricValue = "No Data";

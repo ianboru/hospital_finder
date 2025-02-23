@@ -126,16 +126,14 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
             selectedCareType.includes('Hospice') && ( //for outpatient facilites
               <>
             {
-              place['Family caregiver survey rating'] && place['Family caregiver survey rating'] > 0 ?
                 <div>
-                  <b>Caregiver Rating: <span style={{color:"#fdcc0d"}}>{getHCAHPSStars(place['Family caregiver survey rating'],5)}</span></b>
-                </div> : <></>
+                  <b>Caregiver Rating: <span>{getHCAHPSStars(place['Family caregiver survey rating'],5)}</span></b>
+                </div>
             }
             {
-              place['Abuse Icon'] && place['Abuse Icon'] > 0 ?
                 <div>
-                  <b>Potential Abuse: <span style={{color:"#fdcc0d"}}>{getHaiEmoji(place['Abuse Icon'],3)}</span></b>
-                </div> : <></>
+                  <b>Symptoms Managed: <span>{getHCAHPSStars(place['The patient always got the help they needed for pain and symptoms'],3)}</span></b>
+                </div>
             }
             </>
             )

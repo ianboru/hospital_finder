@@ -20,7 +20,7 @@ class Facility(TimeStamp):
         null=True,
         blank=True,
     )
-
+    phone_number = models.CharField(max_length=12, blank=True)
     def __str__(self):
         return f'{self.facility_id} - {self.facility_name}'
     

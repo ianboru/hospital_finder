@@ -19,14 +19,15 @@ class Command(BaseCommand):
             city_column = facility_df.columns[facility_df.columns.str.contains('City', case=False)].values[0]
             state_column = facility_df.columns[facility_df.columns.str.contains('State', case=False)].values[0]
             zip_column = facility_df.columns[facility_df.columns.str.contains('Zip', case=False)].values[0]
-            
+            phone_number_column = facility_df.columns[facility_df.columns.str.contains('Telephone Number', case=False)].values[0]
             facility_df = facility_df[[
              facility_id_column,
              address_column,
              city_column,
              state_column,
              zip_column,
-             name_column
+             name_column,
+             phone_number_column
             ]]
             facility_df[facility_id_column] = facility_df[facility_id_column].astype(str)
             facility_df[facility_id_column] = facility_df[facility_id_column].str.zfill(6)
@@ -89,7 +90,8 @@ class Command(BaseCommand):
                 current_facility = Facility.objects.create(
                     facility_name = row[facility_name_column],
                     facility_id = row[facility_id_column],
-                    care_types = [care_type]
+                    care_types = [care_type],
+                    phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
                 )
                 address = Address.objects.create(
                         zip=row['ZIP Code'],

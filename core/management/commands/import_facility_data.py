@@ -5,7 +5,7 @@ import numpy as np
 from core.models.facility_data import CAPHSMetrics, HAIMetrics 
 from core.models.facility import Facility, Address
 from hospital_finder.settings import DATA_DIR
-
+import re 
 
 class Command(BaseCommand):
     help = 'Import Patient Data'

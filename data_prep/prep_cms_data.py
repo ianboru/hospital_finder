@@ -203,38 +203,38 @@ def extract_questions_as_columns(df, care_type):
     measure_columns_by_care_type = {
         "Home Health" : [
             "HHCAHPS Survey Summary Star Rating",
-            # "Star Rating for health team gave care in a professional way",
-            # "Star Rating for health team communicated well with them",
-            # "Star Rating team discussed medicines, pain, and home safety",
-            # "Star Rating for how patients rated overall care from agency"
+            "Star Rating for health team gave care in a professional way",
+            "Star Rating for health team communicated well with them",
+            "Star Rating team discussed medicines, pain, and home safety",
+            "Star Rating for how patients rated overall care from agency"
         ],
         "Outpatient" : [
             "Facilities and staff linear mean score",
             "Patients who reported that staff definitely communicated about what to expect during and after the procedure",
-            # "Communication about your procedure linear mean score",
-            # "Patients' rating of the facility linear mean score",
-            # "Patients recommending the facility linear mean score"
+            "Communication about your procedure linear mean score",
+            "Patients' rating of the facility linear mean score",
+            "Patients recommending the facility linear mean score"
         ],
         "In-Center Hemodialysis" : [
             "Patient Hospital Readmission Category",
-            # "Patient Transfusion category text",
-            # "SWR category text",
-            # "PPPW category text",
-            # "SEDR category text",
-            # "ED30 Category text",
-            # "Patient Infection category text",
-            # "Fistula Category Text"
+            "Patient Transfusion category text",
+            "SWR category text",
+            "PPPW category text",
+            "SEDR category text",
+            "ED30 Category text",
+            "Patient Infection category text",
+            "Fistula Category Text"
         ],
         "Nursing Homes" : [
             "Overall Rating",
-            # "Health Inspection Rating",
-            # "QM Rating",
-            # "Long-Stay QM Rating",
-            # "Short-Stay QM Rating",
-            # "Staffing Rating"
+            "Health Inspection Rating",
+            "QM Rating",
+            "Long-Stay QM Rating",
+            "Short-Stay QM Rating",
+            "Staffing Rating"
         ],
         "Hospice" : [
-            #"Family caregiver survey rating",
+            "Family caregiver survey rating",
         ]
     }   
 
@@ -310,7 +310,7 @@ def load_cahps_data(export_path, care_type, files_with_measures_as_columns):
 
 export_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"data")
 current_date = today = time.strftime("%m-%d-%Y")
-care_types = ["Outpatient"]#, "ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
+care_types = ["Outpatient", "ED + Others", "Home Health", "Hospice", "Hospitals", "In-Center Hemodialysis", "Nursing Homes"]
 regenerate_ccn_list = False
 all_providers_df = load_provider_cms_list()
 all_cahps_df = pd.DataFrame()

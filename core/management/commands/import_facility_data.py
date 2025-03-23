@@ -19,16 +19,23 @@ class Command(BaseCommand):
             city_column = facility_df.columns[facility_df.columns.str.contains('City', case=False)].values[0]
             state_column = facility_df.columns[facility_df.columns.str.contains('State', case=False)].values[0]
             zip_column = facility_df.columns[facility_df.columns.str.contains('Zip', case=False)].values[0]
-            phone_number_column = facility_df.columns[facility_df.columns.str.contains('Telephone Number', case=False)].values[0]
-            facility_df = facility_df[[
+            print(facility_df.columns.str.contains('Telephone Number', case=False))
+            phone_number_column = None
+            if any(facility_df.columns.str.contains('Telephone Number', case=False)):
+                phone_number_column = facility_df.columns[facility_df.columns.str.contains('Telephone Number', case=False)].values[0]
+            essential_columns = [
              facility_id_column,
              address_column,
              city_column,
              state_column,
              zip_column,
              name_column,
-             phone_number_column
-            ]]
+            ]
+            if phone_number_column:
+                essential_columns.append(phone_number_column)
+            facility_df = facility_df[essential_columns]
+            
+
             facility_df[facility_id_column] = facility_df[facility_id_column].astype(str)
             facility_df[facility_id_column] = facility_df[facility_id_column].str.zfill(6)
             return facility_df
@@ -78,6 +85,13 @@ class Command(BaseCommand):
                 if "59749" in facility_id:
                     print(facility_id, current_facility.care_types, current_facility.address)
                     print(row)
+                if not current_facility.phone_number:
+                    phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
+                    if len(phone_number) > 12:
+                        print(phone_number)
+                    else:
+                        current_facility.phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
+                        current_facility.save()
                 if care_type not in current_facility.care_types:
                     current_facility = Facility.objects.filter(facility_id=facility_id).first()
                     current_facility.care_types.append(care_type)
@@ -103,6 +117,7 @@ class Command(BaseCommand):
 
             percentage = round(100 * index / len(ccn_facility_df))
             if index % 500 == 0:
+                print(current_facility.phone_number)
                 print(f"Current CCN loading Percentage: {percentage}, {index} / {len(ccn_facility_df)}")
                 
     def extract_questions_as_rows(self, df, care_type): 
@@ -468,14 +483,14 @@ class Command(BaseCommand):
         run_start_of_pipeline = True
         run_load_ccn_data = True
         run_load_hai_data = False
-        run_load_caphs_data = True
+        run_load_caphs_data = False
         run_load_lat_long_data = False 
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
 
         if run_start_of_pipeline == True:
             if run_load_ccn_data == True:
-                ccn_care_types = ["Nursing Homes",  "Home Health", "Hospice", "Outpatient"]#"ED",
+                ccn_care_types = ["Nursing Homes",  "Home Health", "Hospice", "Outpatient","ED"]
                 for care_type in ccn_care_types:
                     print('loading ccn care_type', care_type)
                     self.load_ccn_data_to_facility_model(export_path, care_type)
@@ -486,7 +501,7 @@ class Command(BaseCommand):
                 self.load_hai_data_to_facility_model(export_path)
             
             if run_load_caphs_data == True:
-                caphs_care_types = ["Home Health", "ED + Others", "Outpatient Ambulatory Services", "Hospice", "Nursing Homes"]  # Updated list
+                caphs_care_types = ["Hospice"]  # Updated list
                 #caphs_care_types = ["Hospitals"  ]  # Updated list
                 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
                 

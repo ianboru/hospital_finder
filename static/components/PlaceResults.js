@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars, addressToUrl} from '../utils';
+import ViewOnGoogleMapsButton from './ViewOnGoogleMapsButton';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCareType}) => {
 
     const placeTileStyles = {
@@ -28,23 +29,6 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
       selectedCareType = "Hospital"
     }
 
-    const renderViewOnGoogleMapsButton = (url) => {
-      const style={
-        border: "1px solid #7C51B2",
-        padding : 5, 
-        borderRadius : 10,
-        marginTop : 5,
-        marginBottom : 5,
-        width : "fit-content",
-        color: "#7C51B2"
-      }
-      return (
-        <div style={style}>
-          <a style={{textDecoration: "none", color:"inherit"}} href={url} target="_blank" >Google Maps</a>
-        </div>
-        
-      )
-    }
     const placeTiles = (placesData && placesData.length) > 0 ? placesData.map((place, i)=>{
       const medianTimeTillDischarge = place["Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better"]
       const selectedPlaceStyle = {...placeTileStyles}
@@ -66,7 +50,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
                   Distance {place.distance} 
               </div>
           </div>
-          {renderViewOnGoogleMapsButton(addressToUrl(place.address[0]))}
+          <ViewOnGoogleMapsButton url={addressToUrl(place.address[0])}/>
 
           {
             selectedCareType.includes('Hospital') && ( //for hospital facilities

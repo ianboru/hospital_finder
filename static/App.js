@@ -10,7 +10,6 @@ import Map from "./components/Map"
 import CareTypeFilter from "./components/CareTypeFilter"
 import './App.css'
 import StartingModal from "./components/StartingModal";
-
 function App() {
   console.log("version 0.9")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)

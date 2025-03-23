@@ -1,5 +1,7 @@
 import React from 'react'
 import { getHCAHPSStars, getHaiEmoji, addressToUrl} from '../utils';
+import ViewOnGoogleMapsButton from "./ViewOnGoogleMapsButton";
+
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
     const metricQuantiles = props.metricQuantiles
@@ -97,12 +99,14 @@ const PlaceDetail = (props) => {
       const qualitativeMetric = dataDictionaryEntry["unit"] && dataDictionaryEntry["unit"].includes("High")
       const unitSuffix = dataDictionaryEntry["unit"] 
         && dataDictionaryEntry["unit"].includes("Minutes") ? " min" : 
-           dataDictionaryEntry["unit"].includes("Percent") ? "%" : "" 
+           dataDictionaryEntry["unit"].includes("Percent") && metricValue ? "%" : "" 
       const emojiContent = ":P"
       if(useEmojis && qualitativeMetric){
         emojiContent = getQualitativeEmoji(metricValue)
       }
-      const showSuffix = (typeof metricValue == "string" && !metricValue.includes("Not"))|| typeof metricValue != "string"
+      const showSuffix = (
+        (typeof metricValue == "string" && !metricValue.includes("Not"))|| typeof metricValue != "string" 
+      ) && metricValue && metricValue != "No Data"     
       console.log(unitSuffix, key , showSuffix, metricValue, typeof metricValue,  )
       return (
         <div>
@@ -150,7 +154,7 @@ const PlaceDetail = (props) => {
             }}>Current Selection</div>
             <div><b>{selectedPlace.name}</b></div>
             <div>{selectedPlace.address}</div>
-            <a href={googleMapsUrl} target="_blank">view on Google Maps</a>
+            <ViewOnGoogleMapsButton url={googleMapsUrl}/>
             {
               detailMetrics && Object.keys(detailMetrics).length > 0 ?
               <>

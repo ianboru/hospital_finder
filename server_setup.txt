@@ -1,4 +1,35 @@
 server {
+    listen 443 ssl; # Enable SSL and listen on port 443
+    server_name skilldex.org www.skilldex.org;
+
+    # Use the self-signed SSL certificate
+    ssl_certificate /etc/letsencrypt/live/skilldex.org/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/skilldex.org/privkey.pem; # managed by Certbot
+
+    # Root directory and file serving configuration
+    root /var/www/skilldex/;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ ^/(profile|detail|addpattern|tricklist|stats|home|filter|contributor) {
+        try_files /index.html =404;
+    }
+
+    include /etc/nginx/mime.types;
+
+
+}
+
+server {
+    listen 80;
+    server_name skilldex.org www.skilldex.org;
+    return 301 https://www.skilldex.org$request_uri;
+}
+
+server {
   listen 80;
   server_name 172.233.188.56;
   location / {
@@ -13,11 +44,9 @@ server {
     alias /root/hospital_finder/static/;
   }
 }
-
-
 server {
   listen 80;
-  server_name www.findqualitycare.com findqualitycare.com;
+  server_name www.findqualitycare.org findqualitycare.org;
   location / {
     proxy_pass http://127.0.0.1:8001;
     proxy_set_header Host $host;
@@ -30,5 +59,3 @@ server {
     alias /root/hospital_finder/static/;
   }
 }
-
-./bin/gunicorn --bind 127.0.0.1:8001 hospital_finder.wsgi:application --log-file  ./log.txt --capture-output --log-level debug

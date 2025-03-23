@@ -87,7 +87,7 @@ class Command(BaseCommand):
                     print(row)
                 if not current_facility.phone_number:
                     phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
-                    phone_number = re.sub('[^0-9]','', phone_number)
+                    phone_number = re.sub('[^0-9]','', str(phone_number))
                     current_facility.phone_number = phone_number
                     current_facility.save()
                 if care_type not in current_facility.care_types:

@@ -87,7 +87,7 @@ class Command(BaseCommand):
                     print(row)
                 if not current_facility.phone_number:
                     phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
-                    if len(phone_number) > 12:
+                    if len(str(phone_number)) > 12:
                         print(phone_number)
                     else:
                         current_facility.phone_number = row["Telephone Number"] if "Telephone Number" in row else ""

@@ -87,11 +87,9 @@ class Command(BaseCommand):
                     print(row)
                 if not current_facility.phone_number:
                     phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
-                    if len(str(phone_number)) > 12:
-                        print(phone_number)
-                    else:
-                        current_facility.phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
-                        current_facility.save()
+                    phone_number = re.sub('[^0-9]','', phone_number)
+                    current_facility.phone_number = phone_number
+                    current_facility.save()
                 if care_type not in current_facility.care_types:
                     current_facility = Facility.objects.filter(facility_id=facility_id).first()
                     current_facility.care_types.append(care_type)

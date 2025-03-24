@@ -25,8 +25,6 @@ const getHaiEmoji = (starCount, midPoint) => {
     }
 }
 const getHCAHPSStars = (starCount, maxCount=5) => {
-    console.log("counting stars")
-    console.log(starCount)
     if (starCount === null||starCount == 'Not Available'||starCount == 'NaN'||starCount == "Not Applicable"){
         return "No Data"
     }
@@ -47,11 +45,14 @@ const scrollToPlaceResult = (id) => {
     element.scrollIntoView({behavior: 'smooth'})
 }
 
+const formatPhoneNumber = (phoneNumber) => {
+    return `(${phoneNumber.substring(0,3)}) ${phoneNumber.substring(3,6)}-${phoneNumber.substring(6,10)} `
+}
 
 export {
     getHaiEmoji,
     getHCAHPSStars,
     scrollToPlaceResult,
-    addressToUrl
-
+    addressToUrl,
+    formatPhoneNumber
 }

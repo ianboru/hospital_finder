@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { getHaiEmoji, getHCAHPSStars, addressToUrl} from '../utils';
+import { getHaiEmoji, getHCAHPSStars, addressToUrl, formatPhoneNumber} from '../utils';
 import ViewOnGoogleMapsButton from './ViewOnGoogleMapsButton';
 const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCareType}) => {
 
@@ -42,7 +42,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
           </div>
           <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575", marginTop: '5px' }}>
               <div style={{ display: 'inline-block' }}>
-                  Phone Number {place.phone_number}
+                  {formatPhoneNumber(place.phone_number)}
               </div>
           </div>
           <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575", marginTop: '5px' }}>

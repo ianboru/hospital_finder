@@ -13,6 +13,7 @@ import StartingModal from "./components/StartingModal";
 function App() {
   console.log("version 0.9")
   const placesData = JSON.parse(document.getElementById("google_places_data").textContent)
+  console.log("initial placeresults", placesData)
   const metricQuantiles = JSON.parse(document.getElementById("metric_quantiles").textContent)
   const dataDictionary = JSON.parse(document.getElementById("data_dictionary").textContent)
   const [selectedPlace, setSelectedPlace] = React.useState(null)

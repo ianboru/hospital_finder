@@ -220,7 +220,8 @@ def find_providers_in_radius(search_location, radius, care_type):
             cur_provider = {
                 "name": facility.facility_name,
                 "caretype": care_types_str,
-                "id" : facility.id
+                "id" : facility.id,
+                "phone_number" :   facility.phone_number
             }
             if address:
                 cur_provider["location"] ={

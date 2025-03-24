@@ -1,5 +1,5 @@
 import React from 'react'
-import { getHCAHPSStars, getHaiEmoji, addressToUrl} from '../utils';
+import { getHCAHPSStars, getHaiEmoji, addressToUrl, formatPhoneNumber} from '../utils';
 import ViewOnGoogleMapsButton from "./ViewOnGoogleMapsButton";
 
 const PlaceDetail = (props) => {
@@ -154,6 +154,7 @@ const PlaceDetail = (props) => {
             }}>Current Selection</div>
             <div><b>{selectedPlace.name}</b></div>
             <div>{selectedPlace.address}</div>
+            <div>{formatPhoneNumber(selectedPlace.phone_number)}</div>
             <ViewOnGoogleMapsButton url={googleMapsUrl}/>
             {
               detailMetrics && Object.keys(detailMetrics).length > 0 ?

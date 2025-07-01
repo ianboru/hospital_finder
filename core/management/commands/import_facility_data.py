@@ -99,11 +99,15 @@ class Command(BaseCommand):
                 if not facility_id_column in row:
                     print("making facility", facility_id, row)
                     continue 
+                # Clean phone number by removing non-numeric characters
+                phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
+                phone_number = re.sub('[^0-9]','', str(phone_number))
+                
                 current_facility = Facility.objects.create(
                     facility_name = row[facility_name_column],
                     facility_id = row[facility_id_column],
                     care_types = [care_type],
-                    phone_number = row["Telephone Number"] if "Telephone Number" in row else ""
+                    phone_number = phone_number
                 )
                 address = Address.objects.create(
                         zip=row['ZIP Code'],

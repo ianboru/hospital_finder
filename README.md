@@ -139,3 +139,12 @@ user.save()
 
 //to exit the shell
 exit()
+
+
+
+
+
+
+# COMMON ISSUES
+### SETTING UP THE DATABASE
+at line 116 in `core/views.py` comment out lines 116-125.

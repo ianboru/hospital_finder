@@ -148,3 +148,23 @@ exit()
 # COMMON ISSUES
 ### SETTING UP THE DATABASE
 at line 116 in `core/views.py` comment out lines 116-125.
+
+
+When setting up the database, you will need to run the following command:
+
+```
+python manage.py import_facility_data
+```
+
+make sure to check off the following flags in `import_facility_data.py`:
+```
+    def handle(self, *args, **options):
+        run_start_of_pipeline = True
+        run_load_ccn_data = True
+        run_load_hai_data = True
+        run_load_caphs_data = True
+        run_load_lat_long_data = True 
+```
+This will import the facility data from the csv files in the `data` directory.
+
+You will need to run the following command to import the facility data:

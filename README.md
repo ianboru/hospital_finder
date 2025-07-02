@@ -158,12 +158,12 @@ python manage.py import_facility_data
 
 make sure to check off the following flags in `import_facility_data.py`:
 ```
-    def handle(self, *args, **options):
-        run_start_of_pipeline = True
-        run_load_ccn_data = True
-        run_load_hai_data = True
-        run_load_caphs_data = True
-        run_load_lat_long_data = True 
+def handle(self, *args, **options):
+    run_start_of_pipeline = True
+    run_load_ccn_data = True
+    run_load_hai_data = True
+    run_load_caphs_data = True
+    run_load_lat_long_data = True 
 ```
 This will import the facility data from the csv files in the `data` directory.
 

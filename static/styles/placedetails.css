@@ -1,0 +1,14 @@
+.place-detail-container {
+    border : 2px black; 
+    width : 400px; 
+    margin-right : 10px;
+    margin-left : 10px; 
+    margin-bottom: 15px;
+    z-index : 50;
+}  
+
+@media (max-width: 768px) {
+    .place-detail-container {
+        width : 95%;
+    }
+}

@@ -1,0 +1,271 @@
+/* Mobile-specific styles and optimizations */
+
+/* Ensure proper viewport settings */
+@viewport {
+  width: device-width;
+  initial-scale: 1.0;
+  maximum-scale: 1.0;
+  user-scalable: no;
+}
+
+/* Prevent horizontal scrolling on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Mobile-specific app container */
+.app {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Mobile-specific map optimizations */
+@media (max-width: 768px) {
+  /* Ensure map container doesn't overflow */
+  .map-container {
+    overflow: hidden;
+  }
+  
+  /* Optimize map for touch interactions */
+  .map-container > div {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+  
+  /* Improve marker visibility on mobile */
+  .map-container .marker {
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  /* Search results toggle animations */
+  .search-results-container {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+  }
+
+  .search-results-container.collapsed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .search-results-container.expanded {
+    max-height: 50vh;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Toggle button improvements */
+  .toggle-results-button {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .toggle-results-button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+  }
+
+  /* Smooth icon rotation */
+  .toggle-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .toggle-icon.expanded {
+    transform: rotate(180deg);
+  }
+
+  /* Results count styling */
+  .results-count {
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* Ensure sticky positioning works properly */
+  .main-app > div:first-child {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Improve scrolling performance */
+  .search-results-container.expanded {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Mobile-specific loading states */
+@media (max-width: 768px) {
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 18px;
+    color: #666;
+  }
+}
+
+/* Mobile-specific error states */
+@media (max-width: 768px) {
+  .error {
+    padding: 20px;
+    text-align: center;
+    color: #d32f2f;
+    font-size: 16px;
+  }
+}
+
+/* Mobile-specific empty states */
+@media (max-width: 768px) {
+  .empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+  }
+  
+  .empty-state h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .empty-state p {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+/* Mobile-specific animations */
+@media (max-width: 768px) {
+  @keyframes slideInFromBottom {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .place-detail-overlay {
+    animation: slideInFromBottom 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .definition-info-popup {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      max-height: 0;
+      opacity: 0;
+    }
+    to {
+      max-height: 50vh;
+      opacity: 1;
+    }
+  }
+
+  .search-results-container.expanded {
+    animation: slideDown 0.3s ease-out;
+  }
+}
+
+/* Mobile-specific accessibility improvements */
+@media (max-width: 768px) {
+  /* Ensure sufficient color contrast */
+  .search-input::placeholder {
+    color: #999;
+  }
+  
+  /* Improve focus indicators */
+  .search-input:focus,
+  .dropdown-select:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+  
+  /* Ensure buttons are accessible */
+  button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+
+  /* Improve toggle button accessibility */
+  .toggle-results-button {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .toggle-results-button:active {
+    background-color: #e9ecef;
+  }
+}
+
+/* Mobile-specific performance optimizations */
+@media (max-width: 768px) {
+  /* Reduce animations for better performance */
+  * {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+  
+  /* Optimize scrolling performance */
+  .search-container,
+  .place-detail-overlay,
+  .search-results-container {
+    will-change: scroll-position;
+  }
+
+  /* Optimize toggle animations */
+  .search-results-container {
+    will-change: max-height, opacity;
+  }
+}
+
+/* Mobile-specific print styles */
+@media print {
+  .map-container,
+  .search-form,
+  .dropdown-container,
+  .toggle-results-button {
+    display: none !important;
+  }
+  
+  .search-container,
+  .search-results-container {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .search-results-container.expanded {
+    max-height: 40vh;
+  }
+
+  .map-container {
+    height: 45vh;
+  }
+} 

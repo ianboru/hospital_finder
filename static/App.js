@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import PlaceResults from "./components/PlaceResults";
 import PlaceDetail from "./components/PlaceDetail";
 import SearchButton from "./components/SearchButton";
@@ -20,7 +20,13 @@ function App() {
   const dataDictionary = JSON.parse(
     document.getElementById("data_dictionary").textContent
   );
-  const [selectedPlace, setSelectedPlace] = React.useState(null);
+  const [selectedPlace, _setSelectedPlace] = React.useState(null);
+  const setSelectedPlace = useCallback((place) => {
+    if(place){
+      setSearchActive(false)
+    }
+    _setSelectedPlace(place)
+  }, [])
   console.log("initial quantiles", metricQuantiles);
   let url = new URL(window.location);
   console.log("initial dictionary", dataDictionary);
@@ -44,6 +50,8 @@ function App() {
   const [searchTerm, setSearchTerm] = React.useState(
     initialSearchParam ? initialSearchParam : ""
   );
+  const [searchActive, setSearchActive] = React.useState(false);
+
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius);
   const [shownDefinition, setShownDefinition] = React.useState(null);
 
@@ -147,7 +155,6 @@ function App() {
   const isMobile = width < 768;
   console.log("width", width);
   console.log("is mobile", isMobile);
-  const [searchActive, setSearchActive] = React.useState(false);
   if (isMobile) {
     return (
       <div className="app">
@@ -180,7 +187,7 @@ function App() {
           </div>
 
           {searchActive && (
-          <div>
+          <div style={{display : searchActive ? "block" : "none"}}>
             <PlaceResults
               placesData={placesData}
               selectedPlace={selectedPlace}
@@ -190,7 +197,8 @@ function App() {
           </div>
           )}
         </div>
-        {!searchActive && (
+        {(
+          <div style={{display : !searchActive ? "block" : "none"}}>
         <div className="map-container">
           {selectedPlace && (
             <div className="place-detail-overlay">
@@ -216,6 +224,7 @@ function App() {
             setZoomRadius={setZoomRadius}
             currentGPSLocation={currentGPSLocation}
           ></Map>
+        </div>
         </div>
         )}
       </div>

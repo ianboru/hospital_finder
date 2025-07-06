@@ -12,6 +12,12 @@
   padding-right: 15;
 }
 
+@media (max-width: 768px) {
+  .search-container {
+   flex: inherit;
+  }
+}
+
 .map-container {
   position: relative; 
   flex: 3;
@@ -53,5 +59,33 @@
 .definition-info-popup > h3 {
   padding: 0;
   margin: 0;
+}
+
+.tab-wrapper {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Ensure the app container takes full height */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .app {
+    height: 100vh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .tab-wrapper {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+  }
 }
 

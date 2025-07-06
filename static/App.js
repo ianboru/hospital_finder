@@ -6,6 +6,7 @@ import SearchButton from "./components/SearchButton";
 import HeaderInformation from "./components/HeaderInformation";
 import Map from "./components/Map";
 import CareTypeFilter from "./components/CareTypeFilter";
+import TabComponent from "./components/TabComponent";
 import "./App.css";
 import StartingModal from "./components/StartingModal";
 function App() {
@@ -22,9 +23,6 @@ function App() {
   );
   const [selectedPlace, _setSelectedPlace] = React.useState(null);
   const setSelectedPlace = useCallback((place) => {
-    if(place){
-      setSearchActive(false)
-    }
     _setSelectedPlace(place)
   }, [])
   console.log("initial quantiles", metricQuantiles);
@@ -50,7 +48,6 @@ function App() {
   const [searchTerm, setSearchTerm] = React.useState(
     initialSearchParam ? initialSearchParam : ""
   );
-  const [searchActive, setSearchActive] = React.useState(false);
 
   const [zoomRadius, setZoomRadius] = React.useState(initialZoomRadius);
   const [shownDefinition, setShownDefinition] = React.useState(null);
@@ -141,6 +138,7 @@ function App() {
     );
 
   const [width, setWidth] = React.useState(window.innerWidth);
+  const [activeTab, setActiveTab] = useState('map'); // Default to map view
 
   function handleWindowSizeChange() {
     setWidth(window.innerWidth);
@@ -155,6 +153,7 @@ function App() {
   const isMobile = width < 768;
   console.log("width", width);
   console.log("is mobile", isMobile);
+  
   if (isMobile) {
     return (
       <div className="app">
@@ -176,57 +175,60 @@ function App() {
               selectedCareType={initialCareType}
               onSelectCareType={onSelectCareType}
             />
-            <div onClick={() => setSearchActive(!searchActive)}>
             <SearchButton
               onSearchSubmit={onSearchSubmit}
               searchTerm={searchTerm}
               onSearchInputChange={onSearchInputChange}
               setSearchTerm={setSearchTerm}
             />
-            </div>
           </div>
-
-          {searchActive && (
-          <div style={{display : searchActive ? "block" : "none"}}>
-            <PlaceResults
-              placesData={placesData}
-              selectedPlace={selectedPlace}
-              setSelectedPlace={setSelectedPlace}
-              selectedCareType={initialCareTypeParam}
-            />
-          </div>
-          )}
         </div>
-        {(
-          <div style={{display : !searchActive ? "block" : "none"}}>
-        <div className="map-container">
-          {selectedPlace && (
-            <div className="place-detail-overlay">
-              {definitionInfoPopUp}
-              <PlaceDetail
+        
+        <div className="tab-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <TabComponent
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            searchResults={
+              <PlaceResults
+                clickCallback={() => {
+                  setActiveTab('map')
+                }}
+                placesData={placesData}
                 selectedPlace={selectedPlace}
                 setSelectedPlace={setSelectedPlace}
-                setShownDefinition={setShownDefinition}
-                shownDefinition={shownDefinition}
                 selectedCareType={initialCareTypeParam}
-                dataDictionary={dataDictionary}
-                metricQuantiles={metricQuantiles}
-              ></PlaceDetail>
-            </div>
-          )}
-          <Map
-            placesData={placesData}
-            initialLocation={initialLocation}
-            setSelectedPlace={setSelectedPlace}
-            selectedPlace={selectedPlace}
-            metricQuantiles={metricQuantiles}
-            onSearchSubmit={onSearchSubmit}
-            setZoomRadius={setZoomRadius}
-            currentGPSLocation={currentGPSLocation}
-          ></Map>
+              />
+            }
+            mapView={
+              <div className="map-container">
+                {selectedPlace && (
+                  <div className="place-detail-overlay">
+                    {definitionInfoPopUp}
+                    <PlaceDetail
+                      selectedPlace={selectedPlace}
+                      setSelectedPlace={setSelectedPlace}
+                      setShownDefinition={setShownDefinition}
+                      shownDefinition={shownDefinition}
+                      selectedCareType={initialCareTypeParam}
+                      dataDictionary={dataDictionary}
+                      metricQuantiles={metricQuantiles}
+                    ></PlaceDetail>
+                  </div>
+                )}
+                <Map
+                  placesData={placesData}
+                  initialLocation={initialLocation}
+                  setSelectedPlace={setSelectedPlace}
+                  selectedPlace={selectedPlace}
+                  metricQuantiles={metricQuantiles}
+                  onSearchSubmit={onSearchSubmit}
+                  setZoomRadius={setZoomRadius}
+                  currentGPSLocation={currentGPSLocation}
+                ></Map>
+              </div>
+            }
+          />
         </div>
-        </div>
-        )}
       </div>
     );
   }

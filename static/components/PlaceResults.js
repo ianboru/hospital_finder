@@ -1,7 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { getHaiEmoji, getHCAHPSStars, addressToUrl, formatPhoneNumber} from '../utils';
 import ViewOnGoogleMapsButton from './ViewOnGoogleMapsButton';
-const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCareType}) => {
+const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCareType, clickCallback = () => {} }) => {
+  const handlePlaceClick = (place) => {
+    setSelectedPlace(place)
+    clickCallback(place)
+  }
 
     const placeTileStyles = {
       "borderTop": "1px solid #e0e0e0", // Light gray line at the top
@@ -33,7 +37,7 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
       const medianTimeTillDischarge = place["Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better"]
       const selectedPlaceStyle = {...placeTileStyles}
       return (
-        <div key={i} id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => setSelectedPlace(place)}>
+        <div key={i} id={place['Facility ID']} style={selectedPlaceStyle} onClick={() => handlePlaceClick(place)}>
             <div style={{ color: "black", fontWeight: "bold", fontSize: "16px", fontFamily: "'Roboto', sans-serif", paddingTop : "10px", paddingBottom : "10px"}}>{place.name}</div>
             <div style={{ fontSize: "14px", fontFamily: "'Roboto', sans-serif", color: "#757575" }}>
               <div style={{ display: 'inline-block' }}>

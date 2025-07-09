@@ -19,7 +19,7 @@ html, body {
 /* Mobile-specific app container */
 .app {
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   overflow-x: hidden;
 }
 
@@ -93,7 +93,7 @@ html, body {
     position: sticky;
     top: 0;
     z-index: 30;
-    background: white;
+    /* background: white; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 

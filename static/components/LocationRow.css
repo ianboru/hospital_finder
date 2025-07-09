@@ -1,0 +1,156 @@
+.lr-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 0 20px 0;
+  background: #fff;
+  gap: 16px;
+}
+
+.lr-main-info {
+}
+
+.lr-title {
+  font-weight: bold;
+  font-size: 1.15rem;
+  margin-bottom: 2px;
+}
+
+.lr-address {
+  color: #444;
+  font-size: 0.98rem;
+  margin-bottom: 2px;
+}
+
+.lr-details {
+  color: #6a8c6a;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 2px;
+}
+
+.lr-metrics {
+  max-width: 40%;
+  /* flex: 1.2; */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* min-width: 180px; */
+}
+
+.lr-metric-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  font-size: 1rem;
+}
+
+.lr-info-icon {
+  background: #f5f5f5;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: #888;
+  border: 1px solid #e0e0e0;
+  margin-right: 2px;
+}
+
+.lr-metric-label {
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.lr-stars {
+  font-size: 1.1rem;
+  margin-left: 2px;
+}
+
+.lr-star-filled {
+  color: #f7c948;
+}
+
+.lr-star-empty {
+  color: #e0e0e0;
+}
+
+.lr-infection-icon {
+  font-size: 1.3rem;
+  margin: 0 2px 0 6px;
+}
+
+.lr-infection-bad {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.lr-infection-average {
+  color: #f7c948;
+  font-weight: 600;
+}
+
+.lr-infection-good {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.lr-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 180px;
+}
+
+.lr-btn {
+  background: #ede7f6;
+  color: #6c4eb6;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lr-btn.lr-maps {
+  background: #ede7f6;
+}
+
+.lr-btn.lr-compare {
+  background: #ede7f6;
+}
+
+.lr-btn:hover {
+  background: #d1c4e9;
+}
+
+@media (max-width: 700px) {
+  .lr-row {
+    /* flex-direction: column; */
+    gap: 10px;
+    padding: 16px 0;
+  }
+  .lr-actions {
+    justify-content: flex-start;
+    min-width: unset;
+  }
+  .lr-metrics {
+    min-width: unset;
+  }
+} 

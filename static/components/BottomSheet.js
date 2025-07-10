@@ -55,12 +55,26 @@ function BottomSheet(props) {
   }
 
   function handleMouseDown(e) {
-    e.preventDefault();
-    handleDragStart(e.clientY);
+    // Only handle mouse down on the drag handle area
+    const target = e.target;
+    const isDragHandle = target.closest('.drag-handle-container');
+    
+    if (isDragHandle) {
+      e.preventDefault();
+      handleDragStart(e.clientY);
+    }
   }
 
   function handleTouchStart(e) {
-    handleDragStart(e.touches[0].clientY);
+    // Only handle touch start on the drag handle area
+    const target = e.target;
+    const isDragHandle = target.closest('.drag-handle-container');
+    
+    if (isDragHandle) {
+      // Prevent any default behavior when starting drag
+      e.preventDefault();
+      handleDragStart(e.touches[0].clientY);
+    }
   }
 
   useEffect(function() {
@@ -73,12 +87,17 @@ function BottomSheet(props) {
     }
 
     function handleTouchMove(e) {
-      e.preventDefault();
-      handleDragMove(e.touches[0].clientY);
+      if (isDragging) {
+        e.preventDefault();
+        handleDragMove(e.touches[0].clientY);
+      }
+      // If not dragging, allow normal touch behavior for scrolling
     }
 
     function handleTouchEnd() {
-      handleDragEnd();
+      if (isDragging) {
+        handleDragEnd();
+      }
     }
 
     if (isDragging) {

@@ -12,6 +12,7 @@ import SearchBar from "./SearchBar";
 import LocationResults from "./LocationResults";
 import "./MobileLayout.css";
 import SearchBox from "./SearchBox";
+import SearchScreen from "./SearchScreen";
 
 const MobileLayout = () => {
   const {
@@ -33,44 +34,30 @@ const MobileLayout = () => {
     definitionInfoPopUp,
     initialCareType,
     onSelectCareType,
+    isSearchActive,
   } = useAppContext();
+  console.log("!!!!!isSearchActive", isSearchActive);
+//   if (isSearchActive) {
+//     return (
+//       <div className="app">
+//         <div
+//           style={{
+//           }}
+//         >
+//           <SearchBox
+//             onSearchSubmit={onSearchSubmit}
+//             searchTerm={searchTerm}
+//             onSearchInputChange={onSearchInputChange}
+//             setSearchTerm={setSearchTerm}
+//           />
+//         </div>
+//         <SearchScreen />
+//       </div>
+//     );
+//   }
 
   return (
     <div className="app">
-      {/* <HeaderInformation /> */}
-      {/* <div className="search-container">
-        <div
-          style={{
-            position: "-webkit-sticky", // this is for all Safari (Desktop & iOS), not for Chrome
-            position: "sticky",
-            top: 0,
-            zIndex: 1, // any positive value, layer order is global
-            background: "#fff",
-            paddingRight: 15,
-            paddingLeft: 10,
-            width: "100%",
-          }}
-        >
-          <CareTypeFilter
-            selectedCareType={initialCareType}
-            onSelectCareType={onSelectCareType}
-          />
-          <SearchButton
-            onSearchSubmit={onSearchSubmit}
-            searchTerm={searchTerm}
-            onSearchInputChange={onSearchInputChange}
-            setSearchTerm={setSearchTerm}
-          />
-        </div>
-      </div> */}
-      {/* <div className="search-container">
-        <SearchBar
-          onChange={onSearchInputChange}
-          onClear={() => setSearchTerm("")}
-          value={searchTerm}
-          placeholder="Search facilities or locations here"
-        />
-      </div> */}
       <SearchBox
         onSearchSubmit={onSearchSubmit}
         searchTerm={searchTerm}

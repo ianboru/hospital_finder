@@ -4,17 +4,21 @@ import FloatingFilterButton from "./FloatingFilterButton";
 import FloatingSortButton from "./FloatingSortButton";
 import CareTypeFilter from "./CareTypeFilter";
 import "./SearchBox.css";
+import { useAppContext } from "../context/AppContext";
 
-const SearchBox = ({
-  searchValue,
-  onSearchChange,
-  onSearchClear,
-  selectedCareType,
-  onSelectCareType,
-  onSortClick,
-  placeholder = "Search facilities or locations here",
-}) => {
+const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
   const [showCareTypeFilter, setShowCareTypeFilter] = useState(false);
+  const {
+    searchValue,
+    searchTerm,
+    setSearchTerm,
+    onSearchSubmit,
+    isSearchActive,
+    setIsSearchActive,
+    careType,
+    setCareType,
+    onSelectCareType,
+  } = useAppContext();
 
   const handleFilterClick = () => {
     setShowCareTypeFilter(!showCareTypeFilter);
@@ -22,38 +26,42 @@ const SearchBox = ({
 
   return (
     <div className="search-box-container">
-      {/* Main Search Bar Tile */}
       <div className="search-tile search-bar-tile">
         <SearchBar
-          value={searchValue}
-          onChange={onSearchChange}
-          onClear={onSearchClear}
+          onSubmit={onSearchSubmit}
+          value={searchTerm}
+          onChange={setSearchTerm}
+          onClear={() => {
+            setSearchTerm("");
+          }}
           placeholder={placeholder}
+          onFocus={() => setIsSearchActive(true)}
+          onBlur={() => setTimeout(() => setIsSearchActive(false), 200)}
         />
       </div>
 
-      {/* Filter Button Tile */}
       <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
         <div className="search-tile filter-tile">
           <FloatingFilterButton
-            label={selectedCareType || "Care Type"}
+            label={careType || "Care Type"}
             icon="▼"
             onClick={handleFilterClick}
           />
         </div>
 
         {/* Sort Button Tile */}
-        <div className="search-tile sort-tile">
-          <FloatingSortButton label="Sort By" icon="≡" onClick={onSortClick} />
-        </div>
+        {/* <div className="search-tile sort-tile">
+          <FloatingSortButton label="Sort By" icon="≡" onClick={() => {}} />
+        </div> */}
 
         {/* Care Type Filter Dropdown Tile - Conditionally Rendered */}
         {showCareTypeFilter && (
           <div className="search-tile care-type-tile">
             <CareTypeFilter
-              selectedCareType={selectedCareType}
-              onSelectCareType={(careType) => {
-                onSelectCareType(careType);
+              selectedCareType={careType}
+              onSelectCareType={(_careType) => {
+                // setCareType(_careType);
+                onSelectCareType(_careType);
                 setShowCareTypeFilter(false);
               }}
             />

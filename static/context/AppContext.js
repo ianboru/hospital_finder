@@ -42,6 +42,7 @@ export const AppProvider = ({ children }) => {
     : "Hospital";
 
   // State
+  const [careType, setCareType] = useState(initialCareType);
   const [selectedPlace, _setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState(
     initialSearchParam ? initialSearchParam : ""
@@ -51,20 +52,10 @@ export const AppProvider = ({ children }) => {
   const [currentGPSLocation, setCurrentGPSLocation] = useState(null);
   const [width, setWidth] = useState(window.innerWidth);
   const [activeTab, setActiveTab] = useState('map');
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
-  // Callback functions
-  const setSelectedPlace = useCallback((place) => {
-    _setSelectedPlace(place);
-  }, []);
+  // State for comparision
 
-  const onSelectCareType = (careType) => {
-    console.log("selected caretype", careType);
-    onSearchSubmit(null, null, careType);
-  };
-
-  const onSearchInputChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
 
   const onSearchSubmit = (
     newCenter = null,
@@ -90,6 +81,22 @@ export const AppProvider = ({ children }) => {
     window.location.href = url;
   };
 
+
+  // Callback functions
+  const setSelectedPlace = useCallback((place) => {
+    _setSelectedPlace(place);
+  }, []);
+
+  const onSelectCareType = (careType) => {
+    console.log("selected caretype", careType);
+    onSearchSubmit(null, null, careType);
+  };
+
+  const onSearchInputChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+ 
   const handleWindowSizeChange = () => {
     setWidth(window.innerWidth);
   };
@@ -164,7 +171,9 @@ export const AppProvider = ({ children }) => {
     currentGPSLocation,
     width,
     activeTab,
+    isSearchActive,
     isMobile,
+    careType,
     
     // Functions
     setSelectedPlace,
@@ -176,6 +185,9 @@ export const AppProvider = ({ children }) => {
     onSelectCareType,
     onSearchInputChange,
     onSearchSubmit,
+    setIsSearchActive,
+    setCareType,
+
     
     // Computed
     definitionInfoPopUp,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import HeaderInformation from "./HeaderInformation";
 import CareTypeFilter from "./CareTypeFilter";
 import SearchButton from "./SearchButton";
@@ -13,6 +13,7 @@ import LocationResults from "./LocationResults";
 import "./MobileLayout.css";
 import SearchBox from "./SearchBox";
 import SearchScreen from "./SearchScreen";
+import CompareSelector from "./CompareSelector";
 
 const MobileLayout = () => {
   const {
@@ -35,6 +36,8 @@ const MobileLayout = () => {
     initialCareType,
     onSelectCareType,
     isSearchActive,
+    comparisonPlaces,
+    setComparisonPlaces,
   } = useAppContext();
   console.log("!!!!!isSearchActive", isSearchActive);
 //   if (isSearchActive) {
@@ -55,6 +58,17 @@ const MobileLayout = () => {
 //       </div>
 //     );
 //   }
+const handleCompare = useCallback((place) => {
+    setComparisonPlaces([...comparisonPlaces, place]);
+  }, [comparisonPlaces]);
+
+  const handleRemoveComparison = useCallback((index) => {
+    setComparisonPlaces(comparisonPlaces.filter((_, i) => i !== index));
+  }, [comparisonPlaces]);
+
+  const handleAddComparison = useCallback((index) => {
+    setComparisonPlaces([...comparisonPlaces, index]);
+  }, [comparisonPlaces]);
 
   return (
     <div className="app">
@@ -91,10 +105,18 @@ const MobileLayout = () => {
         ></Map>
       </div>
       <BottomSheet>
+        {/* TODO: Add comparison places */}
+        {
+            comparisonPlaces.length > 0 && (
+                <CompareSelector
+                    selectedHospitals={comparisonPlaces}
+                    onRemove={(index) => handleRemoveComparison(index)}
+                />
+            )
+        }
         <LocationResults
           results={placesData}
-          onClose={() => setSelectedPlace(null)}
-          onCompare={() => setSelectedPlace(null)}
+          onCompare={(place) => handleCompare(place)}
           title="Hospitals"
         />
       </BottomSheet>

@@ -55,6 +55,7 @@ export const AppProvider = ({ children }) => {
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   // State for comparision
+  const [comparisonPlaces, setComparisonPlaces] = useState([]);
 
 
   const onSearchSubmit = (
@@ -174,6 +175,7 @@ export const AppProvider = ({ children }) => {
     isSearchActive,
     isMobile,
     careType,
+    comparisonPlaces,
     
     // Functions
     setSelectedPlace,
@@ -187,7 +189,7 @@ export const AppProvider = ({ children }) => {
     onSearchSubmit,
     setIsSearchActive,
     setCareType,
-
+    setComparisonPlaces,
     
     // Computed
     definitionInfoPopUp,

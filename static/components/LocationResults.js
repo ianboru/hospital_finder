@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import LocationRow from './LocationRow';
 import './LocationResults.css';
 import { addressToUrl, formatPhoneNumber } from '../utils';
+import { useAppContext } from '../context/AppContext';
 
 const getInfectionStatus = (rating) => {
   if (rating === null || rating === undefined) return '';
@@ -13,10 +14,12 @@ const getInfectionStatus = (rating) => {
 
 const LocationResults = ({
   results = [],
-  onClose = () => {},
-  onCompare = () => {},
+  onCompare = (_place) => {},
   title = 'Hospitals',
-}) => (
+}) => {
+
+
+  return (
   <div className="lr-results-sheet">
     <div className="lr-results-header">
       <span className="lr-results-title">{title}</span>
@@ -41,6 +44,7 @@ const LocationResults = ({
       ))}
     </div>
   </div>
-);
+  );
+};
 
 export default LocationResults;

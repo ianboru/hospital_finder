@@ -1,5 +1,5 @@
-import React from 'react';
-import './ComparisonTable.css';
+import React from "react";
+import "./ComparisonTable.css";
 
 const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
   // Ensure we always have exactly 3 columns by padding with empty placeholders
@@ -23,7 +23,8 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
 
   // Get CSS class based on score
   const getInfectionStatusClass = (score) => {
-    if (score === null || score === undefined) return "hospital-comparison-status-na";
+    if (score === null || score === undefined)
+      return "hospital-comparison-status-na";
     if (score <= 2) return "hospital-comparison-status-below";
     if (score >= 4) return "hospital-comparison-status-above";
     return "hospital-comparison-status-average";
@@ -39,8 +40,11 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
 
   // Render stars for ratings
   const renderStars = (rating) => {
-    if (isNaN(rating) || rating === null) return <span className="hospital-comparison-no-rating">No rating</span>;
-    return <span className="hospital-comparison-stars">{Math.round(rating)}★</span>;
+    if (isNaN(rating) || rating === null)
+      return <span className="hospital-comparison-no-rating">No rating</span>;
+    return (
+      <span className="hospital-comparison-stars">{Math.round(rating)}★</span>
+    );
   };
 
   // Format distance and time
@@ -49,6 +53,15 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
     const minutes = Math.round(miles * 1.5);
     return `${distance} • ~${minutes} min`;
   };
+
+  // Patient's Rating sub-metrics
+  const patientRatingMetrics = [
+    { key: "Nurse Communication", label: "Nurse Communication" },
+    { key: "Doctor Communication", label: "Doctor Communication" },
+    { key: "Staff Responsiveness", label: "Staff Responsiveness" },
+    { key: "Medicine Communication", label: "Medicine Communication" },
+    { key: "Discharge Information", label: "Discharge Information" },
+  ];
 
   return (
     <div className="hospital-comparison-container">
@@ -68,12 +81,20 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
               <td key={index} className="hospital-comparison-cell">
                 {hospital ? (
                   <>
-                    <div className="hospital-comparison-name">{hospital.name}</div>
-                    <div className="hospital-comparison-info">{hospital.caretype}</div>
-                    <div className="hospital-comparison-info">{formatDistance(hospital.distance)}</div>
+                    <div className="hospital-comparison-name">
+                      {hospital.name}
+                    </div>
+                    <div className="hospital-comparison-info">
+                      {hospital.caretype}
+                    </div>
+                    <div className="hospital-comparison-info">
+                      {formatDistance(hospital.distance)}
+                    </div>
                   </>
                 ) : (
-                  <div className="hospital-comparison-placeholder">No hospital selected</div>
+                  <div className="hospital-comparison-placeholder">
+                    No hospital selected
+                  </div>
                 )}
               </td>
             ))}
@@ -81,41 +102,64 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
         </thead>
         <tbody>
           {/* Patient's Rating Section */}
-          <tr>
-            <td colSpan={4} className="hospital-comparison-section-header">
+          {/* <tr>
+            <td className="hospital-comparison-section-header">
               <span>⭐ Patient's Rating</span>
             </td>
-          </tr>
-          <tr className="hospital-comparison-data-row">
-            <td className="hospital-comparison-label-cell-bold">Overall</td>
-            {hospitals.map((hospital, index) => (
-              <td key={index} className="hospital-comparison-data-cell">
-                {hospital ? renderStars(hospital["Summary star rating"]) : <span className="hospital-comparison-empty">—</span>}
+            {[0, 1, 2].map((num) => (
+              <td key={num} className="hospital-comparison-header-cell-body">
+                <div>overall</div>
+                <div>2⭐</div>
               </td>
             ))}
-          </tr>
-          <tr className="hospital-comparison-data-row">
-            <td className="hospital-comparison-label-cell">Phone</td>
-            {hospitals.map((hospital, index) => (
-              <td key={index} className="hospital-comparison-data-cell">
-                {hospital ? hospital.phone_number.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : <span className="hospital-comparison-empty">—</span>}
-              </td>
-            ))}
-          </tr>
-
-          {/* Infection Risk Section */}
-          <tr>
-            <td colSpan={4} className="hospital-comparison-section-header" style={{ paddingTop: '24px' }}>
-              <span>🛡️ Infection Risk</span>
-            </td>
           </tr>
           <tr className="hospital-comparison-data-row">
             <td className="hospital-comparison-label-cell-bold">Overall</td>
             {hospitals.map((hospital, index) => (
               <td key={index} className="hospital-comparison-data-cell">
                 {hospital ? (
-                  <span className={getInfectionStatusClass(hospital["Infection Rating"])}>
-                    <span className="hospital-comparison-icon">{getInfectionIcon(hospital["Infection Rating"])}</span>
+                  renderStars(hospital["Summary star rating"])
+                ) : (
+                  <span className="hospital-comparison-empty">—</span>
+                )}
+              </td>
+            ))}
+          </tr> */}
+          <tr className="hospital-comparison-data-row">
+            <td className="hospital-comparison-label-cell">Phone</td>
+            {hospitals.map((hospital, index) => (
+              <td key={index} className="hospital-comparison-data-cell">
+                {hospital ? (
+                  hospital.phone_number.replace(
+                    /(\d{3})(\d{3})(\d{4})/,
+                    "($1) $2-$3"
+                  )
+                ) : (
+                  <span className="hospital-comparison-empty">—</span>
+                )}
+              </td>
+            ))}
+          </tr>
+
+          {/* Infection Risk Section */}
+          <tr className="hospital-comparison-data-row">
+            <td
+              className="hospital-comparison-section-header"
+              style={{ paddingTop: "24px" }}
+            >
+              <span>🛡️ Infection Risk</span>
+            </td>
+            {hospitals.map((hospital, index) => (
+              <td key={index} className="hospital-comparison-data-cell">
+                {hospital ? (
+                  <span
+                    className={getInfectionStatusClass(
+                      hospital["Infection Rating"]
+                    )}
+                  >
+                    <span className="hospital-comparison-icon">
+                      {getInfectionIcon(hospital["Infection Rating"])}
+                    </span>
                     {getInfectionStatus(hospital["Infection Rating"])}
                   </span>
                 ) : (
@@ -125,20 +169,30 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
             ))}
           </tr>
           {[
-            { key: 'Central Line Associated Bloodstream Infection', label: 'CLABSI' },
-            { key: 'Catheter Associated Urinary Tract Infections', label: 'CAUTI' },
-            { key: 'Clostridium Difficile (C.Diff)', label: 'C. diff' },
-            { key: 'MRSA Bacteremia', label: 'MRSA' },
-            { key: 'SSI - Abdominal Hysterectomy', label: 'SSI Hysterectomy' },
-            { key: 'SSI - Colon Surgery', label: 'SSI Colon Surgery' }
+            {
+              key: "Central Line Associated Bloodstream Infection",
+              label: "CLABSI",
+            },
+            {
+              key: "Catheter Associated Urinary Tract Infections",
+              label: "CAUTI",
+            },
+            { key: "Clostridium Difficile (C.Diff)", label: "C. diff" },
+            { key: "MRSA Bacteremia", label: "MRSA" },
+            { key: "SSI - Abdominal Hysterectomy", label: "SSI Hysterectomy" },
+            { key: "SSI - Colon Surgery", label: "SSI Colon Surgery" },
           ].map((item) => (
             <tr key={item.key} className="hospital-comparison-data-row">
               <td className="hospital-comparison-label-cell">{item.label}</td>
               {hospitals.map((hospital, index) => (
                 <td key={index} className="hospital-comparison-data-cell">
                   {hospital ? (
-                    <span className={getInfectionStatusClass(hospital[item.key])}>
-                      <span className="hospital-comparison-icon">{getInfectionIcon(hospital[item.key])}</span>
+                    <span
+                      className={getInfectionStatusClass(hospital[item.key])}
+                    >
+                      <span className="hospital-comparison-icon">
+                        {getInfectionIcon(hospital[item.key])}
+                      </span>
                       {getInfectionStatus(hospital[item.key])}
                     </span>
                   ) : (
@@ -153,7 +207,13 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
             {hospitals.map((hospital, index) => (
               <td key={index} className="hospital-comparison-data-cell">
                 {hospital ? (
-                  <span className={hospital["Mean SIR"] < 1 ? 'hospital-comparison-sir-good' : 'hospital-comparison-sir-bad'}>
+                  <span
+                    className={
+                      hospital["Mean SIR"] < 1
+                        ? "hospital-comparison-sir-good"
+                        : "hospital-comparison-sir-bad"
+                    }
+                  >
                     {hospital["Mean SIR"].toFixed(3)}
                   </span>
                 ) : (
@@ -165,7 +225,11 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
 
           {/* Location Section */}
           <tr>
-            <td colSpan={4} className="hospital-comparison-section-header" style={{ paddingTop: '24px' }}>
+            <td
+              colSpan={4}
+              className="hospital-comparison-section-header"
+              style={{ paddingTop: "24px" }}
+            >
               <span>📍 Location</span>
             </td>
           </tr>
@@ -173,7 +237,11 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
             <td className="hospital-comparison-label-cell">Address</td>
             {hospitals.map((hospital, index) => (
               <td key={index} className="hospital-comparison-data-cell-small">
-                {hospital ? hospital.address[0] : <span className="hospital-comparison-empty">—</span>}
+                {hospital ? (
+                  hospital.address[0]
+                ) : (
+                  <span className="hospital-comparison-empty">—</span>
+                )}
               </td>
             ))}
           </tr>

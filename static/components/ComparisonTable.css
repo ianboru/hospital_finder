@@ -39,6 +39,11 @@
   text-align: center;
 }
 
+.hospital-comparison-header-cell-body {
+    text-align: center;
+    font-size: 12px;
+}
+
 .hospital-comparison-cell {
   padding: 8px;
   text-align: center;
@@ -64,7 +69,7 @@
 .hospital-comparison-section-header {
   padding-top: 16px;
   padding-bottom: 8px;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
 }
 

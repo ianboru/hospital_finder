@@ -4,6 +4,7 @@ import './CompareSelector.css';
 const CompareSelector = ({
   selectedHospitals = [],
   onRemove = () => {},
+  navigateToComparison = () => {},
 }) => {
   // Fill up to 3 slots
   const slots = [0, 1, 2].map((i) => selectedHospitals[i] || null);
@@ -33,7 +34,7 @@ const CompareSelector = ({
       </div>
       <button
         className="compare-selector-compare-btn"
-        // onClick={onCompare}
+        onClick={navigateToComparison}
         disabled={!canCompare}
       >
         Compare

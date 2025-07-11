@@ -14,6 +14,7 @@ import "./MobileLayout.css";
 import SearchBox from "./SearchBox";
 import SearchScreen from "./SearchScreen";
 import CompareSelector from "./CompareSelector";
+import ComparisonModal from "./ComparisonModal";
 
 const MobileLayout = () => {
   const {
@@ -38,6 +39,8 @@ const MobileLayout = () => {
     isSearchActive,
     comparisonPlaces,
     setComparisonPlaces,
+    showComparisonModal,
+    setShowComparisonModal,
   } = useAppContext();
   console.log("!!!!!isSearchActive", isSearchActive);
 //   if (isSearchActive) {
@@ -70,8 +73,17 @@ const handleCompare = useCallback((place) => {
     setComparisonPlaces([...comparisonPlaces, index]);
   }, [comparisonPlaces]);
 
+
+
   return (
     <div className="app">
+      {showComparisonModal && (
+        <ComparisonModal
+          comparisonPlaces={comparisonPlaces}
+          onClose={() => setShowComparisonModal(false)}
+          onBack={() => setShowComparisonModal(false)}
+        />
+      )}
       <SearchBox
         onSearchSubmit={onSearchSubmit}
         searchTerm={searchTerm}
@@ -111,6 +123,7 @@ const handleCompare = useCallback((place) => {
                 <CompareSelector
                     selectedHospitals={comparisonPlaces}
                     onRemove={(index) => handleRemoveComparison(index)}
+                    navigateToComparison={() => setShowComparisonModal(true)}
                 />
             )
         }

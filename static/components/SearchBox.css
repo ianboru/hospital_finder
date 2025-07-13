@@ -1,0 +1,130 @@
+.search-box-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  pointer-events: none; /* Allow clicks to pass through to map */
+}
+
+.search-tile {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 30px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  pointer-events: auto; /* Re-enable pointer events for the tile */
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-tile:hover {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Search Bar Tile - Main and largest */
+.search-bar-tile {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Filter Button Tile - Positioned to the right of search bar */
+.filter-tile {
+  top: 60px;
+  right: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Sort Button Tile - Positioned below filter button */
+.sort-tile {
+  top: 110px;
+  right: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Care Type Filter Tile - Positioned below search bar on the left */
+.care-type-tile {
+  top: 60px;
+  left: 0;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  min-width: 280px;
+  max-width: 320px;
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Animation for dropdown appearance */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Override SearchBar styles to work within the tile */
+.search-bar-tile .sb-container {
+  position: relative;
+  top: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Override FloatingFilterButton styles */
+.filter-tile .ffb-btn,
+.sort-tile .fsb-btn {
+  background: transparent;
+  box-shadow: none;
+  margin: 0;
+  padding: 10px 22px;
+}
+
+/* Override CareTypeFilter styles for better integration */
+.care-type-tile .dropdown-container {
+  margin: 0;
+}
+
+.care-type-tile .dropdown {
+  margin-top: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .search-box-container {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  
+  .filter-tile {
+    top: 55px;
+  }
+  
+  .sort-tile {
+    top: 100px;
+  }
+  
+  .care-type-tile {
+    top: 55px;
+    left: 0;
+    right: 0;
+    min-width: auto;
+    max-width: none;
+  }
+}
+
+/* Ensure tiles don't interfere with map interactions */
+.search-tile * {
+  pointer-events: auto;
+} 

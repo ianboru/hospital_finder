@@ -1,0 +1,11 @@
+@media (max-width: 768px) {
+  .search-container {
+    position: sticky;
+    top: 10px;
+    z-index: 1;
+    background: transparent;
+    padding-right: 15px;
+    padding-left: 10px;
+    width: 100%;
+  }
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { getHCAHPSStars, getHaiEmoji, addressToUrl, formatPhoneNumber} from '../utils';
 import ViewOnGoogleMapsButton from "./ViewOnGoogleMapsButton";
+import "../styles/placedetails.css"
 
 const PlaceDetail = (props) => {
     const selectedPlace = props.selectedPlace
@@ -129,16 +130,7 @@ const PlaceDetail = (props) => {
     })
     
     return(
-        <div style={{
-          border : 2, 
-          borderColor : 'black', 
-          width : 400, 
-          marginRight : 10,
-          marginLeft : 10, 
-          marginBottom: 15,
-          zIndex : 50,
-         
-        }}>
+        <div className="place-detail-container">
             <div onClick={closePlaceDetail} style={{
               display : 'flex', 
               justifyContent : 'flex-end', 

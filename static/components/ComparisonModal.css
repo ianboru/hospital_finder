@@ -1,0 +1,121 @@
+.comparison-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.comparison-modal {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  padding: 24px 18px 18px 18px;
+  min-width: 340px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  font-family: inherit;
+}
+.comparison-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.7rem;
+  color: #aaa;
+  cursor: pointer;
+  z-index: 2;
+}
+.comparison-modal-header {
+  display: flex;
+  border-bottom: 2px solid #e5e5e5;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  font-weight: 600;
+  color: #6c3fc5;
+}
+.comparison-modal-measure {
+  flex: 1.2;
+  text-align: left;
+  font-size: 1.1rem;
+  padding-left: 2px;
+}
+.comparison-modal-col-header {
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
+  color: #222;
+}
+.comparison-modal-place-name {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+.comparison-modal-place-meta {
+  font-size: 0.85rem;
+  color: #6c3fc5;
+  margin-bottom: 1px;
+}
+.comparison-modal-add {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin-top: 12px;
+}
+.comparison-modal-section {
+  display: flex;
+  border-bottom: 1px solid #ececec;
+  align-items: stretch;
+}
+.comparison-modal-row-label {
+  flex: 1.2;
+  font-size: 0.98rem;
+  color: #333;
+  padding: 8px 0 8px 2px;
+  display: flex;
+  align-items: center;
+}
+.comparison-modal-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  font-size: 1rem;
+}
+.comparison-modal-rating {
+  font-size: 1.1rem;
+  color: #e6b800;
+  font-weight: 600;
+}
+.comparison-modal-risk {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1rem;
+}
+.risk-icon.below { color: #2ecc40; }
+.risk-icon.average { color: #e6b800; }
+.risk-icon.above { color: #e74c3c; }
+.comparison-modal-risk-label {
+  font-size: 0.95rem;
+  color: #888;
+}
+.comparison-modal-back {
+  width: 100%;
+  margin-top: 18px;
+  background: #4b7c3a;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.comparison-modal-back:hover {
+  background: #35602a;
+} 

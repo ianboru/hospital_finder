@@ -1,0 +1,175 @@
+.hospital-comparison-container {
+  max-width: 896px;
+  height: 80vh;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.hospital-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.hospital-comparison-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+.hospital-comparison-header-cell {
+  background-color: #936DC3;
+  border: 1px solid #7C51B2;
+  color: white;
+  padding: 8px;
+  text-align: left;
+}
+
+.hospital-comparison-header-cell-center {
+  background-color: #936DC3;
+  border: 1px solid #7C51B2;
+  color: white;
+  padding: 8px;
+  text-align: center;
+}
+
+.hospital-comparison-header-cell-body {
+    text-align: center;
+    font-size: 12px;
+}
+
+.hospital-comparison-cell {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.hospital-comparison-name {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.hospital-comparison-info {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+.hospital-comparison-placeholder {
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.hospital-comparison-section-header {
+  padding-top: 16px;
+  padding-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hospital-comparison-data-row {
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.hospital-comparison-label-cell {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.hospital-comparison-label-cell-bold {
+  padding: 8px;
+  font-weight: 500;
+}
+
+.hospital-comparison-data-cell {
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.hospital-comparison-data-cell-small {
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.hospital-comparison-back-button {
+  width: 100%;
+  background-color: #059669;
+  color: white;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+  font-size: 16px;
+}
+
+/* Status colors */
+.hospital-comparison-status-na {
+  color: #9CA3AF;
+}
+
+.hospital-comparison-status-below {
+  color: #059669;
+}
+
+.hospital-comparison-status-average {
+  color: #D97706;
+}
+
+.hospital-comparison-status-above {
+  color: #DC2626;
+}
+
+.hospital-comparison-stars {
+  color: #EAB308;
+}
+
+.hospital-comparison-no-rating {
+  color: #9CA3AF;
+}
+
+.hospital-comparison-empty {
+  color: #D1D5DB;
+}
+
+.hospital-comparison-sir-good {
+  color: #059669;
+}
+
+.hospital-comparison-sir-bad {
+  color: #DC2626;
+}
+
+.hospital-comparison-icon {
+  margin-right: 4px;
+}
+
+/* Custom scrollbar styling */
+.hospital-comparison-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.hospital-comparison-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.hospital-comparison-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.hospital-comparison-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

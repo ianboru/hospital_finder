@@ -10,8 +10,8 @@ const BottomSheet = forwardRef(function BottomSheet(props, ref) {
   const [startHeight, setStartHeight] = useState(30);
   const sheetRef = useRef(null);
   
-  const SNAP_POINTS = [30, 80];
-  const MIN_HEIGHT = 20;
+  const SNAP_POINTS = [10, 30, 80];
+  const MIN_HEIGHT = 5;
   const MAX_HEIGHT = 80;
 
   // Expose methods to parent components via ref
@@ -193,25 +193,43 @@ const BottomSheet = forwardRef(function BottomSheet(props, ref) {
   const transformY = 100 - height;
 
   return (
-    <div
-      ref={sheetRef}
-      className={isDragging ? 'bottom-sheet dragging' : 'bottom-sheet not-dragging'}
-      style={{
-        transform: `translateY(${transformY}%)`
-      }}
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
-    >
-      <div className="drag-handle-container">
-        <div className="drag-handle" />
-      </div>
-      
-      <div className="sheet-content">
-        <div className="sheet-main-content">
-          {children}
+    <>
+      {/* Backdrop to prevent background interaction when sheet is expanded */}
+      {height > 50 && (
+        <div 
+          className="bottom-sheet-backdrop"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 40,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            pointerEvents: 'auto'
+          }}
+        />
+      )}
+      <div
+        ref={sheetRef}
+        className={isDragging ? 'bottom-sheet dragging' : 'bottom-sheet not-dragging'}
+        style={{
+          transform: `translateY(${transformY}%)`
+        }}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+      >
+        <div className="drag-handle-container">
+          <div className="drag-handle" />
+        </div>
+        
+        <div className="sheet-content">
+          <div className="sheet-main-content">
+            {children}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 });
 

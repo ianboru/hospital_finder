@@ -39,12 +39,12 @@ function AppContent() {
     isMobile,
   } = useAppContext();
 
-  console.log("initial placeresults", placesData);
-  console.log("initial quantiles", metricQuantiles);
-  console.log("initial dictionary", dataDictionary);
+  // console.log("initial placeresults", placesData);
+  // console.log("initial quantiles", metricQuantiles);
+  // console.log("initial dictionary", dataDictionary);
   console.log("initial care type", initialCareType);
-  console.log("initial map location", initialLocation);
-  console.log("is mobile", isMobile);
+  // console.log("initial map location", initialLocation);
+  // console.log("is mobile", isMobile);
   
   if (isMobile) {
     return (

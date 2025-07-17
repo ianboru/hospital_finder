@@ -49,69 +49,85 @@ const LocationRow = ({
   infectionStatus,
   onGoogleMaps,
   onCompare,
+  onSelect,
 }) => (
-  <div className="lr-row">
-    
-      <div>
-        <div className="lr-main-info">
-          <div className="lr-title">{name}</div>
-          <div className="lr-address">{address}</div>
-          <div className="lr-details">
-            <span className="lr-hours">{openHours}</span>
-            <span className="lr-phone">{phone}</span>
-            <span className="lr-distance">{distance} mi</span>
-            <span className="lr-travel">
-              <span role="img" aria-label="car">
-                🚗
-              </span>{" "}
-              {travelTime} min
-            </span>
-          </div>
-        </div>
-        <div className="lr-actions">
-          <button className="lr-btn lr-maps" onClick={onGoogleMaps}>
-            <span role="img" aria-label="maps">
-              📍
+  <div
+    onClick={onSelect}
+    onTouchStart={(e) => {
+      e.currentTarget.style.opacity = "0.7";
+    }}
+    onTouchEnd={(e) => {
+      e.currentTarget.style.opacity = "1";
+    }}
+    onTouchCancel={(e) => {
+      e.currentTarget.style.opacity = "1";
+    }}
+    className="lr-row"
+  >
+    <div>
+      <div className="lr-main-info">
+        <div className="lr-title">{name}</div>
+        <div className="lr-address">{address}</div>
+        <div className="lr-details">
+          <span className="lr-hours">{openHours}</span>
+          <span className="lr-phone">{phone}</span>
+          <span className="lr-distance">{distance} mi</span>
+          <span className="lr-travel">
+            <span role="img" aria-label="car">
+              🚗
             </span>{" "}
-            Google Maps
-          </button>
-          <button className="lr-btn lr-compare" onClick={onCompare}>
-            <span role="img" aria-label="compare">
-              ⇄
-            </span>{" "}
-            Compare
-          </button>
+            {travelTime} min
+          </span>
         </div>
       </div>
-      <div className="lr-metrics">
-        <div className="lr-metric-row">
-          <div style={{
+      <div className="lr-actions">
+        <button className="lr-btn lr-maps" onClick={onGoogleMaps}>
+          <span role="img" aria-label="maps">
+            📍
+          </span>{" "}
+          Google Maps
+        </button>
+        <button className="lr-btn lr-compare" onClick={onCompare}>
+          <span role="img" aria-label="compare">
+            ⇄
+          </span>{" "}
+          Compare
+        </button>
+      </div>
+    </div>
+    <div className="lr-metrics">
+      <div className="lr-metric-row">
+        <div
+          style={{
             display: "flex",
             flexDirection: "row",
             // alignItems: "center",
-          }}>
+          }}
+        >
           <span className="lr-info-icon" title="Patient Rating">
             ?
           </span>
           <span className="lr-metric-label">Patient Rating</span>
-          </div>
-          {ratingStars(patientRating)}
         </div>
-        <div className="lr-metric-row">
-          <div style={{
+        {ratingStars(patientRating)}
+      </div>
+      <div className="lr-metric-row">
+        <div
+          style={{
             display: "flex",
             flexDirection: "row",
             // alignItems: "center",
-          }}>
+          }}
+        >
           <span className="lr-info-icon" title={infectionLabelText}>
             ?
           </span>
           <span className="lr-metric-label">{infectionLabelText}</span>
-          </div>
-          {infectionIcon(infectionStatus)}
-          {infectionLabel(infectionStatus)}
         </div>
+        {infectionIcon(infectionStatus)}
+        {infectionLabel(infectionStatus)}
       </div>
+    </div>
   </div>
 );
 

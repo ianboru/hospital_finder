@@ -18,6 +18,10 @@ const LocationResults = ({
   title = 'Hospitals',
 }) => {
 
+  const {
+    setSelectedPlace,
+  } = useAppContext();
+
 
   return (
   <div className="lr-results-sheet">
@@ -28,6 +32,7 @@ const LocationResults = ({
       {results.length === 0 && <div className="lr-no-results">No valid results</div>}
       {results.map((place, i) => (
         <LocationRow
+          onSelect={() => setSelectedPlace(place)}
           key={place["Facility ID"] || i}
           name={place.name}
           address={place.address}

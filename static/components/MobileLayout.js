@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import HeaderInformation from "./HeaderInformation";
 import CareTypeFilter from "./CareTypeFilter";
 import SearchButton from "./SearchButton";
@@ -7,7 +7,7 @@ import Map from "./Map";
 import PlaceResultsMobile from "./PlaceResultsMobile";
 import PlaceResults from "./PlaceResults";
 import { useAppContext } from "../context/AppContext";
-import BottomSheet, { BottomSheetDemo } from "./BottomSheet";
+import BottomSheet from "./BottomSheet";
 import SearchBar from "./SearchBar";
 import LocationResults from "./LocationResults";
 import "./MobileLayout.css";
@@ -42,38 +42,87 @@ const MobileLayout = () => {
     showComparisonModal,
     setShowComparisonModal,
   } = useAppContext();
+
+  const bottomSheetRef = useRef(null);
   // console.log("!!!!!isSearchActive", isSearchActive);
-//   if (isSearchActive) {
-//     return (
-//       <div className="app">
-//         <div
-//           style={{
-//           }}
-//         >
-//           <SearchBox
-//             onSearchSubmit={onSearchSubmit}
-//             searchTerm={searchTerm}
-//             onSearchInputChange={onSearchInputChange}
-//             setSearchTerm={setSearchTerm}
-//           />
-//         </div>
-//         <SearchScreen />
-//       </div>
-//     );
-//   }
-const handleCompare = useCallback((place) => {
-    setComparisonPlaces([...comparisonPlaces, place]);
-  }, [comparisonPlaces]);
+  //   if (isSearchActive) {
+  //     return (
+  //       <div className="app">
+  //         <div
+  //           style={{
+  //           }}
+  //         >
+  //           <SearchBox
+  //             onSearchSubmit={onSearchSubmit}
+  //             searchTerm={searchTerm}
+  //             onSearchInputChange={onSearchInputChange}
+  //             setSearchTerm={setSearchTerm}
+  //           />
+  //         </div>
+  //         <SearchScreen />
+  //       </div>
+  //     );
+  //   }
 
-  const handleRemoveComparison = useCallback((index) => {
-    setComparisonPlaces(comparisonPlaces.filter((_, i) => i !== index));
-  }, [comparisonPlaces]);
+  useEffect(() => {
+    if (selectedPlace) {
+      bottomSheetRef.current && bottomSheetRef.current.expand();
+    }
+  }, [selectedPlace]);
 
-  const handleAddComparison = useCallback((index) => {
-    setComparisonPlaces([...comparisonPlaces, index]);
-  }, [comparisonPlaces]);
+  const handleCompare = useCallback(
+    (place) => {
+      setComparisonPlaces([...comparisonPlaces, place]);
+    },
+    [comparisonPlaces]
+  );
 
+  const handleRemoveComparison = useCallback(
+    (index) => {
+      setComparisonPlaces(comparisonPlaces.filter((_, i) => i !== index));
+    },
+    [comparisonPlaces]
+  );
 
+  const handleAddComparison = useCallback(
+    (index) => {
+      setComparisonPlaces([...comparisonPlaces, index]);
+    },
+    [comparisonPlaces]
+  );
+
+  const BottomSheetContent = () => {
+    if (selectedPlace) {
+      return (
+        <PlaceDetail
+          selectedPlace={selectedPlace}
+          setSelectedPlace={setSelectedPlace}
+          setShownDefinition={setShownDefinition}
+          shownDefinition={shownDefinition}
+          selectedCareType={initialCareTypeParam}
+          dataDictionary={dataDictionary}
+          metricQuantiles={metricQuantiles}
+        />
+      );
+    }
+    return (
+      <>
+        {comparisonPlaces.length > 0 && (
+          <CompareSelector
+            selectedHospitals={comparisonPlaces}
+            onRemove={(index) => handleRemoveComparison(index)}
+            navigateToComparison={() => setShowComparisonModal(true)}
+          />
+        )}
+
+        <LocationResults
+          results={placesData}
+          onCompare={(place) => handleCompare(place)}
+          title="Hospitals"
+        />
+      </>
+    );
+  };
 
   return (
     <div className="app">
@@ -86,7 +135,7 @@ const handleCompare = useCallback((place) => {
       )}
       <SearchBox />
       <div className="map-container">
-        {selectedPlace && (
+        {/* {selectedPlace && (
           <div className="place-detail-overlay">
             {definitionInfoPopUp}
             <PlaceDetail
@@ -99,7 +148,7 @@ const handleCompare = useCallback((place) => {
               metricQuantiles={metricQuantiles}
             ></PlaceDetail>
           </div>
-        )}
+        )} */}
         <Map
           placesData={placesData}
           initialLocation={initialLocation}
@@ -111,22 +160,8 @@ const handleCompare = useCallback((place) => {
           currentGPSLocation={currentGPSLocation}
         ></Map>
       </div>
-      <BottomSheet>
-        {/* TODO: Add comparison places */}
-        {
-            comparisonPlaces.length > 0 && (
-                <CompareSelector
-                    selectedHospitals={comparisonPlaces}
-                    onRemove={(index) => handleRemoveComparison(index)}
-                    navigateToComparison={() => setShowComparisonModal(true)}
-                />
-            )
-        }
-        <LocationResults
-          results={placesData}
-          onCompare={(place) => handleCompare(place)}
-          title="Hospitals"
-        />
+      <BottomSheet ref={bottomSheetRef}>
+        <BottomSheetContent />
       </BottomSheet>
       {/* <PlaceResultsMobile placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} selectedCareType={initialCareTypeParam} /> */}
     </div>

@@ -45,13 +45,13 @@ const PlaceDetail = (props) => {
       "Clostridium Difficile (C.Diff)" : "C.Diff"
     }
 
-    const detailedInfectionMetricStars = Object.keys(detailedInfectionMetricsMap).map((metricName)=>{
+    const detailedInfectionMetricStars = Object.keys(detailedInfectionMetricsMap).map((metricName, index)=>{
       const metricValue = selectedPlace[metricName]
       const metricLabel = detailedInfectionMetricsMap[metricName]
       const dataDictionaryEntry = dataDictionary[metricName.toLowerCase()]
-      console.log("infection metric", metricName.toLowerCase())
+      // console.log("infection metric", metricName.toLowerCase())
       return(
-        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-around"}}>
+        <div style={{marginTop : 5, marginBottom: 5, display: "flex", justifyContent: "space-around"}} key={`${metricName}-${index}-metric-stars`}>
           <span style={{cursor: "pointer",}} onClick={
             ()=>{
               props.setShownDefinition(metricName.toLowerCase())
@@ -74,16 +74,17 @@ const PlaceDetail = (props) => {
       "id","Facility ID", "Facility Name", "address", "Address", "caretype", "name","location", 
       "City/Town", "ZIP Code", "Care Type", "Mean SIR", "Infection Rating", "Mean Compared to National"
     ]
-    //console.log(selectedPlace.name, dataDictionary[key.toLowerCase()]["Care Type"], selectedCareType)
-    const detailMetrics = Object.keys(selectedPlace).filter( (key) => {
-
-      const careTypesString = dataDictionary[key.toLowerCase()] ? dataDictionary[key.toLowerCase()]["care_types"].join(",") : ""
-      const matchesSelectedCareType = dataDictionary[key.toLowerCase()] && careTypesString.includes(selectedCareType)
-        return(
-          !nonMetricKeys.includes(key) && !detailedInfectionMetricsMap[key] && matchesSelectedCareType
-        )
-    }).map((key)=>{
+    const detailMetrics = Object.keys(selectedPlace).filter( (_key) => {
+      const key = _key.toLowerCase()
+      const careTypesString = dataDictionary[key] ? dataDictionary[key]["care_types"].join(",") : ""
+      const matchesSelectedCareType = dataDictionary[key] && careTypesString.includes(selectedCareType)
+        const isMetric = !nonMetricKeys.includes(key) && !detailedInfectionMetricsMap[key] && matchesSelectedCareType
+        // console.log("!!isMetric", isMetric, key, dataDictionary[key])
+        return isMetric
+    }).map((key, index)=>{
+      // console.log("!!!key", key)
       const dataDictionaryEntry = dataDictionary[key.toLowerCase()]
+      // console.log("!!dataDictionaryEntry", dataDictionaryEntry)
       let metricValue = selectedPlace[key]
       if (metricValue === "N") {
         metricValue = "N";
@@ -108,9 +109,8 @@ const PlaceDetail = (props) => {
       const showSuffix = (
         (typeof metricValue == "string" && !metricValue.includes("Not"))|| typeof metricValue != "string" 
       ) && metricValue && metricValue != "No Data"     
-      console.log(unitSuffix, key , showSuffix, metricValue, typeof metricValue,  )
       return (
-        <div>
+        <div key={`${key}-${index}-detail-metric`}>
             <div style={{marginTop : 5, marginBottom: 5, display: "flex",justifyContent: "space-around"}}>
               <span style={{cursor: "pointer",}} onClick={()=>{
                 props.setShownDefinition(key.toLowerCase())
@@ -128,6 +128,7 @@ const PlaceDetail = (props) => {
         </div>
       )
     })
+    // console.log("detailMetrics", detailMetrics)
     
     return(
         <div className="place-detail-container">

@@ -42,7 +42,7 @@ const MobileLayout = () => {
     showComparisonModal,
     setShowComparisonModal,
   } = useAppContext();
-  console.log("!!!!!isSearchActive", isSearchActive);
+  // console.log("!!!!!isSearchActive", isSearchActive);
 //   if (isSearchActive) {
 //     return (
 //       <div className="app">
@@ -84,12 +84,7 @@ const handleCompare = useCallback((place) => {
           onBack={() => setShowComparisonModal(false)}
         />
       )}
-      <SearchBox
-        onSearchSubmit={onSearchSubmit}
-        searchTerm={searchTerm}
-        onSearchInputChange={onSearchInputChange}
-        setSearchTerm={setSearchTerm}
-      />
+      <SearchBox />
       <div className="map-container">
         {selectedPlace && (
           <div className="place-detail-overlay">

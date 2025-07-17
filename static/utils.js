@@ -42,7 +42,9 @@ const getHCAHPSStars = (starCount, maxCount=5) => {
 
 const scrollToPlaceResult = (id) => {
     const element = document.getElementById(id)
-    element.scrollIntoView({behavior: 'smooth'})
+    if (element) {
+        element.scrollIntoView({behavior: 'smooth'})
+    }
 }
 
 const formatPhoneNumber = (phoneNumber) => {

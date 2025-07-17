@@ -54,14 +54,16 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
     return `${distance} • ~${minutes} min`;
   };
 
-  // Patient's Rating sub-metrics
-  const patientRatingMetrics = [
-    { key: "Nurse Communication", label: "Nurse Communication" },
-    { key: "Doctor Communication", label: "Doctor Communication" },
-    { key: "Staff Responsiveness", label: "Staff Responsiveness" },
-    { key: "Medicine Communication", label: "Medicine Communication" },
-    { key: "Discharge Information", label: "Discharge Information" },
-  ];
+  // Patient's Rating sub-metrics - matching PlaceDetail component
+  const detailedExperienceMetricsMap = {
+    "Staff responsiveness - star rating" : "Staff responsiveness",
+    "Discharge information - star raing" : "Discharge information",
+    "Care transition - star rating" : "Care transition",
+    "Cleanliness - star rating" : "Cleanliness",
+    "Quietness - star rating" : "Quietness",
+    "Facilities and staff linear mean score" : "Patient Rating",
+    "Patients who reported that staff definitely communicated about what to expect during and after the procedure" : "Communication",
+  }
 
   return (
     <div className="hospital-comparison-container">
@@ -102,16 +104,10 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
         </thead>
         <tbody>
           {/* Patient's Rating Section */}
-          {/* <tr>
+          <tr>
             <td className="hospital-comparison-section-header">
               <span>⭐ Patient's Rating</span>
             </td>
-            {[0, 1, 2].map((num) => (
-              <td key={num} className="hospital-comparison-header-cell-body">
-                <div>overall</div>
-                <div>2⭐</div>
-              </td>
-            ))}
           </tr>
           <tr className="hospital-comparison-data-row">
             <td className="hospital-comparison-label-cell-bold">Overall</td>
@@ -124,7 +120,24 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
                 )}
               </td>
             ))}
-          </tr> */}
+          </tr>
+          {Object.keys(detailedExperienceMetricsMap).map((metricName) => {
+            const metricLabel = detailedExperienceMetricsMap[metricName];
+            return (
+              <tr key={metricName} className="hospital-comparison-data-row">
+                <td className="hospital-comparison-label-cell">{metricLabel}</td>
+                {hospitals.map((hospital, index) => (
+                  <td key={index} className="hospital-comparison-data-cell">
+                    {hospital ? (
+                      renderStars(hospital[metricName])
+                    ) : (
+                      <span className="hospital-comparison-empty">—</span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
           <tr className="hospital-comparison-data-row">
             <td className="hospital-comparison-label-cell">Phone</td>
             {hospitals.map((hospital, index) => (
@@ -216,29 +229,6 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
                   >
                     {hospital["Mean SIR"].toFixed(3)}
                   </span>
-                ) : (
-                  <span className="hospital-comparison-empty">—</span>
-                )}
-              </td>
-            ))}
-          </tr>
-
-          {/* Location Section */}
-          <tr>
-            <td
-              colSpan={4}
-              className="hospital-comparison-section-header"
-              style={{ paddingTop: "24px" }}
-            >
-              <span>📍 Location</span>
-            </td>
-          </tr>
-          <tr className="hospital-comparison-data-row">
-            <td className="hospital-comparison-label-cell">Address</td>
-            {hospitals.map((hospital, index) => (
-              <td key={index} className="hospital-comparison-data-cell-small">
-                {hospital ? (
-                  hospital.address[0]
                 ) : (
                   <span className="hospital-comparison-empty">—</span>
                 )}

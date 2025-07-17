@@ -87,7 +87,10 @@ const LocationRow = ({
           </span>{" "}
           Google Maps
         </button>
-        <button className="lr-btn lr-compare" onClick={onCompare}>
+        <button className="lr-btn lr-compare" onClick={e => {
+          e.stopPropagation();
+          onCompare();
+        }}>
           <span role="img" aria-label="compare">
             ⇄
           </span>{" "}

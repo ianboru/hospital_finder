@@ -9,14 +9,7 @@ import { useAppContext } from "../context/AppContext";
 const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
   const [showCareTypeFilter, setShowCareTypeFilter] = useState(false);
   const {
-    searchValue,
-    searchTerm,
-    setSearchTerm,
-    onSearchSubmit,
-    isSearchActive,
-    setIsSearchActive,
     careType,
-    setCareType,
     onSelectCareType,
   } = useAppContext();
 
@@ -28,15 +21,7 @@ const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
     <div className="search-box-container">
       <div className="search-tile search-bar-tile">
         <SearchBar
-          onSubmit={onSearchSubmit}
-          value={searchTerm}
-          onChange={setSearchTerm}
-          onClear={() => {
-            setSearchTerm("");
-          }}
           placeholder={placeholder}
-          onFocus={() => setIsSearchActive(true)}
-          onBlur={() => setTimeout(() => setIsSearchActive(false), 200)}
         />
       </div>
 

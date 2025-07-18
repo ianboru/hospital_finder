@@ -73,7 +73,8 @@ const Map = (props) => {
               labelOrigin: new google.maps.Point(0, -30)
           }}
           zIndex={zindex}
-          label={{color: 'white', strokeColor: 'black', strokeWeight: 2} }
+          // commenting for issue: InvalidValueError: setLabel: not a string; and no text property
+          // label={{color: 'white', strokeColor: 'black', strokeWeight: 2} }
           position={latLng}
           onClick={(marker)=>{
             console.log("selecting place in marker", marker)

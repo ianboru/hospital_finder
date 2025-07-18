@@ -28,7 +28,6 @@ const PlaceResults = ({placesData, selectedPlace, setSelectedPlace, selectedCare
         return leftHasCMSMetric ? -1 : rightHasCMSMetric ? 1 : 0
       });
     }
-    console.log("re-rendering place results caretype:", selectedCareType)
     if(!selectedCareType){
       selectedCareType = "Hospital"
     }

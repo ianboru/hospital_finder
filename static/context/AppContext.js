@@ -59,7 +59,7 @@ export const AppProvider = ({ children }) => {
   const [showComparisonModal, setShowComparisonModal] = useState(false);
 
 
-  const onSearchSubmit = (
+  const onSearchSubmit = useCallback((
     newCenter = null,
     newRadius = null,
     careType = careType
@@ -68,7 +68,7 @@ export const AppProvider = ({ children }) => {
     url.searchParams.set("search", searchTerm);
     url.searchParams.set(
       "careType",
-      careType ? careType.name : initialCareType
+      careType ? (careType.name || careType) : initialCareType
     );
     if (newCenter && newCenter !== undefined) {
       if (newRadius) {
@@ -81,7 +81,7 @@ export const AppProvider = ({ children }) => {
       );
     }
     window.location.href = url;
-  };
+  }, [searchTerm]);
 
 
   // Callback functions
@@ -90,7 +90,6 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   const onSelectCareType = (careType) => {
-    console.log("selected caretype", careType);
     onSearchSubmit(null, null, careType);
   };
 

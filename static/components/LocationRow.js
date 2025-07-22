@@ -50,6 +50,9 @@ const LocationRow = ({
   onGoogleMaps,
   onCompare,
   onSelect,
+  compareIndex,
+  onRemoveComparison,
+  disableCompare,
 }) => (
   <div
     onClick={onSelect}
@@ -87,14 +90,31 @@ const LocationRow = ({
           </span>{" "}
           Google Maps
         </button>
-        <button className="lr-btn lr-compare" onClick={e => {
-          e.stopPropagation();
-          onCompare();
-        }}>
-          <span role="img" aria-label="compare">
-            ⇄
-          </span>{" "}
-          Compare
+        <button
+          disabled={disableCompare}
+          style={{
+            backgroundColor: compareIndex !== -1 ? "#7C51B2" : disableCompare ? "grey" : "#ede7f6",
+          }}
+          className="lr-btn lr-compare"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (compareIndex !== -1) {
+              onRemoveComparison();
+            } else {
+              onCompare();
+            }
+          }}
+        >
+          {compareIndex !== -1 ? (
+            <span className="lr-compare-index">{compareIndex + 1}</span>
+          ) : (
+            <>
+              <span role="img" aria-label="compare">
+                ⇄
+              </span>{" "}
+              <span>Compare</span>
+            </>
+          )}
         </button>
       </div>
     </div>

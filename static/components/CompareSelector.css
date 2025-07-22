@@ -4,7 +4,6 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   padding: 20px 12px 12px 12px;
   width: 100%;
-  max-width: 420px;
   margin: 0 auto;
   font-family: inherit;
 }
@@ -141,10 +140,10 @@
   transition: background 0.2s, color 0.2s;
 }
 .compare-selector-compare-btn:enabled {
-  background: #6c3fc5;
+  background: #4E844D;
   cursor: pointer;
   opacity: 1;
 }
 .compare-selector-compare-btn:enabled:hover {
-  background: #4b2991;
+  opacity: 0.8;
 } 

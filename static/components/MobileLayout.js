@@ -70,12 +70,8 @@ const MobileLayout = () => {
     }
   }, [selectedPlace]);
 
-  const handleCompare = useCallback(
-    (place) => {
-      setComparisonPlaces([...comparisonPlaces, place]);
-    },
-    [comparisonPlaces]
-  );
+
+
 
   const handleRemoveComparison = useCallback(
     (index) => {
@@ -84,12 +80,6 @@ const MobileLayout = () => {
     [comparisonPlaces]
   );
 
-  const handleAddComparison = useCallback(
-    (index) => {
-      setComparisonPlaces([...comparisonPlaces, index]);
-    },
-    [comparisonPlaces]
-  );
 
   const BottomSheetContent = () => {
     if (selectedPlace) {

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import LocationRow from './LocationRow';
 import './LocationResults.css';
 import { addressToUrl, formatPhoneNumber } from '../utils';
@@ -14,13 +14,33 @@ const getInfectionStatus = (rating) => {
 
 const LocationResults = ({
   results = [],
-  onCompare = (_place) => {},
   title = 'Hospitals',
 }) => {
 
   const {
     setSelectedPlace,
+    comparisonPlaces,
+    setComparisonPlaces,
   } = useAppContext();
+
+  const handleCompare = useCallback(
+    (place) => {
+      if (comparisonPlaces.length >= 3) {
+        return;
+      }
+      setComparisonPlaces([...comparisonPlaces, place]);
+    },
+    [comparisonPlaces]
+  );
+
+  const handleRemoveComparison = useCallback(
+    (place) => {
+      setComparisonPlaces(comparisonPlaces.filter((p) => p['Facility ID'] !== place['Facility ID']));
+    },
+    [comparisonPlaces]
+  );
+  
+
 
 
   return (
@@ -32,6 +52,8 @@ const LocationResults = ({
       {results.length === 0 && <div className="lr-no-results">No valid results</div>}
       {results.map((place, i) => (
         <LocationRow
+          disableCompare={comparisonPlaces.length >= 3}
+          compareIndex={comparisonPlaces.findIndex((p) => p['Facility ID'] === place['Facility ID'])}
           onSelect={() => setSelectedPlace(place)}
           key={place["Facility ID"] || i}
           name={place.name}
@@ -44,7 +66,8 @@ const LocationResults = ({
           infectionLabelText={place['Infection Label'] || 'Infections'}
           infectionStatus={getInfectionStatus(place['Infection Rating'])}
           onGoogleMaps={() => window.open(addressToUrl(place.address), '_blank')}
-          onCompare={() => onCompare(place)}
+          onCompare={() => handleCompare(place)}
+          onRemoveComparison={() => handleRemoveComparison(place)}
         />
       ))}
     </div>

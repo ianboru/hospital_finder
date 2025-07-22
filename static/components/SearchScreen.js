@@ -7,7 +7,7 @@ import Map from "./Map";
 import PlaceResultsMobile from "./PlaceResultsMobile";
 import PlaceResults from "./PlaceResults";
 import { useAppContext } from "../context/AppContext";
-import BottomSheet, { BottomSheetDemo } from "./BottomSheet";
+import BottomSheet from "./BottomSheet";
 import SearchBar from "./SearchBar";
 import LocationResults from "./LocationResults";
 import "./SearchScreen.css";

@@ -126,18 +126,40 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  max-height: 50px;
+  text-wrap: nowrap;
+  flex-direction: row;
 }
+
+
 
 .lr-btn.lr-maps {
   background: #ede7f6;
 }
 
 .lr-btn.lr-compare {
+  flex-direction: row;
+  display: flex;
   background: #ede7f6;
+  min-width: 120px;
+  justify-content: center;
+  align-items: center;
+  min-height: 42px;
+
+}
+
+.lr-btn.lr-compare-active {
+  flex-direction: row;
+  display: flex;
+  background: #7C51B2;
 }
 
 .lr-btn:hover {
   background: #d1c4e9;
+}
+
+.lr-compare-index {
+  color: #fff;
 }
 
 @media (max-width: 700px) {

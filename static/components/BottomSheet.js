@@ -251,7 +251,6 @@ const BottomSheet = forwardRef(function BottomSheet(props, ref) {
         <div className="drag-handle-container">
           <div className="drag-handle" />
         </div>
-
         <div
           className="sheet-content"
           style={{

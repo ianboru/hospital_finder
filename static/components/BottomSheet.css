@@ -245,16 +245,27 @@ body {
 .drag-handle-container {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding-top: 0.75rem;
     padding-bottom: 0.5rem;
     cursor: grab;
     touch-action: none;
     z-index: 1;
     position: relative;
+    /* Create a larger touch area */
+    min-height: 2.5rem;
+    /* Add padding to make the entire area draggable */
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .drag-handle-container:active {
     cursor: grabbing;
+}
+
+.drag-handle-container:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 0.5rem;
 }
 
 .drag-handle {
@@ -263,6 +274,8 @@ body {
     background-color: #d1d5db;
     border-radius: 9999px;
     transition: background-color 0.15s ease;
+    /* Ensure the visual handle stays centered */
+    flex-shrink: 0;
 }
 
 .drag-handle:hover {
@@ -276,6 +289,8 @@ body {
     overflow: hidden;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
+    /* Ensure content can scroll independently of drag handle */
+    pointer-events: auto;
 }
 
 .sheet-controls {
@@ -321,6 +336,9 @@ body {
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden;
     will-change: scroll-position;
+    /* Ensure content scrolling works properly */
+    position: relative;
+    z-index: 0;
 }
 
 .sheet-section {

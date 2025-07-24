@@ -63,9 +63,9 @@ const LocationResults = ({ results = [], title = "Hospitals" }) => {
               comparisonPlaces.length >= 3 &&
               comparisonPlaces.findIndex((p) => comparePlaces(p, place)) === -1
             }
-            compareIndex={comparisonPlaces.findIndex(
-              (p) => p["Facility ID"] === place["Facility ID"]
-            )}
+            compareIndex={
+              comparisonPlaces.findIndex((p) => comparePlaces(p, place))
+            }
             onSelect={() => setSelectedPlace(place)}
             key={place["Facility ID"] || i}
             name={place.name}

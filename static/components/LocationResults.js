@@ -52,7 +52,7 @@ const LocationResults = ({
       {results.length === 0 && <div className="lr-no-results">No valid results</div>}
       {results.map((place, i) => (
         <LocationRow
-          disableCompare={comparisonPlaces.length >= 3}
+          disableCompare={comparisonPlaces.length >= 3 && comparisonPlaces.findIndex((p) => p['Facility ID'] === place['Facility ID']) === -1}
           compareIndex={comparisonPlaces.findIndex((p) => p['Facility ID'] === place['Facility ID'])}
           onSelect={() => setSelectedPlace(place)}
           key={place["Facility ID"] || i}

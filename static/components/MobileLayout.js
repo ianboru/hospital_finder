@@ -109,6 +109,7 @@ const MobileLayout = () => {
           results={placesData}
           onCompare={(place) => handleCompare(place)}
           title="Hospitals"
+          onRemoveComparison={handleRemoveComparison}
         />
       </>
     );

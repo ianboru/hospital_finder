@@ -99,7 +99,7 @@ const LocationRow = ({
           onClick={(e) => {
             e.stopPropagation();
             if (compareIndex !== -1) {
-              onRemoveComparison();
+              onRemoveComparison(compareIndex);
             } else {
               onCompare();
             }

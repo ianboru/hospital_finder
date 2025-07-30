@@ -12,7 +12,7 @@ const getInfectionStatus = (rating) => {
   return "";
 };
 
-const LocationResults = ({ results = [], title = "Hospitals" }) => {
+const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison = (_i) => {} }) => {
   const { setSelectedPlace, comparisonPlaces, setComparisonPlaces } =
     useAppContext();
   console.log("comparisonPlaces", comparisonPlaces);
@@ -27,28 +27,18 @@ const LocationResults = ({ results = [], title = "Hospitals" }) => {
     [comparisonPlaces]
   );
 
-  const handleRemoveComparison = useCallback(
-    (place) => {
-      setComparisonPlaces(
-        comparisonPlaces.filter(
-          (p) => p["Facility ID"] !== place["Facility ID"]
-        )
-      );
-    },
-    [comparisonPlaces]
-  );
-
   const comparePlaces = (place1, place2) => {
     return (
       place1 &&
       place2 &&
       place1["Facility ID"] === place2["Facility ID"] &&
       place1["Facility Name"] === place2["Facility Name"] &&
-      place1["id"] === place2["id"]
+      place1["id"] === place2["id"] &&
+      place1["name"] === place2["name"]
     );
   };
 
-  return (
+  return ( 
     <div className="lr-results-sheet">
       <div className="lr-results-header">
         <span className="lr-results-title">{title}</span>
@@ -63,9 +53,9 @@ const LocationResults = ({ results = [], title = "Hospitals" }) => {
               comparisonPlaces.length >= 3 &&
               comparisonPlaces.findIndex((p) => comparePlaces(p, place)) === -1
             }
-            compareIndex={
-              comparisonPlaces.findIndex((p) => comparePlaces(p, place))
-            }
+            compareIndex={comparisonPlaces.findIndex((p) =>
+              comparePlaces(p, place)
+            )}
             onSelect={() => setSelectedPlace(place)}
             key={place["Facility ID"] || i}
             name={place.name}
@@ -81,7 +71,7 @@ const LocationResults = ({ results = [], title = "Hospitals" }) => {
               window.open(addressToUrl(place.address), "_blank")
             }
             onCompare={() => handleCompare(place)}
-            onRemoveComparison={() => handleRemoveComparison(place)}
+            onRemoveComparison={(index) => onRemoveComparison(index)}
           />
         ))}
       </div>

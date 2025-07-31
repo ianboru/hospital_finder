@@ -221,9 +221,9 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
           <tr className="hospital-comparison-data-row">
             <td className="hospital-comparison-label-cell">Mean SIR</td>
             {hospitals.map((hospital, index) => {
-              const sir = hospital["Mean SIR"];
               let formattedSir 
               try {
+                const sir = hospital["Mean SIR"];
                 formattedSir = sir.toFixed(3);
               } catch (error) {
                 formattedSir = "—";
@@ -233,7 +233,7 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
                   {formattedSir ? (
                     <span
                       className={
-                        !!sir && sir < 1
+                        formattedSir && formattedSir !== "—"
                           ? "hospital-comparison-sir-good"
                           : "hospital-comparison-sir-bad"
                       }

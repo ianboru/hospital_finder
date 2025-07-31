@@ -222,7 +222,7 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
                 {hospital ? (
                   <span
                     className={
-                      hospital["Mean SIR"] < 1
+                      !!hospital["Mean SIR"] && hospital["Mean SIR"] < 1
                         ? "hospital-comparison-sir-good"
                         : "hospital-comparison-sir-bad"
                     }

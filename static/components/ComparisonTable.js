@@ -56,14 +56,15 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
 
   // Patient's Rating sub-metrics - matching PlaceDetail component
   const detailedExperienceMetricsMap = {
-    "Staff responsiveness - star rating" : "Staff responsiveness",
-    "Discharge information - star raing" : "Discharge information",
-    "Care transition - star rating" : "Care transition",
-    "Cleanliness - star rating" : "Cleanliness",
-    "Quietness - star rating" : "Quietness",
-    "Facilities and staff linear mean score" : "Patient Rating",
-    "Patients who reported that staff definitely communicated about what to expect during and after the procedure" : "Communication",
-  }
+    "Staff responsiveness - star rating": "Staff responsiveness",
+    "Discharge information - star raing": "Discharge information",
+    "Care transition - star rating": "Care transition",
+    "Cleanliness - star rating": "Cleanliness",
+    "Quietness - star rating": "Quietness",
+    "Facilities and staff linear mean score": "Patient Rating",
+    "Patients who reported that staff definitely communicated about what to expect during and after the procedure":
+      "Communication",
+  };
 
   return (
     <div className="hospital-comparison-container">
@@ -125,7 +126,9 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
             const metricLabel = detailedExperienceMetricsMap[metricName];
             return (
               <tr key={metricName} className="hospital-comparison-data-row">
-                <td className="hospital-comparison-label-cell">{metricLabel}</td>
+                <td className="hospital-comparison-label-cell">
+                  {metricLabel}
+                </td>
                 {hospitals.map((hospital, index) => (
                   <td key={index} className="hospital-comparison-data-cell">
                     {hospital ? (
@@ -217,23 +220,32 @@ const HospitalComparisonTable = ({ hospitals: propHospitals }) => {
           ))}
           <tr className="hospital-comparison-data-row">
             <td className="hospital-comparison-label-cell">Mean SIR</td>
-            {hospitals.map((hospital, index) => (
-              <td key={index} className="hospital-comparison-data-cell">
-                {hospital ? (
-                  <span
-                    className={
-                      !!hospital["Mean SIR"] && hospital["Mean SIR"] < 1
-                        ? "hospital-comparison-sir-good"
-                        : "hospital-comparison-sir-bad"
-                    }
-                  >
-                    {hospital["Mean SIR"].toFixed(3)}
-                  </span>
-                ) : (
-                  <span className="hospital-comparison-empty">—</span>
-                )}
-              </td>
-            ))}
+            {hospitals.map((hospital, index) => {
+              const sir = hospital["Mean SIR"];
+              let formattedSir 
+              try {
+                formattedSir = sir.toFixed(3);
+              } catch (error) {
+                formattedSir = "—";
+              }
+              return (
+                <td key={index} className="hospital-comparison-data-cell">
+                  {formattedSir ? (
+                    <span
+                      className={
+                        !!sir && sir < 1
+                          ? "hospital-comparison-sir-good"
+                          : "hospital-comparison-sir-bad"
+                      }
+                    >
+                      {formattedSir}
+                    </span>
+                  ) : (
+                    <span className="hospital-comparison-empty">—</span>
+                  )}
+                </td>
+              );
+            })}
           </tr>
         </tbody>
       </table>

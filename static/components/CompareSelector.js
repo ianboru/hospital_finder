@@ -9,7 +9,9 @@ const CompareSelector = ({
   // Fill up to 3 slots
   const slots = [0, 1, 2].map((i) => selectedHospitals[i] || null);
   const canCompare = selectedHospitals.filter(Boolean).length >= 2;
-
+  console.log("canCompare", canCompare)
+  console.log("selectedHospitals", selectedHospitals)
+  console.log("slots", slots)
   return (
     <div className="compare-selector-root">
       <div className="compare-selector-header">

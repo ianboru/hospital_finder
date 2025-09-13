@@ -1,0 +1,76 @@
+.desktop-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.desktop-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 12px 20px;
+}
+
+.desktop-main-content {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  padding-top: 72px;
+  width: 100%;
+}
+
+.desktop-sidebar {
+  /* width: 00px; */
+  min-width: 350px;
+  max-width: 500px;
+  background: white;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  resize: horizontal;
+  overflow-x: hidden;
+}
+
+.desktop-map-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.desktop-map-container .map {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 1024px) {
+  .desktop-sidebar {
+    width: 350px;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-main-content {
+    flex-direction: column;
+  }
+  
+  .desktop-sidebar {
+    width: 100%;
+    max-width: 100%;
+    height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    resize: none;
+  }
+  
+  .desktop-map-container {
+    height: calc(60vh - 72px);
+  }
+}

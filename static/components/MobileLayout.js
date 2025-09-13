@@ -105,6 +105,7 @@ const MobileLayout = () => {
           />
         )}
 
+
         <LocationResults
           results={placesData}
           onCompare={(place) => handleCompare(place)}
@@ -126,20 +127,6 @@ const MobileLayout = () => {
       )}
       <SearchBox />
       <div className="map-container">
-        {/* {selectedPlace && (
-          <div className="place-detail-overlay">
-            {definitionInfoPopUp}
-            <PlaceDetail
-              selectedPlace={selectedPlace}
-              setSelectedPlace={setSelectedPlace}
-              setShownDefinition={setShownDefinition}
-              shownDefinition={shownDefinition}
-              selectedCareType={initialCareTypeParam}
-              dataDictionary={dataDictionary}
-              metricQuantiles={metricQuantiles}
-            ></PlaceDetail>
-          </div>
-        )} */}
         <Map
           placesData={placesData}
           initialLocation={initialLocation}

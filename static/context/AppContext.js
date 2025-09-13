@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useCallback, useState } from "react";
+import { SORT_FIELD_MAP } from "../constants/sortConstants";
 
 const AppContext = createContext();
 
@@ -44,6 +45,7 @@ export const AppProvider = ({ children }) => {
   // State
   const [careType, setCareType] = useState(initialCareType);
   const [sortBy, setSortBy] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
   const [selectedPlace, _setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState(
     initialSearchParam ? initialSearchParam : ""
@@ -96,6 +98,16 @@ export const AppProvider = ({ children }) => {
 
   const onSelectSortBy = (sortOption) => {
     setSortBy(sortOption);
+    // Reset to default direction when changing sort field
+    if (sortOption && sortOption.id) {
+      const sortConfig = SORT_FIELD_MAP[sortOption.id];
+      const defaultDirection = sortConfig && sortConfig.defaultAscending ? 'asc' : 'desc';
+      setSortDirection(defaultDirection);
+    }
+  };
+
+  const toggleSortDirection = () => {
+    setSortDirection(current => current === 'asc' ? 'desc' : 'asc');
   };
 
   const onSearchInputChange = (e) => {
@@ -181,6 +193,7 @@ export const AppProvider = ({ children }) => {
     isMobile,
     careType,
     sortBy,
+    sortDirection,
     comparisonPlaces,
     showComparisonModal,
     // Functions
@@ -192,6 +205,7 @@ export const AppProvider = ({ children }) => {
     setActiveTab,
     onSelectCareType,
     onSelectSortBy,
+    toggleSortDirection,
     onSearchInputChange,
     onSearchSubmit,
     setIsSearchActive,

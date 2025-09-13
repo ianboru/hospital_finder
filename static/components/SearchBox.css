@@ -89,15 +89,27 @@
 @media (max-width: 768px) {
   .filter-tile {
     top: 60px;
+    left: 0;
     padding: 0;
     background: rgba(255, 255, 255, 0.85);
+    width: auto;
   }
 }
 
-/* Sort Button Tile - Positioned below filter button */
+/* Sort Button Tile */
 .sort-tile {
   padding: 0;
   background: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 768px) {
+  .sort-tile {
+    top: 60px;
+    right: 0;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.85);
+    width: auto;
+  }
 }
 
 /* Sort By Filter Tile */
@@ -187,16 +199,20 @@
     right: 10px;
   }
 
-  .filter-tile {
-    top: 55px;
-  }
-
-  .sort-tile {
-    top: 100px;
-  }
-
   .care-type-tile {
-    top: 55px;
+    top: 110px;
+    left: 0;
+    right: 0;
+    min-width: auto;
+    max-width: none;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #d9d9d9;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sort-by-tile {
+    top: 110px;
     left: 0;
     right: 0;
     min-width: auto;

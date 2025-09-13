@@ -3,6 +3,7 @@ import LocationRow from "./LocationRow";
 import "./LocationResults.css";
 import { addressToUrl, formatPhoneNumber } from "../utils";
 import { useAppContext } from "../context/AppContext";
+import { SORT_FIELD_MAP } from "../constants/sortConstants";
 
 const getInfectionStatus = (rating) => {
   if (rating === null || rating === undefined) return "";
@@ -12,9 +13,19 @@ const getInfectionStatus = (rating) => {
   return "";
 };
 
-const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison = (_i) => {} }) => {
-  const { setSelectedPlace, comparisonPlaces, setComparisonPlaces, isMobile, sortBy } =
-    useAppContext();
+const LocationResults = ({
+  results = [],
+  title = "Hospitals",
+  onRemoveComparison = (_i) => {},
+}) => {
+  const {
+    setSelectedPlace,
+    comparisonPlaces,
+    setComparisonPlaces,
+    isMobile,
+    sortBy,
+    sortDirection,
+  } = useAppContext();
   console.log("comparisonPlaces", comparisonPlaces);
 
   const handleCompare = useCallback(
@@ -40,73 +51,98 @@ const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison
 
   // Sort results based on selected sort option
   const sortedResults = useMemo(() => {
+    console.log("sortBy", sortBy);
     if (!sortBy || !sortBy.id) {
+      console.log("no sort option selected");
       return results; // Return unsorted if no sort option selected
     }
+    console.log(SORT_FIELD_MAP);
 
-    const sorted = [...results];
-    
-    // Map sort option IDs to actual data field names
-    const sortFieldMap = {
-      'distance': 'distance',
-      'care_transition': 'Care transition',
-      'cleanliness': 'Cleanliness',
-      'discharge_info': 'Discharge Information',
-      'doctor_comm': 'Doctors Always Communicated Well',
-      'medicine_comm': 'Communication About Medicines',
-      'nurse_comm': 'Nurses Always Communicated Well',
-      'overall_rating': 'Summary star rating',
-      'patient_exp': 'Patient Experience',
-      'quietness': 'Always Quiet at Night',
-      'staff_resp': 'Staff Always Responsive',
-      'recommend': 'Would Definitely Recommend'
-    };
+    const sortConfig = SORT_FIELD_MAP[sortBy.id];
+    console.log("sortConfig", sortConfig);
 
-    const sortField = sortFieldMap[sortBy.id];
-    
-    if (sortField) {
+    if (sortConfig) {
+      // First filter out entries with undefined/invalid values for the sort field
+      const isValidValue = (val) => {
+        console.log("filtering val", val);
+        if (
+          !val ||
+          val === null ||
+          val === undefined ||
+          val === "" ||
+          val === "N/A" ||
+          val === "Not Available"
+        )
+          return false;
+
+        // For rating fields, also filter out 0 ratings
+        if (
+          sortConfig.field.includes("star rating") &&
+          (val === 0 || val === "0")
+        )
+          return false;
+
+        return true;
+      };
+
+      const filtered = results.filter((item) =>
+        isValidValue(item[sortConfig.field])
+      );
+
+      const sorted = [...filtered];
       sorted.sort((a, b) => {
-        const aValue = a[sortField];
-        const bValue = b[sortField];
-        
-        // Handle null/undefined values
-        if (aValue === null || aValue === undefined) return 1;
-        if (bValue === null || bValue === undefined) return -1;
-        
-        // Special handling for distance (sort ascending - closer first)
-        if (sortField === 'distance') {
+        const aValue = a[sortConfig.field];
+        const bValue = b[sortConfig.field];
+
+        let comparison = 0;
+
+        // Special handling for distance
+        if (sortConfig.id === "distance") {
           // Parse distance values if they're strings like "2.5 mi"
           const parseDistance = (val) => {
-            if (typeof val === 'number') return val;
-            if (typeof val === 'string') {
+            if (typeof val === "number") return val;
+            if (typeof val === "string") {
               const num = parseFloat(val);
               return isNaN(num) ? Infinity : num;
             }
             return Infinity;
           };
-          
-          return parseDistance(aValue) - parseDistance(bValue);
-        }
-        
-        // Sort in descending order (higher values first) for ratings
-        if (typeof aValue === 'number' && typeof bValue === 'number') {
-          return bValue - aValue;
-        }
-        
-        // For string values, sort alphabetically
-        return String(bValue).localeCompare(String(aValue));
-      });
-    }
-    
-    return sorted;
-  }, [results, sortBy]);
 
-  return ( 
+          comparison = parseDistance(aValue) - parseDistance(bValue);
+        } else {
+          // For numeric values
+          if (typeof aValue === "number" && typeof bValue === "number") {
+            comparison = aValue - bValue;
+          } else {
+            // Convert to numbers if they're strings
+            const numA = parseFloat(aValue);
+            const numB = parseFloat(bValue);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              comparison = numA - numB;
+            } else {
+              // For string values, sort alphabetically
+              comparison = String(aValue).localeCompare(String(bValue));
+            }
+          }
+        }
+
+        // Use the user-selected sort direction
+        const isAscending = sortDirection === "asc";
+        return isAscending ? comparison : -comparison;
+      });
+
+      console.log("sorted", sorted);
+      return sorted;
+    }
+
+    return results;
+  }, [results, sortBy, sortDirection]);
+  console.log("sortedResults", sortedResults);
+
+  return (
     <div className="lr-results-sheet">
       <div className="lr-results-header">
-        {isMobile && (
-          <span className="lr-results-title">{title}</span>
-        )}
+        {isMobile && <span className="lr-results-title">{title}</span>}
       </div>
       <div className="lr-results-list">
         {sortedResults.length === 0 && (

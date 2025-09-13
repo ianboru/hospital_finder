@@ -1,21 +1,12 @@
 import React from 'react'
 import SelectDropdown from './SelectDropdown'
+import { getSortOptions } from '../constants/sortConstants'
+import { useAppContext } from '../context/AppContext'
+import './SortByFilter.css'
 
 const SortByFilter = ({ selectedSort, onSelectSort }) => {
-    const sortOptions = [
-        { id: 'distance', name: 'Distance' },
-        { id: 'care_transition', name: 'Care Transition' },
-        { id: 'cleanliness', name: 'Cleanliness' },
-        { id: 'discharge_info', name: 'Discharge Information' },
-        { id: 'doctor_comm', name: 'Doctor Communication' },
-        { id: 'medicine_comm', name: 'Medicine Communication' },
-        { id: 'nurse_comm', name: 'Nurse Communication' },
-        { id: 'overall_rating', name: 'Overall Rating' },
-        { id: 'patient_exp', name: 'Patient Experience' },
-        { id: 'quietness', name: 'Quietness' },
-        { id: 'staff_resp', name: 'Staff Responsiveness' },
-        { id: 'recommend', name: 'Would Recommend' }
-    ]
+    const { sortDirection, toggleSortDirection } = useAppContext()
+    const sortOptions = getSortOptions()
     
     const foundSortOption = selectedSort ? 
         sortOptions.find(el => el.name === selectedSort || el.id === selectedSort) : null
@@ -27,17 +18,28 @@ const SortByFilter = ({ selectedSort, onSelectSort }) => {
     }
     
     return (
-        <SelectDropdown
-            options={sortOptions}
-            selectedValue={selectedSortId}
-            onChange={handleChange}
-            placeholder="Sort By"
-            label="Sort By |"
-            showLabel={false}
-            className="sort-by-dropdown"
-            isSearchable={false}
-            isClearable={false}
-        />
+        <div className="sort-by-filter-container">
+            <SelectDropdown
+                options={sortOptions}
+                selectedValue={selectedSortId}
+                onChange={handleChange}
+                placeholder="Sort By"
+                label="Sort By |"
+                showLabel={false}
+                className="sort-by-dropdown"
+                isSearchable={false}
+                isClearable={false}
+            />
+            {selectedSort && (
+                <button 
+                    className="sort-direction-toggle"
+                    onClick={toggleSortDirection}
+                    title={`Sort ${sortDirection === 'asc' ? 'Ascending' : 'Descending'}`}
+                >
+                    {sortDirection === 'asc' ? '↑' : '↓'}
+                </button>
+            )}
+        </div>
     )
 }
 

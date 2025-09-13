@@ -43,6 +43,7 @@ export const AppProvider = ({ children }) => {
 
   // State
   const [careType, setCareType] = useState(initialCareType);
+  const [sortBy, setSortBy] = useState(null);
   const [selectedPlace, _setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState(
     initialSearchParam ? initialSearchParam : ""
@@ -91,6 +92,10 @@ export const AppProvider = ({ children }) => {
 
   const onSelectCareType = (careType) => {
     onSearchSubmit(null, null, careType);
+  };
+
+  const onSelectSortBy = (sortOption) => {
+    setSortBy(sortOption);
   };
 
   const onSearchInputChange = (e) => {
@@ -175,6 +180,7 @@ export const AppProvider = ({ children }) => {
     isSearchActive,
     isMobile,
     careType,
+    sortBy,
     comparisonPlaces,
     showComparisonModal,
     // Functions
@@ -185,10 +191,12 @@ export const AppProvider = ({ children }) => {
     setCurrentGPSLocation,
     setActiveTab,
     onSelectCareType,
+    onSelectSortBy,
     onSearchInputChange,
     onSearchSubmit,
     setIsSearchActive,
     setCareType,
+    setSortBy,
     setComparisonPlaces,
     setShowComparisonModal,
     // Computed

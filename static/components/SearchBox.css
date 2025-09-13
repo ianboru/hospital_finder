@@ -96,10 +96,27 @@
 
 /* Sort Button Tile - Positioned below filter button */
 .sort-tile {
-  top: 110px;
-  right: 0;
   padding: 0;
   background: rgba(255, 255, 255, 0.85);
+}
+
+/* Sort By Filter Tile */
+.sort-by-tile {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: 280px;
+  max-width: 320px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@media (min-width: 769px) {
+  .sort-by-tile {
+    padding: 0;
+    background: transparent;
+    min-width: 200px;
+  }
 }
 
 /* Care Type Filter Tile - Positioned below search bar on the left */

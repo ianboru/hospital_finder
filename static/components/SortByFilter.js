@@ -3,6 +3,7 @@ import SelectDropdown from './SelectDropdown'
 
 const SortByFilter = ({ selectedSort, onSelectSort }) => {
     const sortOptions = [
+        { id: 'distance', name: 'Distance' },
         { id: 'care_transition', name: 'Care Transition' },
         { id: 'cleanliness', name: 'Cleanliness' },
         { id: 'discharge_info', name: 'Discharge Information' },

@@ -59,7 +59,7 @@ const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison
               comparePlaces(p, place)
             )}
             onSelect={() => setSelectedPlace(place)}
-            key={place["Facility ID"] || i}
+            key={place["Facility ID"] + i}
             name={place.name}
             address={place.address}
             openHours={place.open_hours || "Open 24 hours"}

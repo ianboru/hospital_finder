@@ -26,7 +26,6 @@ const LocationResults = ({
     sortBy,
     sortDirection,
   } = useAppContext();
-  console.log("comparisonPlaces", comparisonPlaces);
 
   const handleCompare = useCallback(
     (place) => {
@@ -51,20 +50,16 @@ const LocationResults = ({
 
   // Sort results based on selected sort option
   const sortedResults = useMemo(() => {
-    console.log("sortBy", sortBy);
+    
     if (!sortBy || !sortBy.id) {
-      console.log("no sort option selected");
       return results; // Return unsorted if no sort option selected
     }
-    console.log(SORT_FIELD_MAP);
 
     const sortConfig = SORT_FIELD_MAP[sortBy.id];
-    console.log("sortConfig", sortConfig);
 
     if (sortConfig) {
       // First filter out entries with undefined/invalid values for the sort field
       const isValidValue = (val) => {
-        console.log("filtering val", val);
         if (
           !val ||
           val === null ||
@@ -85,9 +80,12 @@ const LocationResults = ({
         return true;
       };
 
-      const filtered = results.filter((item) =>
-        isValidValue(item[sortConfig.field])
-      );
+      const filtered = results.filter((item) => {
+        const fieldValue = item[sortConfig.field];
+        const isValid = isValidValue(fieldValue);
+        return isValid;
+      });
+      
 
       const sorted = [...filtered];
       sorted.sort((a, b) => {
@@ -131,13 +129,11 @@ const LocationResults = ({
         return isAscending ? comparison : -comparison;
       });
 
-      console.log("sorted", sorted);
       return sorted;
     }
 
     return results;
   }, [results, sortBy, sortDirection]);
-  console.log("sortedResults", sortedResults);
 
   return (
     <div className="lr-results-sheet">

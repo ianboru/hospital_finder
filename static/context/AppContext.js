@@ -44,6 +44,15 @@ export const AppProvider = ({ children }) => {
 
   // State
   const [careType, setCareType] = useState(initialCareType);
+
+  // Redirect to add careType if missing
+  useEffect(() => {
+    if (!initialCareTypeParam && initialLocationParam) {
+      let redirectUrl = new URL(window.location);
+      redirectUrl.searchParams.set("careType", "Hospital");
+      window.location.href = redirectUrl;
+    }
+  }, []);
   const [sortBy, setSortBy] = useState({ id: 'distance', name: 'Distance' }); // Default to distance
   const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc' - distance defaults to ascending
   

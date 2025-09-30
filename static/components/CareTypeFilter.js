@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import '../CareTypeFilter.css'
+import SelectDropdown from './SelectDropdown'
 
 const CareTypeFilter = (props) => { 
     const [alreadySelectedCareType, setAlreadySelectedCareType] = React.useState(false)
@@ -15,34 +15,34 @@ const CareTypeFilter = (props) => {
         { 'id': 8, 'name': 'Home Health' },
         { 'id': 9, 'name': 'Nursing Homes' }
     ]
-    const selectedCareTypeId = careTypes.find(el =>
-        el["name"] === selectedCareType
-    ).id
-    const handleChange = (event) => { 
+    
+    const foundCareType = selectedCareType ? 
+        careTypes.find(el => el["name"] === selectedCareType) : null
+    const selectedCareTypeId = foundCareType ? foundCareType.id : null
+    
+    const handleChange = (careTypeId) => { 
         if(!alreadySelectedCareType){
             setAlreadySelectedCareType(true)
         }
-        const careTypeId = event.target.value 
         const careType = careTypes.find(value => value.id == careTypeId) 
         onSelectCareType(careType)
     }
+    
     return(
     <div>
         { !alreadySelectedCareType ? <div>Choose the type of care you are looking for</div> : <></>}
-        <div className="dropdown-container">
-        <span className="dropdown-label">Care Type |</span>
-        <div style={{fontSize : 20}} className="dropdown">
-            <select className="dropdown-select" value={selectedCareType ? selectedCareTypeId : ''} onChange={handleChange}>
-                <option style={{fontSize : 20}} value="" disabled>Select Care Type</option>
-                {careTypes.map(careType => (
-                    <option style={{fontSize : 20}} key={careType.id} value={careType.id}>{careType.name}</option>
-                ))}
-            </select>
-            <span className="dropdown-arrow">&#9662;</span>
-        </div>
+        <SelectDropdown
+            options={careTypes}
+            selectedValue={selectedCareTypeId}
+            onChange={handleChange}
+            placeholder="Select Care Type"
+            label="Care Type |"
+            showLabel={false}
+            className="care-type-dropdown"
+            isSearchable={false}
+            isClearable={false}
+        />
     </div>
-    </div>
-    
     )
 }
 

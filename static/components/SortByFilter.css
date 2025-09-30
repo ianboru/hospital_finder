@@ -1,0 +1,55 @@
+.sort-by-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.sort-direction-toggle {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sort-direction-toggle:hover {
+    background: #f5f5f5;
+    border-color: #999;
+}
+
+.sort-direction-toggle:active {
+    background: #e5e5e5;
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+    .sort-direction-toggle {
+        height: 44px;
+        width: 44px;
+        border-radius: 8px;
+        font-size: 18px;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .sort-by-filter-container {
+        gap: 6px;
+    }
+    
+    .sort-direction-toggle {
+        height: 28px;
+        width: 28px;
+        font-size: 14px;
+    }
+}

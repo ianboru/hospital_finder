@@ -1,14 +1,8 @@
 import React, { useCallback } from "react";
-import HeaderInformation from "./HeaderInformation";
-import CareTypeFilter from "./CareTypeFilter";
-import SearchButton from "./SearchButton";
 import PlaceDetail from "./PlaceDetail";
 import Map from "./Map";
-import PlaceResults from "./PlaceResults";
 import { useAppContext } from "../context/AppContext";
-import SearchBar from "./SearchBar";
 import LocationResults from "./LocationResults";
-import SearchScreen from "./SearchScreen";
 import CompareSelector from "./CompareSelector";
 import ComparisonModal from "./ComparisonModal";
 import "./DesktopLayout.css";

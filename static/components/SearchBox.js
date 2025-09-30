@@ -1,15 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import SearchBar from "./SearchBar";
-import FloatingFilterButton from "./FloatingFilterButton";
-import FloatingSortButton from "./FloatingSortButton";
-import CareTypeFilter from "./CareTypeFilter";
-import SortByFilter from "./SortByFilter";
+import FloatingDropdownButton from "./FloatingDropdownButton";
+import CareTypeDropdown from "./CareTypeDropdown";
+import SortByDropdown from "./SortByDropdown";
 import "./SearchBox.css";
 import { useAppContext } from "../context/AppContext";
 
 const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
-  const [showCareTypeFilter, setShowCareTypeFilter] = useState(false);
-  const [showSortByFilter, setShowSortByFilter] = useState(false);
   const {
     careType,
     onSelectCareType,
@@ -17,67 +14,32 @@ const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
     onSelectSortBy,
   } = useAppContext();
 
-  const handleFilterClick = () => {
-    setShowCareTypeFilter(!showCareTypeFilter);
-    setShowSortByFilter(false); // Close sort when opening filter
-  };
-
-  const handleSortClick = () => {
-    setShowSortByFilter(!showSortByFilter);
-    setShowCareTypeFilter(false); // Close filter when opening sort
-  };
-
   return (
     <div className="search-box-container">
       <div className="search-tile search-bar-tile">
-        <SearchBar
-          placeholder={placeholder}
-        />
+        <SearchBar placeholder={placeholder} />
       </div>
 
-      <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-        <div className="search-tile filter-tile">
-          <FloatingFilterButton
-            label={careType || "Care Type"}
-            icon="▼"
-            onClick={handleFilterClick}
+      <div className="filter-buttons-container">
+        <FloatingDropdownButton
+          label={careType || "Care Type"}
+          icon="▼"
+        >
+          <CareTypeDropdown
+            selectedCareType={careType}
+            onSelectCareType={onSelectCareType}
           />
-        </div>
+        </FloatingDropdownButton>
 
-        {/* Sort Button Tile */}
-        <div className="search-tile sort-tile">
-          <FloatingSortButton 
-            label={sortBy ? sortBy.name : "Sort By"} 
-            icon="≡" 
-            onClick={handleSortClick} 
+        <FloatingDropdownButton
+          label={sortBy && sortBy.name ? sortBy.name : "Sort By"}
+          icon="≡"
+        >
+          <SortByDropdown
+            selectedSort={sortBy}
+            onSelectSort={onSelectSortBy}
           />
-        </div>
-
-        {/* Care Type Filter Dropdown Tile - Conditionally Rendered */}
-        {showCareTypeFilter && (
-          <div className="search-tile care-type-tile">
-            <CareTypeFilter
-              selectedCareType={careType}
-              onSelectCareType={(_careType) => {
-                onSelectCareType(_careType);
-                setShowCareTypeFilter(false);
-              }}
-            />
-          </div>
-        )}
-
-        {/* Sort By Filter Dropdown Tile - Conditionally Rendered */}
-        {showSortByFilter && (
-          <div className="search-tile sort-by-tile">
-            <SortByFilter
-              selectedSort={sortBy}
-              onSelectSort={(_sortBy) => {
-                onSelectSortBy(_sortBy);
-                setShowSortByFilter(false);
-              }}
-            />
-          </div>
-        )}
+        </FloatingDropdownButton>
       </div>
     </div>
   );

@@ -26,6 +26,46 @@
     transition: border-color 0.2s ease;
 }
 
+/* Mobile styles when inside floating dropdown */
+@media (max-width: 768px) {
+    .floating-dropdown-content .react-select__control {
+        min-height: 48px;
+        border-radius: 12px;
+        font-size: 16px;
+    }
+
+    .floating-dropdown-content .react-select__value-container {
+        padding: 8px 12px;
+    }
+
+    .floating-dropdown-content .react-select__single-value {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .floating-dropdown-content .react-select__placeholder {
+        font-size: 16px;
+    }
+
+    .floating-dropdown-content .react-select__menu {
+        position: static;
+        box-shadow: none;
+        border: none;
+        margin-top: 12px;
+        background-color: #f8f8f8;
+    }
+
+    .floating-dropdown-content .react-select__option {
+        padding: 14px 16px;
+        font-size: 16px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .floating-dropdown-content .react-select__option:last-child {
+        border-bottom: none;
+    }
+}
+
 .react-select__control:hover {
     border-color: #999;
 }

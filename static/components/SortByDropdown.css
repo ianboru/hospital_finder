@@ -1,0 +1,19 @@
+.sort-by-dropdown-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-direction-toggle {
+  padding: 8px;
+  background-color: #f0f0f0;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.sort-direction-toggle:hover {
+  background-color: #e0e0e0;
+}

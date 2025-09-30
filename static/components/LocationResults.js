@@ -13,7 +13,7 @@ const getInfectionStatus = (rating) => {
 };
 
 const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison = (_i) => {} }) => {
-  const { setSelectedPlace, comparisonPlaces, setComparisonPlaces } =
+  const { setSelectedPlace, comparisonPlaces, setComparisonPlaces, isMobile } =
     useAppContext();
   console.log("comparisonPlaces", comparisonPlaces);
 
@@ -41,7 +41,9 @@ const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison
   return ( 
     <div className="lr-results-sheet">
       <div className="lr-results-header">
-        <span className="lr-results-title">{title}</span>
+        {isMobile && (
+          <span className="lr-results-title">{title}</span>
+        )}
       </div>
       <div className="lr-results-list">
         {results.length === 0 && (

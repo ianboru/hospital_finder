@@ -143,7 +143,13 @@ def add_metrics_to_providers(filtered_provider_json):
         caphs_metrics  = CAPHSMetrics.objects.filter(facility=cur_provider['id'])   
              
         if len(caphs_metrics) > 0:
-            cur_cahps_metrics_json = sanitize_json_list(caphs_metrics[0].caphs_metric_json)
+            try:
+                # cur_cahps_metrics_json = sanitize_json_list(caphs_metrics[0].caphs_metric_json)
+                cur_cahps_metrics_json = json.loads(caphs_metrics[0].caphs_metric_json[0])
+            except Exception as e:
+                print(e)
+                print("error parsing metrics:", json.dumps(list(caphs_metrics.values()), default=str))
+                break
 
             if len(caphs_metrics) == 2:
                 
@@ -192,6 +198,8 @@ def find_providers_in_radius(search_location, radius, care_type):
         #currently these are not consistently loading in pipeline 
         #so we keep both till its fixed
         provider_list = Facility.objects.filter(Q(care_types__contains=["ED"])| Q(care_types__contains=["ED + Others"]))
+    elif care_type == "Hospital":
+        provider_list = Facility.objects.filter(Q(care_types__contains=["Hospitals"])| Q(care_types__contains=["Hospital"]))
     else:
         provider_list = Facility.objects.filter(care_types__contains = [care_type]).prefetch_related("address")
 

@@ -3,18 +3,28 @@ import SearchBar from "./SearchBar";
 import FloatingFilterButton from "./FloatingFilterButton";
 import FloatingSortButton from "./FloatingSortButton";
 import CareTypeFilter from "./CareTypeFilter";
+import SortByFilter from "./SortByFilter";
 import "./SearchBox.css";
 import { useAppContext } from "../context/AppContext";
 
 const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
   const [showCareTypeFilter, setShowCareTypeFilter] = useState(false);
+  const [showSortByFilter, setShowSortByFilter] = useState(false);
   const {
     careType,
     onSelectCareType,
+    sortBy,
+    onSelectSortBy,
   } = useAppContext();
 
   const handleFilterClick = () => {
     setShowCareTypeFilter(!showCareTypeFilter);
+    setShowSortByFilter(false); // Close sort when opening filter
+  };
+
+  const handleSortClick = () => {
+    setShowSortByFilter(!showSortByFilter);
+    setShowCareTypeFilter(false); // Close filter when opening sort
   };
 
   return (
@@ -35,9 +45,13 @@ const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
         </div>
 
         {/* Sort Button Tile */}
-        {/* <div className="search-tile sort-tile">
-          <FloatingSortButton label="Sort By" icon="≡" onClick={() => {}} />
-        </div> */}
+        <div className="search-tile sort-tile">
+          <FloatingSortButton 
+            label={sortBy ? sortBy.name : "Sort By"} 
+            icon="≡" 
+            onClick={handleSortClick} 
+          />
+        </div>
 
         {/* Care Type Filter Dropdown Tile - Conditionally Rendered */}
         {showCareTypeFilter && (
@@ -45,9 +59,21 @@ const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
             <CareTypeFilter
               selectedCareType={careType}
               onSelectCareType={(_careType) => {
-                // setCareType(_careType);
                 onSelectCareType(_careType);
                 setShowCareTypeFilter(false);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Sort By Filter Dropdown Tile - Conditionally Rendered */}
+        {showSortByFilter && (
+          <div className="search-tile sort-by-tile">
+            <SortByFilter
+              selectedSort={sortBy}
+              onSelectSort={(_sortBy) => {
+                onSelectSortBy(_sortBy);
+                setShowSortByFilter(false);
               }}
             />
           </div>

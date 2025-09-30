@@ -3,6 +3,7 @@ import LocationRow from "./LocationRow";
 import "./LocationResults.css";
 import { addressToUrl, formatPhoneNumber } from "../utils";
 import { useAppContext } from "../context/AppContext";
+import { SORT_FIELD_MAP } from "../constants/sortConstants";
 
 const getInfectionStatus = (rating) => {
   if (rating === null || rating === undefined) return "";
@@ -12,9 +13,19 @@ const getInfectionStatus = (rating) => {
   return "";
 };
 
-const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison = (_i) => {} }) => {
-  const { setSelectedPlace, comparisonPlaces, setComparisonPlaces, isMobile } =
-    useAppContext();
+const LocationResults = ({
+  results = [],
+  title = "Hospitals",
+  onRemoveComparison = (_i) => {},
+}) => {
+  const {
+    setSelectedPlace,
+    comparisonPlaces,
+    setComparisonPlaces,
+    isMobile,
+    sortBy,
+    sortDirection,
+  } = useAppContext();
   console.log("comparisonPlaces", comparisonPlaces);
 
   const handleCompare = useCallback(
@@ -38,18 +49,106 @@ const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison
     );
   };
 
-  return ( 
+  // Sort results based on selected sort option
+  const sortedResults = useMemo(() => {
+    console.log("sortBy", sortBy);
+    if (!sortBy || !sortBy.id) {
+      console.log("no sort option selected");
+      return results; // Return unsorted if no sort option selected
+    }
+    console.log(SORT_FIELD_MAP);
+
+    const sortConfig = SORT_FIELD_MAP[sortBy.id];
+    console.log("sortConfig", sortConfig);
+
+    if (sortConfig) {
+      // First filter out entries with undefined/invalid values for the sort field
+      const isValidValue = (val) => {
+        console.log("filtering val", val);
+        if (
+          !val ||
+          val === null ||
+          val === undefined ||
+          val === "" ||
+          val === "N/A" ||
+          val === "Not Available"
+        )
+          return false;
+
+        // For rating fields, also filter out 0 ratings
+        if (
+          sortConfig.field.includes("star rating") &&
+          (val === 0 || val === "0")
+        )
+          return false;
+
+        return true;
+      };
+
+      const filtered = results.filter((item) =>
+        isValidValue(item[sortConfig.field])
+      );
+
+      const sorted = [...filtered];
+      sorted.sort((a, b) => {
+        const aValue = a[sortConfig.field];
+        const bValue = b[sortConfig.field];
+
+        let comparison = 0;
+
+        // Special handling for distance
+        if (sortConfig.id === "distance") {
+          // Parse distance values if they're strings like "2.5 mi"
+          const parseDistance = (val) => {
+            if (typeof val === "number") return val;
+            if (typeof val === "string") {
+              const num = parseFloat(val);
+              return isNaN(num) ? Infinity : num;
+            }
+            return Infinity;
+          };
+
+          comparison = parseDistance(aValue) - parseDistance(bValue);
+        } else {
+          // For numeric values
+          if (typeof aValue === "number" && typeof bValue === "number") {
+            comparison = aValue - bValue;
+          } else {
+            // Convert to numbers if they're strings
+            const numA = parseFloat(aValue);
+            const numB = parseFloat(bValue);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              comparison = numA - numB;
+            } else {
+              // For string values, sort alphabetically
+              comparison = String(aValue).localeCompare(String(bValue));
+            }
+          }
+        }
+
+        // Use the user-selected sort direction
+        const isAscending = sortDirection === "asc";
+        return isAscending ? comparison : -comparison;
+      });
+
+      console.log("sorted", sorted);
+      return sorted;
+    }
+
+    return results;
+  }, [results, sortBy, sortDirection]);
+  console.log("sortedResults", sortedResults);
+
+  return (
     <div className="lr-results-sheet">
       <div className="lr-results-header">
-        {isMobile && (
-          <span className="lr-results-title">{title}</span>
-        )}
+        {isMobile && <span className="lr-results-title">{title}</span>}
       </div>
       <div className="lr-results-list">
-        {results.length === 0 && (
+        {sortedResults.length === 0 && (
           <div className="lr-no-results">No valid results</div>
         )}
-        {results.map((place, i) => (
+        {sortedResults.map((place, i) => (
           <LocationRow
             disableCompare={
               comparisonPlaces.length >= 3 &&
@@ -59,7 +158,7 @@ const LocationResults = ({ results = [], title = "Hospitals", onRemoveComparison
               comparePlaces(p, place)
             )}
             onSelect={() => setSelectedPlace(place)}
-            key={place["Facility ID"] || i}
+            key={place["Facility ID"] + i}
             name={place.name}
             address={place.address}
             openHours={place.open_hours || "Open 24 hours"}

@@ -5,6 +5,8 @@ import { useAppContext } from "../context/AppContext";
 import LocationResults from "./LocationResults";
 import CompareSelector from "./CompareSelector";
 import ComparisonModal from "./ComparisonModal";
+import InfoModal from "./InfoModal";
+import AboutUsContent from "./AboutUsContent";
 import "./DesktopLayout.css";
 import SearchBox from "./SearchBox";
 
@@ -33,6 +35,10 @@ const DesktopLayout = () => {
     setComparisonPlaces,
     showComparisonModal,
     setShowComparisonModal,
+    showAboutUsModal,
+    setShowAboutUsModal,
+    showAboutDataModal,
+    setShowAboutDataModal,
   } = useAppContext();
 
   const handleRemoveComparison = useCallback(
@@ -64,7 +70,45 @@ const DesktopLayout = () => {
         />
       )}
 
-      <div className="desktop-header"></div>
+      {/* Info Modals */}
+      <InfoModal
+        isOpen={showAboutUsModal}
+        onClose={() => setShowAboutUsModal(false)}
+        title="About FindQualityCare.org"
+      >
+        <AboutUsContent />
+      </InfoModal>
+
+      <InfoModal
+        isOpen={showAboutDataModal}
+        onClose={() => setShowAboutDataModal(false)}
+        title="About the Data"
+      >
+        <p>Data information content will go here...</p>
+      </InfoModal>
+
+      <div className="desktop-header">
+        <div className="header-content">
+          <h1 className="header-title">CareFinder.com provides healthcare safety and quality information</h1>
+          <p className="header-subtitle">Our data comes from national standardized public reporting from CMS</p>
+          <div className="header-buttons">
+            <button 
+              className="header-button about-us-button"
+              onClick={() => setShowAboutUsModal(true)}
+            >
+              <span>About Us</span>
+              <span className="button-icon">👤</span>
+            </button>
+            <button 
+              className="header-button about-data-button"
+              onClick={() => setShowAboutDataModal(true)}
+            >
+              <span>About the Data</span>
+              <span className="button-icon">🔍</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div className="desktop-main-content">
         <div className="desktop-sidebar">

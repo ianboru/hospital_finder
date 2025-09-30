@@ -1,0 +1,125 @@
+.info-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.info-modal {
+  background: white;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.info-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.info-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.info-modal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.info-modal-content {
+  padding: 24px;
+  line-height: 1.6;
+}
+
+.info-modal-content p {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.info-modal-content p:last-child {
+  margin-bottom: 0;
+}
+
+.info-modal-content h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 24px 0 12px 0;
+}
+
+.info-modal-content h3:first-child {
+  margin-top: 0;
+}
+
+.info-modal-content ol, 
+.info-modal-content ul {
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+}
+
+.info-modal-content li {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 14px;
+}
+
+.info-modal-content a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.info-modal-content a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .info-modal-overlay {
+    padding: 10px;
+  }
+  
+  .info-modal {
+    max-height: 90vh;
+  }
+  
+  .info-modal-header {
+    padding: 16px 20px 12px 20px;
+  }
+  
+  .info-modal-content {
+    padding: 20px;
+  }
+}

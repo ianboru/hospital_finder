@@ -62,6 +62,10 @@ export const AppProvider = ({ children }) => {
   const [comparisonPlaces, setComparisonPlaces] = useState([]);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
 
+  // State for info modals
+  const [showAboutUsModal, setShowAboutUsModal] = useState(false);
+  const [showAboutDataModal, setShowAboutDataModal] = useState(false);
+
 
   const onSearchSubmit = useCallback((
     newCenter = null,
@@ -197,6 +201,8 @@ export const AppProvider = ({ children }) => {
     sortDirection,
     comparisonPlaces,
     showComparisonModal,
+    showAboutUsModal,
+    showAboutDataModal,
     // Functions
     setSelectedPlace,
     setSearchTerm,
@@ -214,6 +220,8 @@ export const AppProvider = ({ children }) => {
     setSortBy,
     setComparisonPlaces,
     setShowComparisonModal,
+    setShowAboutUsModal,
+    setShowAboutDataModal,
     // Computed
     definitionInfoPopUp,
   };

@@ -44,8 +44,9 @@ export const AppProvider = ({ children }) => {
 
   // State
   const [careType, setCareType] = useState(initialCareType);
-  const [sortBy, setSortBy] = useState(null);
-  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
+  const [sortBy, setSortBy] = useState({ id: 'distance', name: 'Distance' }); // Default to distance
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc' - distance defaults to ascending
+  
   const [selectedPlace, _setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState(
     initialSearchParam ? initialSearchParam : ""

@@ -1,20 +1,9 @@
 import ReactDOM from "react-dom";
-import React, { useCallback } from "react";
-import PlaceResults from "./components/PlaceResults";
-import PlaceDetail from "./components/PlaceDetail";
-import SearchButton from "./components/SearchButton";
-import HeaderInformation from "./components/HeaderInformation";
-import Map from "./components/Map";
-import CareTypeFilter from "./components/CareTypeFilter";
-import TabComponent from "./components/TabComponent";
+import React from "react";
 import "./App.css";
-import StartingModal from "./components/StartingModal";
-import PlaceResultsMobile from "./components/PlaceResultsMobile";
 import MobileLayout from "./components/MobileLayout";
 import DesktopLayout from "./components/DesktopLayout";
 import { AppProvider, useAppContext } from "./context/AppContext";
-import ComparisonModal from "./components/ComparisonModal";
-import LocationResults from "./components/LocationResults";
 
 function AppContent() {
   console.log("version 0.9");

@@ -144,33 +144,41 @@ const LocationResults = ({
         {sortedResults.length === 0 && (
           <div className="lr-no-results">No valid results</div>
         )}
-        {sortedResults.map((place, i) => (
-          <LocationRow
-            disableCompare={
-              comparisonPlaces.length >= 3 &&
-              comparisonPlaces.findIndex((p) => comparePlaces(p, place)) === -1
-            }
-            compareIndex={comparisonPlaces.findIndex((p) =>
-              comparePlaces(p, place)
-            )}
-            onSelect={() => setSelectedPlace(place)}
-            key={place["Facility ID"] + i}
-            name={place.name}
-            address={place.address}
-            openHours={place.open_hours || "Open 24 hours"}
-            phone={formatPhoneNumber(place.phone_number || "")}
-            distance={place.distance}
-            travelTime={place.time}
-            patientRating={place["Summary star rating"] || 0}
-            infectionLabelText={place["Infection Label"] || "Infections"}
-            infectionStatus={getInfectionStatus(place["Infection Rating"])}
-            onGoogleMaps={() =>
-              window.open(addressToUrl(place.address), "_blank")
-            }
-            onCompare={() => handleCompare(place)}
-            onRemoveComparison={(index) => onRemoveComparison(index)}
-          />
-        ))}
+        {sortedResults.map((place, i) => {
+          // Get the value for the current sort metric
+          const sortConfig = sortBy && sortBy.id ? SORT_FIELD_MAP[sortBy.id] : null;
+          const sortMetricValue = sortConfig ? place[sortConfig.field] : place["Summary star rating"];
+          
+          return (
+            <LocationRow
+              disableCompare={
+                comparisonPlaces.length >= 3 &&
+                comparisonPlaces.findIndex((p) => comparePlaces(p, place)) === -1
+              }
+              compareIndex={comparisonPlaces.findIndex((p) =>
+                comparePlaces(p, place)
+              )}
+              onSelect={() => setSelectedPlace(place)}
+              key={place["Facility ID"] + i}
+              name={place.name}
+              address={place.address}
+              openHours={place.open_hours || "Open 24 hours"}
+              phone={formatPhoneNumber(place.phone_number || "")}
+              distance={place.distance}
+              travelTime={place.time}
+              patientRating={place["Summary star rating"] || 0}
+              sortBy={sortBy}
+              sortMetricValue={sortMetricValue}
+              infectionLabelText={place["Infection Label"] || "Infections"}
+              infectionStatus={getInfectionStatus(place["Infection Rating"])}
+              onGoogleMaps={() =>
+                window.open(addressToUrl(place.address), "_blank")
+              }
+              onCompare={() => handleCompare(place)}
+              onRemoveComparison={(index) => onRemoveComparison(index)}
+            />
+          );
+        })}
       </div>
     </div>
   );

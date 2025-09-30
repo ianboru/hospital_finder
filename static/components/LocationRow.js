@@ -1,6 +1,7 @@
 import React from "react";
 import "./LocationRow.css";
-import CompareButton from "./CompareButton";  
+import CompareButton from "./CompareButton";
+import { SORT_FIELD_MAP } from "../constants/sortConstants";  
 
 const ratingStars = (rating) => {
   return (
@@ -46,6 +47,8 @@ const LocationRow = ({
   distance,
   travelTime,
   patientRating,
+  sortBy,
+  sortMetricValue,
   infectionLabelText = "Infections",
   infectionStatus,
   onGoogleMaps,
@@ -54,7 +57,18 @@ const LocationRow = ({
   compareIndex,
   onRemoveComparison,
   disableCompare,
-}) => (
+}) => {
+  // Determine which metric to display based on sortBy
+  const displayMetric = sortBy && sortBy.id && sortBy.id !== 'distance' 
+    ? SORT_FIELD_MAP[sortBy.id] 
+    : SORT_FIELD_MAP['overall_rating'];
+  
+  // Use sortMetricValue if sorting by something other than distance, otherwise use patientRating
+  const displayValue = sortBy && sortBy.id && sortBy.id !== 'distance' 
+    ? sortMetricValue 
+    : patientRating;
+  
+  return (
   <div
     onClick={onSelect}
     onTouchStart={(e) => {
@@ -108,12 +122,12 @@ const LocationRow = ({
             // alignItems: "center",
           }}
         >
-          <span className="lr-info-icon" title="Patient Rating">
+          <span className="lr-info-icon" title={displayMetric.name}>
             ?
           </span>
-          <span className="lr-metric-label">Patient Rating</span>
+          <span className="lr-metric-label">{displayMetric.name}</span>
         </div>
-        {ratingStars(patientRating)}
+        {ratingStars(displayValue || 0)}
       </div>
       <div className="lr-metric-row">
         <div
@@ -133,6 +147,7 @@ const LocationRow = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default LocationRow;

@@ -85,73 +85,27 @@
   background: rgba(255, 255, 255, 0.85);
 }
 
-/* Filter Button Tile - Positioned to the right of search bar */
+/* Filter buttons container */
+.filter-buttons-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
-  .filter-tile {
+  .filter-buttons-container {
+    position: absolute;
     top: 60px;
     left: 0;
-    padding: 0;
-    background: rgba(255, 255, 255, 0.85);
-    width: auto;
-  }
-}
-
-/* Sort Button Tile */
-.sort-tile {
-  padding: 0;
-  background: rgba(255, 255, 255, 0.85);
-}
-
-@media (max-width: 768px) {
-  .sort-tile {
-    top: 60px;
     right: 0;
-    padding: 0;
-    background: rgba(255, 255, 255, 0.85);
-    width: auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    pointer-events: auto;
   }
 }
 
-/* Sort By Filter Tile */
-.sort-by-tile {
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  min-width: 280px;
-  max-width: 320px;
-  animation: slideDown 0.3s ease-out;
-}
-
-@media (min-width: 769px) {
-  .sort-by-tile {
-    padding: 0;
-    background: transparent;
-    min-width: 200px;
-  }
-}
-
-/* Care Type Filter Tile - Positioned below search bar on the left */
-.care-type-tile {
-  top: 60px;
-  left: 0;
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  min-width: 280px;
-  max-width: 320px;
-  animation: slideDown 0.3s ease-out;
-}
-
-@media (min-width: 769px) {
-  .care-type-tile {
-    position: absolute;
-    padding: 0;
-    background: transparent;
-    min-width: 200px;
-  }
-}
+/* Removed old tile-specific CSS - now handled by FloatingDropdownButton */
 
 /* Animation for dropdown appearance */
 @keyframes slideDown {
@@ -173,23 +127,7 @@
   background: transparent;
 }
 
-/* Override FloatingFilterButton styles */
-.filter-tile .ffb-btn,
-.sort-tile .fsb-btn {
-  background: transparent;
-  box-shadow: none;
-  margin: 0;
-  padding: 10px 22px;
-}
-
-/* Override CareTypeFilter styles for better integration */
-.care-type-tile .dropdown-container {
-  margin: 0;
-}
-
-.care-type-tile .dropdown {
-  margin-top: 8px;
-}
+/* Removed old override styles - now handled by FloatingDropdownButton */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -199,29 +137,6 @@
     right: 10px;
   }
 
-  .care-type-tile {
-    top: 110px;
-    left: 0;
-    right: 0;
-    min-width: auto;
-    max-width: none;
-    padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #d9d9d9;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  }
-  
-  .sort-by-tile {
-    top: 110px;
-    left: 0;
-    right: 0;
-    min-width: auto;
-    max-width: none;
-    padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #d9d9d9;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  }
 }
 
 /* Ensure tiles don't interfere with map interactions */

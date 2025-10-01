@@ -45,12 +45,12 @@ export const AppProvider = ({ children }) => {
   // State
   const [careType, setCareType] = useState(initialCareType);
 
-  // Redirect to add careType if missing
+  // Add careType to URL if missing (without reloading)
   useEffect(() => {
     if (!initialCareTypeParam && initialLocationParam) {
-      let redirectUrl = new URL(window.location);
-      redirectUrl.searchParams.set("careType", "Hospital");
-      window.location.href = redirectUrl;
+      let newUrl = new URL(window.location);
+      newUrl.searchParams.set("careType", "Hospital");
+      window.history.replaceState({}, '', newUrl);
     }
   }, []);
   const [sortBy, setSortBy] = useState({ id: 'distance', name: 'Distance' }); // Default to distance

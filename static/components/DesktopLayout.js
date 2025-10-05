@@ -86,6 +86,14 @@ const DesktopLayout = () => {
       >
         <p>Data information content will go here...</p>
       </InfoModal>
+      <InfoModal
+        isOpen={showAboutDataModal}
+        onClose={() => setShowAboutDataModal(false)}
+        title="Website Guide 👓"
+      >
+        <h3>How to Use FindQualityCare.org</h3>
+        <p>Website guide content will go here...</p>
+      </InfoModal>
 
       <div className="desktop-header">
         <div className="header-content">

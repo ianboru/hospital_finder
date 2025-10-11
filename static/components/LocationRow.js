@@ -1,4 +1,5 @@
 import React from "react";
+import ReactTooltip from "react-tooltip";
 import "./LocationRow.css";
 import CompareButton from "./CompareButton";
 import { SORT_FIELD_MAP } from "../constants/sortConstants";  
@@ -57,6 +58,7 @@ const LocationRow = ({
   compareIndex,
   onRemoveComparison,
   disableCompare,
+  dataDictionary,
 }) => {
   // Determine which metric to display based on sortBy
   const displayMetric = sortBy && sortBy.id && sortBy.id !== 'distance' 
@@ -122,9 +124,17 @@ const LocationRow = ({
             // alignItems: "center",
           }}
         >
-          <span className="lr-info-icon" title={displayMetric.name}>
-            ?
+          <span
+            className="lr-info-icon"
+            data-tip={dataDictionary && displayMetric.key && dataDictionary[displayMetric.key] ? dataDictionary[displayMetric.key].definition : ""}
+            data-for={`tooltip-rating-${name}`}
+            style={{ cursor: "help" }}
+          >
+            ℹ
           </span>
+          {dataDictionary && displayMetric.key && dataDictionary[displayMetric.key] && (
+            <ReactTooltip id={`tooltip-rating-${name}`} place="top" effect="solid" />
+          )}
           <span className="lr-metric-label">{displayMetric.name}</span>
         </div>
         {ratingStars(displayValue || 0)}
@@ -137,9 +147,17 @@ const LocationRow = ({
             // alignItems: "center",
           }}
         >
-          <span className="lr-info-icon" title={infectionLabelText}>
-            ?
+          <span
+            className="lr-info-icon"
+            data-tip={dataDictionary && dataDictionary["infection rating"] ? dataDictionary["infection rating"].definition : ""}
+            data-for={`tooltip-infection-${name}`}
+            style={{ cursor: "help" }}
+          >
+            ℹ
           </span>
+          {dataDictionary && dataDictionary["infection rating"] && (
+            <ReactTooltip id={`tooltip-infection-${name}`} place="top" effect="solid" />
+          )}
           <span className="lr-metric-label">{infectionLabelText}</span>
         </div>
         {infectionIcon(infectionStatus)}

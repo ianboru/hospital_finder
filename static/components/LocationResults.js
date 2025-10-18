@@ -50,7 +50,7 @@ const LocationResults = ({
 
   // Sort results based on selected sort option
   const sortedResults = useMemo(() => {
-    
+
     if (!sortBy || !sortBy.id) {
       return results; // Return unsorted if no sort option selected
     }
@@ -58,10 +58,9 @@ const LocationResults = ({
     const sortConfig = SORT_FIELD_MAP[sortBy.id];
 
     if (sortConfig) {
-      // First filter out entries with undefined/invalid values for the sort field
+      // Helper function to check if a value is valid for sorting
       const isValidValue = (val) => {
         if (
-          !val ||
           val === null ||
           val === undefined ||
           val === "" ||
@@ -80,15 +79,21 @@ const LocationResults = ({
         return true;
       };
 
-      const filtered = results.filter((item) => {
-        const fieldValue = item[sortConfig.field];
-        const isValid = isValidValue(fieldValue);
-        return isValid;
-      });
-      
+      // Separate results into those with valid values and those without
+      const withValidValues = [];
+      const withoutValidValues = [];
 
-      const sorted = [...filtered];
-      sorted.sort((a, b) => {
+      results.forEach((item) => {
+        const fieldValue = item[sortConfig.field];
+        if (isValidValue(fieldValue)) {
+          withValidValues.push(item);
+        } else {
+          withoutValidValues.push(item);
+        }
+      });
+
+      // Sort the results that have valid values
+      withValidValues.sort((a, b) => {
         const aValue = a[sortConfig.field];
         const bValue = b[sortConfig.field];
 
@@ -129,7 +134,8 @@ const LocationResults = ({
         return isAscending ? comparison : -comparison;
       });
 
-      return sorted;
+      // Return sorted results with valid values first, followed by those without
+      return [...withValidValues, ...withoutValidValues];
     }
 
     return results;

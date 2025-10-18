@@ -1,4 +1,5 @@
 import React from "react";
+import ReactTooltip from "react-tooltip";
 import {
   getHCAHPSStars,
   getHaiEmoji,
@@ -80,6 +81,9 @@ const PlaceDetail = (props) => {
     const metricValue = selectedPlace[metricName];
     const metricLabel = detailedInfectionMetricsMap[metricName];
     const dataDictionaryEntry = dataDictionary[metricName.toLowerCase()];
+    console.log("infection metric", metricName.toLowerCase())
+    console.log("data dictionary", dataDictionary)
+    console.log("data dictionary entry", dataDictionaryEntry)
     // console.log("infection metric", metricName.toLowerCase())
     return (
       <div
@@ -92,13 +96,15 @@ const PlaceDetail = (props) => {
         key={`${metricName}-${index}-metric-stars`}
       >
         <span
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            props.setShownDefinition(metricName.toLowerCase());
-          }}
+          data-tip={dataDictionaryEntry ? dataDictionaryEntry.definition : ""}
+          data-for={`tooltip-${metricName}`}
+          style={{ cursor: "help" }}
         >
           {dataDictionaryEntry ? "\u24D8" : ""}
         </span>
+        {dataDictionaryEntry && (
+          <ReactTooltip id={`tooltip-${metricName}`} place="top" effect="solid" />
+        )}
 
         <b
           style={{

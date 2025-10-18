@@ -32,7 +32,6 @@ const AboutUsContent = () => {
         </li>
       </ol>
       
-      <h3>How to Use FindQualityCare.org</h3>
     </>
   );
 };

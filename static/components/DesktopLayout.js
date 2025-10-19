@@ -41,6 +41,30 @@ const DesktopLayout = () => {
     setShowAboutDataModal,
   } = useAppContext();
 
+  const handleDebugData = useCallback(() => {
+    const url = new URL(window.location);
+    const location = url.searchParams.get("location");
+    const radius = url.searchParams.get("radius");
+    const careType = url.searchParams.get("careType");
+    const search = url.searchParams.get("search");
+
+    const debugUrl = `/api/debug-places-data/?location=${location || ""}&radius=${radius || ""}&careType=${careType || ""}&search=${search || ""}`;
+
+    fetch(debugUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log("=== DEBUG DATA FROM SERVER ===");
+        console.log("Params:", data.params);
+        console.log("Places count:", data.google_places_data.length);
+        console.log("Places data:", data.google_places_data);
+        console.log("Metric quantiles:", data.metric_quantiles);
+        console.log("Data dictionary keys:", Object.keys(data.data_dictionary).length);
+      })
+      .catch(error => {
+        console.error("Error fetching debug data:", error);
+      });
+  }, []);
+
   const handleRemoveComparison = useCallback(
     (index) => {
       setComparisonPlaces(comparisonPlaces.filter((_, i) => i !== index));
@@ -100,19 +124,26 @@ const DesktopLayout = () => {
           <h1 className="header-title">CareFinder.com provides healthcare safety and quality information</h1>
           <p className="header-subtitle">Our data comes from national standardized public reporting from CMS</p>
           <div className="header-buttons">
-            <button 
+            <button
               className="header-button about-us-button"
               onClick={() => setShowAboutUsModal(true)}
             >
               <span>About Us</span>
               <span className="button-icon">👤</span>
             </button>
-            <button 
+            <button
               className="header-button about-data-button"
               onClick={() => setShowAboutDataModal(true)}
             >
               <span>About the Data</span>
               <span className="button-icon">🔍</span>
+            </button>
+            <button
+              className="header-button debug-data-button"
+              onClick={handleDebugData}
+            >
+              <span>Debug Data</span>
+              <span className="button-icon">🐛</span>
             </button>
           </div>
         </div>

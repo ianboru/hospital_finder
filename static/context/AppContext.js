@@ -98,7 +98,6 @@ export const AppProvider = ({ children }) => {
         `${initialLocation.lng},${initialLocation.lat}`
       );
     }
-    window.alert(`we are going to navigate to ${url}`)
     window.location.href = url;
   }, [searchTerm]);
 
@@ -150,7 +149,6 @@ export const AppProvider = ({ children }) => {
           "location",
           `${position.coords.latitude},${position.coords.longitude}`
         );
-        window.alert(`we are going to navigate to ${url}`)
         window.location.href = url;
       }
 

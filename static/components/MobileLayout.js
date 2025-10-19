@@ -1,18 +1,11 @@
 import React, { useCallback, useRef, useEffect } from "react";
-import HeaderInformation from "./HeaderInformation";
-import CareTypeFilter from "./CareTypeFilter";
-import SearchButton from "./SearchButton";
 import PlaceDetail from "./PlaceDetail";
 import Map from "./Map";
-import PlaceResultsMobile from "./PlaceResultsMobile";
-import PlaceResults from "./PlaceResults";
 import { useAppContext } from "../context/AppContext";
 import BottomSheet from "./BottomSheet";
-import SearchBar from "./SearchBar";
 import LocationResults from "./LocationResults";
 import "./MobileLayout.css";
 import SearchBox from "./SearchBox";
-import SearchScreen from "./SearchScreen";
 import CompareSelector from "./CompareSelector";
 import ComparisonModal from "./ComparisonModal";
 
@@ -25,18 +18,11 @@ const MobileLayout = () => {
     dataDictionary,
     metricQuantiles,
     onSearchSubmit,
-    onSearchInputChange,
-    setSearchTerm,
-    searchTerm,
     setShownDefinition,
     shownDefinition,
     initialLocation,
     setZoomRadius,
     currentGPSLocation,
-    definitionInfoPopUp,
-    initialCareType,
-    onSelectCareType,
-    isSearchActive,
     comparisonPlaces,
     setComparisonPlaces,
     showComparisonModal,
@@ -44,25 +30,6 @@ const MobileLayout = () => {
   } = useAppContext();
 
   const bottomSheetRef = useRef(null);
-  // console.log("!!!!!isSearchActive", isSearchActive);
-  //   if (isSearchActive) {
-  //     return (
-  //       <div className="app">
-  //         <div
-  //           style={{
-  //           }}
-  //         >
-  //           <SearchBox
-  //             onSearchSubmit={onSearchSubmit}
-  //             searchTerm={searchTerm}
-  //             onSearchInputChange={onSearchInputChange}
-  //             setSearchTerm={setSearchTerm}
-  //           />
-  //         </div>
-  //         <SearchScreen />
-  //       </div>
-  //     );
-  //   }
 
   useEffect(() => {
     if (selectedPlace) {
@@ -141,7 +108,6 @@ const MobileLayout = () => {
       <BottomSheet ref={bottomSheetRef}>
         <BottomSheetContent />
       </BottomSheet>
-      {/* <PlaceResultsMobile placesData={placesData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} selectedCareType={initialCareTypeParam} /> */}
     </div>
   );
 };

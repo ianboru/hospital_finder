@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
   const dataDictionary = JSON.parse(
     document.getElementById("data_dictionary").textContent
   );
+  console.log('[app] placesData', placesData)
 
   // URL parameters
   let url = new URL(window.location);

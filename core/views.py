@@ -293,5 +293,55 @@ def index(request, path=None):
         "data_dictionary" : data_dictionary_lookup,
         'metric_quantiles' : metric_quantiles
     }
-    
+
     return render(request, "index.html", context)
+
+@timeit
+def debug_places_data(request):
+    """API endpoint that returns the same data as index view for debugging"""
+    # Parse request params to get google query args
+    search_string = request.GET.get("search")
+    location_string = request.GET.get("location")
+    radius = request.GET.get("radius") # in meters
+    care_type = request.GET.get("careType")
+
+    # Query google maps for places
+    places_data = {}
+    if not location_string or 'Na' in location_string:
+        location_string = "32.7853263,-117.2407347"
+    if not radius:
+        radius = 150
+    split_location_string = location_string.strip().split(",")
+    search_location = (float(split_location_string[0]), float(split_location_string[1]))
+    search_match_threshold = 70
+
+    filtered_providers, provider_list = find_providers_in_radius(search_location, radius, care_type)
+    filtered_providers = add_metrics_to_providers(filtered_providers)
+
+    providers_after_name_filter = []
+    if search_string:
+        # filter base on fuzzy match on facility name base on search string
+        for provider in filtered_providers:
+            if fuzz.partial_ratio(provider['name'].lower(), search_string) > search_match_threshold:
+                providers_after_name_filter.append(provider)
+
+            if fuzz.partial_ratio(provider['address'][0].lower(), search_string) > search_match_threshold:
+                providers_after_name_filter.append(provider)
+        filtered_providers = providers_after_name_filter
+
+    places_data = filtered_providers
+
+    # Return as JSON
+    response_data = {
+        'google_places_data': places_data,
+        'data_dictionary': data_dictionary_lookup,
+        'metric_quantiles': metric_quantiles,
+        'params': {
+            'search': search_string,
+            'location': location_string,
+            'radius': radius,
+            'careType': care_type,
+        }
+    }
+
+    return JsonResponse(response_data, safe=False)

@@ -149,7 +149,8 @@ def add_metrics_to_providers(filtered_provider_json):
             except Exception as e:
                 print(e)
                 print("error parsing metrics:", json.dumps(list(caphs_metrics.values()), default=str))
-                break
+                print(f"Skipping facility {cur_provider.get('name', 'unknown')} due to malformed CAPHS metrics")
+                continue
 
             if len(caphs_metrics) == 2:
                 

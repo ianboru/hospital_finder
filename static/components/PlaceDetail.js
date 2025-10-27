@@ -37,6 +37,13 @@ const PlaceDetail = (props) => {
   const metricQuantiles = props.metricQuantiles;
   let selectedCareType = props.selectedCareType;
   selectedCareType = selectedCareType || "Hospital";
+
+  // If selectedPlace has a Care Type, prioritize that over the passed selectedCareType
+  // This handles cases where a facility supports multiple care types
+  if (selectedPlace["Care Type"]) {
+    selectedCareType = selectedPlace["Care Type"];
+  }
+
   const dataDictionary = props.dataDictionary;
   // Map patient rating metrics to their respective labels
   const detailedExperienceMetricsMap = {
@@ -151,15 +158,15 @@ const PlaceDetail = (props) => {
     .filter((_key) => {
       const key = _key.toLowerCase();
       const careTypesString = dataDictionary[key]
-        ? dataDictionary[key]["care_types"].join(",")
+        ? dataDictionary[key]["care_types"].join(",").toLowerCase()
         : "";
       const matchesSelectedCareType =
-        dataDictionary[key] && careTypesString.includes(selectedCareType);
+        dataDictionary[key] && careTypesString.includes(selectedCareType.toLowerCase());
       const isMetric =
         !nonMetricKeys.includes(key) &&
         !detailedInfectionMetricsMap[key] &&
         matchesSelectedCareType;
-      // console.log("!!isMetric", isMetric, key, dataDictionary[key])
+
       return isMetric;
     })
     .map((key, index) => {
@@ -255,7 +262,6 @@ const PlaceDetail = (props) => {
         </div>
       );
     });
-  // console.log("detailMetrics", detailMetrics)
 
   return (
     <div className="place-detail-container">

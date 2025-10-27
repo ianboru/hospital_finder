@@ -39,6 +39,8 @@ const DesktopLayout = () => {
     setShowAboutUsModal,
     showAboutDataModal,
     setShowAboutDataModal,
+    showWebsiteGuideModal,
+    setShowWebsiteGuideModal,
   } = useAppContext();
 
   const handleDebugData = useCallback(() => {
@@ -48,19 +50,24 @@ const DesktopLayout = () => {
     const careType = url.searchParams.get("careType");
     const search = url.searchParams.get("search");
 
-    const debugUrl = `/api/debug-places-data/?location=${location || ""}&radius=${radius || ""}&careType=${careType || ""}&search=${search || ""}`;
+    const debugUrl = `/api/debug-places-data/?location=${
+      location || ""
+    }&radius=${radius || ""}&careType=${careType || ""}&search=${search || ""}`;
 
     fetch(debugUrl)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log("=== DEBUG DATA FROM SERVER ===");
         console.log("Params:", data.params);
         console.log("Places count:", data.google_places_data.length);
         console.log("Places data:", data.google_places_data);
         console.log("Metric quantiles:", data.metric_quantiles);
-        console.log("Data dictionary keys:", Object.keys(data.data_dictionary).length);
+        console.log(
+          "Data dictionary keys:",
+          Object.keys(data.data_dictionary).length
+        );
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching debug data:", error);
       });
   }, []);
@@ -108,11 +115,36 @@ const DesktopLayout = () => {
         onClose={() => setShowAboutDataModal(false)}
         title="About the Data"
       >
-        <p>Data information content will go here...</p>
+        <p>
+          The data displayed on this website comes from the Centers for Medicare
+          and Medicaid Services (CMS) standardized patient experience surveys
+          called Consumer Assessment of Healthcare Providers and Systems
+          (CAHPS). CMS sends these surveys to people covered by Medicare or
+          Medicaid after they receive healthcare. Some of their responses are
+          scored as a star rating to help compare quality.
+        </p>
+
+        <br />
+        <p>HAI</p>
+        <p>
+          This data is <b>standardized</b> meaning the surveys use the same
+          questions, format, timing, and collection methods across all hospitals
+          and providers nationwide. Everyone is measured using the same process,
+          so the results can be fairly compared from one place to another.
+        </p>
+
+        <p>
+          The data is <b>validated</b> meaning the survey questions and methods
+          have been scientifically tested to make sure they accurately measure
+          what they're supposed to measure. Validation ensures the results
+          are reliable, unbiased, and based on real-world evidence, not just
+          opinions or inconsistent data.
+        </p>
       </InfoModal>
+
       <InfoModal
-        isOpen={showAboutDataModal}
-        onClose={() => setShowAboutDataModal(false)}
+        isOpen={showWebsiteGuideModal}
+        onClose={() => setShowWebsiteGuideModal(false)}
         title="Website Guide 👓"
       >
         <h3>How to Use FindQualityCare.org</h3>
@@ -121,8 +153,12 @@ const DesktopLayout = () => {
 
       <div className="desktop-header">
         <div className="header-content">
-          <h1 className="header-title">CareFinder.com provides healthcare safety and quality information</h1>
-          <p className="header-subtitle">Our data comes from national standardized public reporting from CMS</p>
+          <h1 className="header-title">
+            CareFinder.com provides healthcare safety and quality information
+          </h1>
+          <p className="header-subtitle">
+            Our data comes from national standardized public reporting from CMS
+          </p>
           <div className="header-buttons">
             <button
               className="header-button about-us-button"

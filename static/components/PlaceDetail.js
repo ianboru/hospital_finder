@@ -255,7 +255,6 @@ const PlaceDetail = (props) => {
         </div>
       );
     });
-  // console.log("detailMetrics", detailMetrics)
 
   return (
     <div className="place-detail-container">

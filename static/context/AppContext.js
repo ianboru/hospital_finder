@@ -75,6 +75,7 @@ export const AppProvider = ({ children }) => {
   // State for info modals
   const [showAboutUsModal, setShowAboutUsModal] = useState(false);
   const [showAboutDataModal, setShowAboutDataModal] = useState(false);
+  const [showWebsiteGuideModal, setShowWebsiteGuideModal] = useState(false);
 
 
   const onSearchSubmit = useCallback((
@@ -213,6 +214,7 @@ export const AppProvider = ({ children }) => {
     showComparisonModal,
     showAboutUsModal,
     showAboutDataModal,
+    showWebsiteGuideModal,
     // Functions
     setSelectedPlace,
     setSearchTerm,
@@ -232,6 +234,7 @@ export const AppProvider = ({ children }) => {
     setShowComparisonModal,
     setShowAboutUsModal,
     setShowAboutDataModal,
+    setShowWebsiteGuideModal,
     // Computed
     definitionInfoPopUp,
   };

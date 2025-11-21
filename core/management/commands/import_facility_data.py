@@ -290,7 +290,9 @@ class Command(BaseCommand):
                 cur_facility_id = cur_facility_id[1:]
             if "Outpatient" in row["Care Type"]:
                 row["Care Type"] = "Outpatient"
-            current_cahps_metrics_json = row.to_dict()  
+            # Replace NaN with None for valid JSON serialization
+            row = row.replace({np.nan: None})
+            current_cahps_metrics_json = row.to_dict()
             # changing dict to json we need json type to save in the instance
             current_cahps_metrics_json = json.dumps(current_cahps_metrics_json) 
             facility = None
@@ -331,7 +333,7 @@ class Command(BaseCommand):
                     created = False
                     caphs_metrics = CAPHSMetrics.objects.filter(facility=facility).first()
                 if created:
-                    caphs_metrics.caphs_metric_json=current_cahps_metrics_json, 
+                    caphs_metrics.caphs_metric_json=current_cahps_metrics_json 
                 else:
                     
                     if type(caphs_metrics.caphs_metric_json) == list:

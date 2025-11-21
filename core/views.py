@@ -144,8 +144,17 @@ def add_metrics_to_providers(filtered_provider_json):
              
         if len(caphs_metrics) > 0:
             try:
-                # cur_cahps_metrics_json = sanitize_json_list(caphs_metrics[0].caphs_metric_json)
-                cur_cahps_metrics_json = json.loads(caphs_metrics[0].caphs_metric_json[0])
+                # Handle both list and string formats for backward compatibility
+                caphs_data = caphs_metrics[0].caphs_metric_json
+                if isinstance(caphs_data, list):
+                    # Old format: list with JSON string
+                    cur_cahps_metrics_json = json.loads(caphs_data[0])
+                elif isinstance(caphs_data, str):
+                    # New format: JSON string
+                    cur_cahps_metrics_json = json.loads(caphs_data)
+                else:
+                    # Already a dict
+                    cur_cahps_metrics_json = caphs_data
             except Exception as e:
                 print(e)
                 print("error parsing metrics:", json.dumps(list(caphs_metrics.values()), default=str))

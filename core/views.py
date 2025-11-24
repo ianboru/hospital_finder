@@ -87,7 +87,7 @@ def calculate_CAHPS_metric_quantiles(data_dictionary):
                 #if lower_key in data_dictionary:
                     #print(lower_key, data_dictionary[lower_key]['unit'])
                 if "minutes" not in key:
-                    if type(value) != str and not math.isnan(value):
+                    if value is not None and type(value) != str and not math.isnan(value):
                         if key not in all_metric_values:
                             print("constructing", key)
                             all_metric_values[key] = []

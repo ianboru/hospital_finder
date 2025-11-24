@@ -23,6 +23,28 @@ const PlaceDetail = (props) => {
     handleCompare,
   } = useAppContext();
 
+  // Helper to check if a value is invalid (NaN, null, undefined, or string "NaN")
+  const isInvalidValue = (value) => {
+    if (value === null || value === undefined) return true;
+    if (typeof value === "number" && isNaN(value)) return true;
+    if (value === "NaN") return true;
+    return false;
+  };
+
+  // Helper to normalize care type for matching (handles "ED + Others", "Hospitals", etc.)
+  const normalizeCareType = (careType) => {
+    if (!careType) return "hospital";
+    const lower = careType.toLowerCase();
+    if (lower.includes("ed")) return "ed";
+    if (lower.includes("hospital")) return "hospitals";
+    return lower;
+  };
+
+  // Helper to check if care types match
+  const careTypesMatch = (careType1, careType2) => {
+    return normalizeCareType(careType1) === normalizeCareType(careType2);
+  };
+
   const comparePlaces = (place1, place2) => {
     return (
       place1 &&
@@ -88,10 +110,6 @@ const PlaceDetail = (props) => {
     const metricValue = selectedPlace[metricName];
     const metricLabel = detailedInfectionMetricsMap[metricName];
     const dataDictionaryEntry = dataDictionary[metricName.toLowerCase()];
-    console.log("infection metric", metricName.toLowerCase())
-    console.log("data dictionary", dataDictionary)
-    console.log("data dictionary entry", dataDictionaryEntry)
-    // console.log("infection metric", metricName.toLowerCase())
     return (
       <div
         style={{
@@ -124,7 +142,7 @@ const PlaceDetail = (props) => {
           {metricLabel}
         </b>
         <span style={{ marginLeft: "auto", color: "  " }}>
-          {metricValue ? getHaiEmoji(metricValue, 2) : "No Data"}
+          {metricValue && !isInvalidValue(metricValue) ? getHaiEmoji(metricValue, 2) : "No Data"}
         </span>
       </div>
     );
@@ -157,11 +175,19 @@ const PlaceDetail = (props) => {
   const detailMetrics = Object.keys(selectedPlace)
     .filter((_key) => {
       const key = _key.toLowerCase();
-      const careTypesString = dataDictionary[key]
-        ? dataDictionary[key]["care_types"].join(",").toLowerCase()
-        : "";
+      const careTypesArray = dataDictionary[key]
+        ? dataDictionary[key]["care_types"]
+        : [];
+      // Check if any care type in the dictionary matches the selected care type
       const matchesSelectedCareType =
-        dataDictionary[key] && careTypesString.includes(selectedCareType.toLowerCase());
+        dataDictionary[key] && careTypesArray.some((ct) => {
+          const normalizedDictCareType = normalizeCareType(ct);
+          const normalizedSelectedCareType = normalizeCareType(selectedCareType);
+          // Also check if the dictionary care type is included in the selected care type string
+          return normalizedDictCareType === normalizedSelectedCareType ||
+            selectedCareType.toLowerCase().includes(ct.toLowerCase()) ||
+            ct.toLowerCase().includes(normalizedSelectedCareType);
+        });
       const isMetric =
         !nonMetricKeys.includes(key) &&
         !detailedInfectionMetricsMap[key] &&
@@ -183,9 +209,8 @@ const PlaceDetail = (props) => {
         metricValue === "Not Applicable"
       ) {
         metricValue = "No Data";
-      } else if (typeof metricValue === "number" && isNaN(metricValue)) {
+      } else if (isInvalidValue(metricValue)) {
         metricValue = "No Data";
-      } else {
       }
       const useStars =
         dataDictionaryEntry["unit"] &&
@@ -319,10 +344,10 @@ const PlaceDetail = (props) => {
           <div style={ratingDivStyle}>
             <b>Patient Rating:</b>
             <span style={{ color: "#fdcc0d" }}>
-              {getHCAHPSStars(
-                selectedPlace["Summary star rating"] ||
-                  selectedCareType["Overall Rating"]
-              )}
+              {(() => {
+                const rating = selectedPlace["Summary star rating"] || selectedPlace["Overall Rating"];
+                return !isInvalidValue(rating) ? getHCAHPSStars(rating) : "No Data";
+              })()}
             </span>
           </div>
           <hr style={{ marginTop: "0px" }} />
@@ -332,12 +357,15 @@ const PlaceDetail = (props) => {
         <></>
       )}
       {selectedPlace["Infection Rating"] &&
-      ["Hospital", "ED"].includes(selectedCareType) ? (
+      !isInvalidValue(selectedPlace["Infection Rating"]) &&
+      ["hospitals", "ed"].includes(normalizeCareType(selectedCareType)) ? (
         <>
           <div style={ratingDivStyle}>
             <b>Infection Rating:</b>
             <span style={{ color: "#fdcc0d" }}>
-              {getHaiEmoji(selectedPlace["Infection Rating"], 3)}
+              {!isInvalidValue(selectedPlace["Infection Rating"])
+                ? getHaiEmoji(selectedPlace["Infection Rating"], 3)
+                : "No Data"}
             </span>
           </div>
           <hr style={{ marginTop: "0px" }} />

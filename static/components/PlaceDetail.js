@@ -66,6 +66,12 @@ const PlaceDetail = (props) => {
     selectedCareType = selectedPlace["Care Type"];
   }
 
+  // Parse all care types the facility supports from the caretype field
+  // e.g., "Hospitals, Hospital, ED + Others, ED" -> ["Hospitals", "Hospital", "ED + Others", "ED"]
+  const facilityCareTypes = selectedPlace.caretype
+    ? selectedPlace.caretype.split(",").map((ct) => ct.trim())
+    : [selectedCareType];
+
   const dataDictionary = props.dataDictionary;
   // Map patient rating metrics to their respective labels
   const detailedExperienceMetricsMap = {
@@ -112,50 +118,43 @@ const PlaceDetail = (props) => {
     const dataDictionaryEntry = dataDictionary[metricName.toLowerCase()];
     return (
       <div
-        style={{
-          marginTop: 5,
-          marginBottom: 5,
-          display: "flex",
-          justifyContent: "space-around",
-        }}
+        className="place-detail-metric-row"
         key={`${metricName}-${index}-metric-stars`}
       >
         <span
           data-tip={dataDictionaryEntry ? dataDictionaryEntry.definition : ""}
           data-for={`tooltip-${metricName}`}
-          style={{ cursor: "help" }}
+          style={{ cursor: "help", flexShrink: 0 }}
         >
           {dataDictionaryEntry ? "\u24D8" : ""}
         </span>
         {dataDictionaryEntry && (
           <ReactTooltip id={`tooltip-${metricName}`} place="top" effect="solid" />
         )}
-
-        <b
-          style={{
-            marginRight: "auto",
-            marginLeft: "5px",
-            marginTop: "auto",
-            marginBottom: "auto",
-          }}
-        >
-          {metricLabel}
-        </b>
-        <span style={{ marginLeft: "auto", color: "  " }}>
+        <span className="place-detail-metric-label">
+          <b>{metricLabel}</b>
+        </span>
+        <span className="place-detail-metric-value">
           {metricValue && !isInvalidValue(metricValue) ? getHaiEmoji(metricValue, 2) : "No Data"}
         </span>
       </div>
     );
   });
 
-  const metricDivStyle = { marginLeft: 15, marginTop: "4px" };
+  const metricDivStyle = { marginLeft: 5, marginRight: 5, marginTop: "4px" };
   const ratingDivStyle = {
     display: "flex",
     justifyContent: "space-between",
+    alignItems: "center",
     marginTop: "1em",
+    gap: "8px",
   };
 
-  const googleMapsUrl = addressToUrl(selectedPlace.address[0]);
+  // Handle address as either array or string
+  const addressString = Array.isArray(selectedPlace.address)
+    ? selectedPlace.address[0]
+    : selectedPlace.address;
+  const googleMapsUrl = addressToUrl(addressString);
   const nonMetricKeys = [
     "id",
     "Facility ID",
@@ -171,6 +170,13 @@ const PlaceDetail = (props) => {
     "Mean SIR",
     "Infection Rating",
     "Mean Compared to National",
+    "phone_number",
+    "distance",
+    "Summary star rating",
+    "Overall Rating",
+    "HHCAHPS Survey Summary Star Rating",
+    "Family caregiver survey rating",
+    "Patient Hospital Readmission Category",
   ];
   const detailMetrics = Object.keys(selectedPlace)
     .filter((_key) => {
@@ -178,20 +184,22 @@ const PlaceDetail = (props) => {
       const careTypesArray = dataDictionary[key]
         ? dataDictionary[key]["care_types"]
         : [];
-      // Check if any care type in the dictionary matches the selected care type
-      const matchesSelectedCareType =
-        dataDictionary[key] && careTypesArray.some((ct) => {
-          const normalizedDictCareType = normalizeCareType(ct);
-          const normalizedSelectedCareType = normalizeCareType(selectedCareType);
-          // Also check if the dictionary care type is included in the selected care type string
-          return normalizedDictCareType === normalizedSelectedCareType ||
-            selectedCareType.toLowerCase().includes(ct.toLowerCase()) ||
-            ct.toLowerCase().includes(normalizedSelectedCareType);
+      // Check if any care type in the dictionary matches ANY of the facility's care types
+      const matchesFacilityCareType =
+        dataDictionary[key] && careTypesArray.some((dictCareType) => {
+          const normalizedDictCareType = normalizeCareType(dictCareType);
+          // Check against all care types the facility supports
+          return facilityCareTypes.some((facilityCt) => {
+            const normalizedFacilityCareType = normalizeCareType(facilityCt);
+            return normalizedDictCareType === normalizedFacilityCareType ||
+              facilityCt.toLowerCase().includes(dictCareType.toLowerCase()) ||
+              dictCareType.toLowerCase().includes(normalizedFacilityCareType);
+          });
         });
       const isMetric =
-        !nonMetricKeys.includes(key) &&
-        !detailedInfectionMetricsMap[key] &&
-        matchesSelectedCareType;
+        !nonMetricKeys.includes(_key) &&
+        !detailedInfectionMetricsMap[_key] &&
+        matchesFacilityCareType;
 
       return isMetric;
     })
@@ -239,51 +247,29 @@ const PlaceDetail = (props) => {
         metricValue &&
         metricValue != "No Data";
       return (
-        <div key={`${key}-${index}-detail-metric`}>
-          <div
-            style={{
-              marginTop: 5,
-              marginBottom: 5,
-              display: "flex",
-              justifyContent: "space-around",
+        <div key={`${key}-${index}-detail-metric`} className="place-detail-metric-row">
+          <span
+            style={{ cursor: "pointer", flexShrink: 0 }}
+            onClick={() => {
+              props.setShownDefinition(key.toLowerCase());
             }}
           >
-            <span
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                props.setShownDefinition(key.toLowerCase());
-              }}
-            >
-              {dataDictionaryEntry ? "\u24D8" : ""}
+            {dataDictionaryEntry ? "\u24D8" : ""}
+          </span>
+          <span className="place-detail-metric-label">
+            <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b>
+          </span>
+          {useStars ? (
+            <span className="place-detail-metric-value" style={{ color: "gold" }}>
+              {metricValue ? getHCAHPSStars(metricValue) : "No Data"}
             </span>
-            <span
-              style={{
-                marginLeft: "10px",
-                marginTop: "auto",
-                marginBottom: "auto",
-              }}
-            >
-              <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b>{" "}
+          ) : (
+            <span className="place-detail-metric-value">
+              {useEmojis ? emojiContent : ""}
+              {metricValue}
+              {showSuffix ? unitSuffix : ""}
             </span>
-            {useStars ? (
-              <span style={{ color: "gold", marginLeft: "auto" }}>
-                {metricValue ? getHCAHPSStars(metricValue) : "No Data"}
-              </span>
-            ) : (
-              <span
-                style={{
-                  color: "black",
-                  marginLeft: "auto",
-                  marginTop: "auto",
-                  marginBottom: "auto",
-                }}
-              >
-                {useEmojis ? emojiContent : ""}
-                {metricValue}
-                {showSuffix ? unitSuffix : ""}
-              </span>
-            )}
-          </div>
+          )}
         </div>
       );
     });
@@ -312,10 +298,10 @@ const PlaceDetail = (props) => {
       >
         Current Selection
       </div>
-      <div>
-        <b>{selectedPlace.name}</b>
+      <div className="place-detail-name">
+        {selectedPlace.name}
       </div>
-      <div>{selectedPlace.address}</div>
+      <div className="place-detail-address">{addressString}</div>
       <div>{formatPhoneNumber(selectedPlace.phone_number)}</div>
       <div className="place-detail-actions-container">
         <hr style={{ width: "100%" }} />
@@ -358,7 +344,7 @@ const PlaceDetail = (props) => {
       )}
       {selectedPlace["Infection Rating"] &&
       !isInvalidValue(selectedPlace["Infection Rating"]) &&
-      ["hospitals", "ed"].includes(normalizeCareType(selectedCareType)) ? (
+      facilityCareTypes.some((ct) => ["hospitals", "ed"].includes(normalizeCareType(ct))) ? (
         <>
           <div style={ratingDivStyle}>
             <b>Infection Rating:</b>

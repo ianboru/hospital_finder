@@ -122,15 +122,14 @@ const PlaceDetail = (props) => {
         key={`${metricName}-${index}-metric-stars`}
       >
         <span
-          data-tip={dataDictionaryEntry ? dataDictionaryEntry.definition : ""}
-          data-for={`tooltip-${metricName}`}
-          style={{ cursor: "help", flexShrink: 0 }}
+          style={{ cursor: "pointer", flexShrink: 0 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            props.setShownDefinition(metricName.toLowerCase());
+          }}
         >
-          {dataDictionaryEntry ? "\u24D8" : ""}
+          ⓘ
         </span>
-        {dataDictionaryEntry && (
-          <ReactTooltip id={`tooltip-${metricName}`} place="top" effect="solid" />
-        )}
         <span className="place-detail-metric-label">
           <b>{metricLabel}</b>
         </span>
@@ -214,7 +213,8 @@ const PlaceDetail = (props) => {
         metricValue = "Y";
       } else if (
         metricValue === "Not Available" ||
-        metricValue === "Not Applicable"
+        metricValue === "Not Applicable" ||
+        metricValue === "N/A"
       ) {
         metricValue = "No Data";
       } else if (isInvalidValue(metricValue)) {
@@ -232,11 +232,11 @@ const PlaceDetail = (props) => {
         dataDictionaryEntry["unit"].includes("High");
       const unitSuffix =
         dataDictionaryEntry["unit"] &&
-        dataDictionaryEntry["unit"].includes("Minutes")
+          dataDictionaryEntry["unit"].includes("Minutes")
           ? " min"
           : dataDictionaryEntry["unit"].includes("Percent") && metricValue
-          ? "%"
-          : "";
+            ? "%"
+            : "";
       const emojiContent = ":P";
       if (useEmojis && qualitativeMetric) {
         emojiContent = getQualitativeEmoji(metricValue);
@@ -250,7 +250,8 @@ const PlaceDetail = (props) => {
         <div key={`${key}-${index}-detail-metric`} className="place-detail-metric-row">
           <span
             style={{ cursor: "pointer", flexShrink: 0 }}
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               props.setShownDefinition(key.toLowerCase());
             }}
           >
@@ -275,36 +276,31 @@ const PlaceDetail = (props) => {
     });
 
   return (
-    <div className="place-detail-container">
-      <div
-        onClick={closePlaceDetail}
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          cursor: "pointer",
-          fontSize: 16,
-          color: "gray",
-        }}
-      >
-        <span>x</span>
-      </div>
-      <div
-        style={{
-          fontSize: 16,
-          marginBottom: 15,
-          fontWeight: "bold",
-          color: "gray",
-        }}
-      >
-        Current Selection
-      </div>
-      <div className="place-detail-name">
-        {selectedPlace.name}
+    <div
+      className="place-detail-container"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="place-detail-name">
+          {selectedPlace.name}
+        </div>
+        <span
+          onClick={closePlaceDetail}
+          style={{
+            cursor: "pointer",
+            fontSize: 20,
+            color: "gray",
+            padding: "0 5px",
+            flexShrink: 0,
+          }}
+        >
+          ×
+        </span>
       </div>
       <div className="place-detail-address">{addressString}</div>
       <div>{formatPhoneNumber(selectedPlace.phone_number)}</div>
       <div className="place-detail-actions-container">
-        <hr style={{ width: "100%" }} />
+        <hr style={{ width: "calc(100% + 20px)", marginLeft: "-10px", marginRight: "-10px", border: "none", borderTop: "1px solid #f0f0f0" }} />
 
         <div className="place-detail-actions">
           <ViewOnGoogleMapsButton url={googleMapsUrl} />
@@ -322,7 +318,7 @@ const PlaceDetail = (props) => {
             onCompare={() => handleCompare(selectedPlace)}
           />
         </div>
-        <hr style={{ width: "100%" }} />
+        <hr style={{ width: "calc(100% + 20px)", marginLeft: "-10px", marginRight: "-10px", border: "none", borderTop: "1px solid #f0f0f0" }} />
       </div>
 
       {detailMetrics && Object.keys(detailMetrics).length > 0 ? (
@@ -336,15 +332,15 @@ const PlaceDetail = (props) => {
               })()}
             </span>
           </div>
-          <hr style={{ marginTop: "0px" }} />
+          <hr style={{ marginTop: "0px", border: "none", borderTop: "1px solid #f0f0f0" }} />
           <div style={metricDivStyle}>{detailMetrics}</div>
         </>
       ) : (
         <></>
       )}
       {selectedPlace["Infection Rating"] &&
-      !isInvalidValue(selectedPlace["Infection Rating"]) &&
-      facilityCareTypes.some((ct) => ["hospitals", "ed"].includes(normalizeCareType(ct))) ? (
+        !isInvalidValue(selectedPlace["Infection Rating"]) &&
+        facilityCareTypes.some((ct) => ["hospitals", "ed"].includes(normalizeCareType(ct))) ? (
         <>
           <div style={ratingDivStyle}>
             <b>Infection Rating:</b>
@@ -354,7 +350,7 @@ const PlaceDetail = (props) => {
                 : "No Data"}
             </span>
           </div>
-          <hr style={{ marginTop: "0px" }} />
+          <hr style={{ marginTop: "0px", border: "none", borderTop: "1px solid #f0f0f0" }} />
           <div style={metricDivStyle}>{detailedInfectionMetricStars}</div>
         </>
       ) : (

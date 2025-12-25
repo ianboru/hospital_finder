@@ -485,10 +485,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         run_start_of_pipeline = True
-        run_load_ccn_data = True
+        run_load_ccn_data = False
         run_load_hai_data = False
-        run_load_caphs_data = False
-        run_load_lat_long_data = False 
+        run_load_caphs_data = True
+        run_load_lat_long_data = True 
         export_path = DATA_DIR
         # load all ccn data into df and create facility for each row
 
@@ -505,7 +505,7 @@ class Command(BaseCommand):
                 self.load_hai_data_to_facility_model(export_path)
             
             if run_load_caphs_data == True:
-                caphs_care_types = ["Hospice"]  # Updated list
+                caphs_care_types = [ "Hospitals", "ED + Others","Outpatient", "Home Health", "Nursing Homes"]  # Updated list
                 #caphs_care_types = ["Hospitals"  ]  # Updated list
                 files_with_measures_as_columns = ["Home Health", "Outpatient", "Nursing Homes", "In-Center Hemodialysis"]
                 

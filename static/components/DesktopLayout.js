@@ -50,9 +50,8 @@ const DesktopLayout = () => {
     const careType = url.searchParams.get("careType");
     const search = url.searchParams.get("search");
 
-    const debugUrl = `/api/debug-places-data/?location=${
-      location || ""
-    }&radius=${radius || ""}&careType=${careType || ""}&search=${search || ""}`;
+    const debugUrl = `/api/debug-places-data/?location=${location || ""
+      }&radius=${radius || ""}&careType=${careType || ""}&search=${search || ""}`;
 
     fetch(debugUrl)
       .then((response) => response.json())
@@ -229,6 +228,7 @@ const DesktopLayout = () => {
           />
         </div>
       </div>
+      {definitionInfoPopUp}
     </div>
   );
 };

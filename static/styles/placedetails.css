@@ -1,37 +1,31 @@
 .place-detail-container {
-  position: absolute;
-  border-radius: 20px;
+  position: relative;
+  border-radius: 0;
   background-color: #fff;
   z-index: 50;
-  margin-right: 10px;
-  margin-left: 10px;
-  margin-bottom: 15px;
-  border: 2px solid #d9d9d9;
-  width: 400px;
-  padding: 10px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  top: 5%;
+  margin: 0;
+  border: none;
+  border-top: none;
+  width: 100%;
+  padding: 0 10px 10px 10px;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
   max-height: 85vh;
+  pointer-events: auto;
 }
 
 @media (max-width: 768px) {
   .place-detail-container {
-    width: calc(100% - 20px);
-    max-width: 100vw;
-    border: 2px solid #d9d9d9;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 15px;
+    width: 100%;
+    max-width: 100%;
+    border: none;
+    border-top: none;
+    margin: 0;
     z-index: 50;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-    max-height: 70vh;
-    top: auto;
-    bottom: 10px;
-    left: 0;
-    right: 0;
+    box-shadow: none;
+    max-height: 100%;
+    position: relative;
   }
 }
 

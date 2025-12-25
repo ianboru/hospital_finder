@@ -1,3 +1,52 @@
+/* Mobile Header */
+.mobile-header {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.mobile-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-header-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-header-buttons {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mobile-header-button {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.mobile-header-button:hover {
+  background-color: #e5e7eb;
+}
+
 @media (max-width: 768px) {
   .search-container {
     position: sticky;

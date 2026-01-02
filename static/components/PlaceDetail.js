@@ -8,10 +8,15 @@ import {
 } from "../utils";
 import ViewOnGoogleMapsButton from "./ViewOnGoogleMapsButton";
 import CompareButton from "./CompareButton";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext, useDefinitionContext } from "../context/AppContext";
 import "../styles/placedetails.css";
 
 const PlaceDetail = (props) => {
+  console.log('[PlaceDetail] RENDERING', {
+    selectedPlaceName: props.selectedPlace ? props.selectedPlace.name : null,
+    propsKeys: Object.keys(props),
+  });
+
   const {
     setSelectedPlace,
     comparisonPlaces,
@@ -22,6 +27,8 @@ const PlaceDetail = (props) => {
     handleRemoveComparison,
     handleCompare,
   } = useAppContext();
+
+  const { setShownDefinition } = useDefinitionContext();
 
   // Helper to check if a value is invalid (NaN, null, undefined, or string "NaN")
   const isInvalidValue = (value) => {
@@ -104,7 +111,7 @@ const PlaceDetail = (props) => {
   const onClickInfo = (e, metricName) => {
     e.stopPropagation();
     e.preventDefault();
-    props.setShownDefinition(metricName.toLowerCase())
+    setShownDefinition(metricName.toLowerCase())
   }
   // Map infection rating metrics to their respective labels
   const detailedInfectionMetricsMap = {
@@ -365,4 +372,21 @@ const PlaceDetail = (props) => {
   );
 };
 
-export default PlaceDetail;
+// Custom comparison function - only re-render if selectedPlace changes
+const arePropsEqual = (prevProps, nextProps) => {
+  // Compare selectedPlace by ID
+  const prevId = prevProps.selectedPlace ? prevProps.selectedPlace['Facility ID'] : null;
+  const nextId = nextProps.selectedPlace ? nextProps.selectedPlace['Facility ID'] : null;
+
+  console.log('[PlaceDetail] arePropsEqual check', {
+    prevId,
+    nextId,
+    areEqual: prevId === nextId,
+  });
+
+  return prevId === nextId &&
+    prevProps.dataDictionary === nextProps.dataDictionary &&
+    prevProps.metricQuantiles === nextProps.metricQuantiles;
+};
+
+export default React.memo(PlaceDetail, arePropsEqual);

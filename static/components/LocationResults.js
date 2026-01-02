@@ -17,7 +17,6 @@ const LocationResults = ({
   results = [],
   title = "Hospitals",
   onRemoveComparison = (_i) => { },
-  setShownDefinition,
   dataDictionary,
 }) => {
   const {
@@ -181,7 +180,6 @@ const LocationResults = ({
             onCompare={() => handleCompare(place)}
             onRemoveComparison={(index) => onRemoveComparison(index)}
             dataDictionary={dataDictionary}
-            setShownDefinition={setShownDefinition}
           />
         );
       })}

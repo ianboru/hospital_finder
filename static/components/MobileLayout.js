@@ -10,6 +10,7 @@ import CompareSelector from "./CompareSelector";
 import ComparisonModal from "./ComparisonModal";
 import InfoModal from "./InfoModal";
 import AboutUsContent from "./AboutUsContent";
+import DefinitionInfoPopUp from "./DefinitionInfoPopUp";
 
 const MobileLayout = () => {
   const {
@@ -20,8 +21,6 @@ const MobileLayout = () => {
     dataDictionary,
     metricQuantiles,
     onSearchSubmit,
-    setShownDefinition,
-    shownDefinition,
     initialLocation,
     setZoomRadius,
     currentGPSLocation,
@@ -29,12 +28,15 @@ const MobileLayout = () => {
     setComparisonPlaces,
     showComparisonModal,
     setShowComparisonModal,
-    definitionInfoPopUp,
     showAboutUsModal,
     setShowAboutUsModal,
     showAboutDataModal,
     setShowAboutDataModal,
   } = useAppContext();
+
+  console.log('[MobileLayout] RENDERING', {
+    selectedPlace: selectedPlace ? selectedPlace.name : null,
+  });
 
   const bottomSheetRef = useRef(null);
 
@@ -54,6 +56,15 @@ const MobileLayout = () => {
     [comparisonPlaces]
   );
 
+  const handleCompare = useCallback(
+    (place) => {
+      if (comparisonPlaces.length >= 3) {
+        return;
+      }
+      setComparisonPlaces([...comparisonPlaces, place]);
+    },
+    [comparisonPlaces, setComparisonPlaces]
+  );
 
   const BottomSheetContent = () => {
     if (selectedPlace) {
@@ -61,8 +72,6 @@ const MobileLayout = () => {
         <PlaceDetail
           selectedPlace={selectedPlace}
           setSelectedPlace={setSelectedPlace}
-          setShownDefinition={setShownDefinition}
-          shownDefinition={shownDefinition}
           selectedCareType={initialCareTypeParam}
           dataDictionary={dataDictionary}
           metricQuantiles={metricQuantiles}
@@ -85,7 +94,6 @@ const MobileLayout = () => {
           onCompare={(place) => handleCompare(place)}
           title="Hospitals"
           onRemoveComparison={handleRemoveComparison}
-          setShownDefinition={setShownDefinition}
           dataDictionary={dataDictionary}
         />
       </>
@@ -184,7 +192,7 @@ const MobileLayout = () => {
       <BottomSheet ref={bottomSheetRef}>
         <BottomSheetContent />
       </BottomSheet>
-      {definitionInfoPopUp}
+      <DefinitionInfoPopUp />
     </div>
   );
 };

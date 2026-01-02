@@ -9,6 +9,7 @@ import InfoModal from "./InfoModal";
 import AboutUsContent from "./AboutUsContent";
 import "./DesktopLayout.css";
 import SearchBox from "./SearchBox";
+import DefinitionInfoPopUp from "./DefinitionInfoPopUp";
 
 const DesktopLayout = () => {
   const {
@@ -22,12 +23,9 @@ const DesktopLayout = () => {
     onSearchInputChange,
     setSearchTerm,
     searchTerm,
-    setShownDefinition,
-    shownDefinition,
     initialLocation,
     setZoomRadius,
     currentGPSLocation,
-    definitionInfoPopUp,
     initialCareType,
     onSelectCareType,
     isSearchActive,
@@ -42,6 +40,10 @@ const DesktopLayout = () => {
     showWebsiteGuideModal,
     setShowWebsiteGuideModal,
   } = useAppContext();
+
+  console.log('[DesktopLayout] RENDERING', {
+    selectedPlace: selectedPlace ? selectedPlace.name : null,
+  });
 
   const handleDebugData = useCallback(() => {
     const url = new URL(window.location);
@@ -200,7 +202,6 @@ const DesktopLayout = () => {
             onCompare={(place) => handleCompare(place)}
             title="Hospitals"
             onRemoveComparison={handleRemoveComparison}
-            setShownDefinition={setShownDefinition}
             dataDictionary={dataDictionary}
           />
         </div>
@@ -210,8 +211,6 @@ const DesktopLayout = () => {
             <PlaceDetail
               selectedPlace={selectedPlace}
               setSelectedPlace={setSelectedPlace}
-              setShownDefinition={setShownDefinition}
-              shownDefinition={shownDefinition}
               selectedCareType={initialCareTypeParam}
               dataDictionary={dataDictionary}
               metricQuantiles={metricQuantiles}
@@ -230,7 +229,7 @@ const DesktopLayout = () => {
           />
         </div>
       </div>
-      {definitionInfoPopUp}
+      <DefinitionInfoPopUp />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import React from "react";
 import "./App.css";
 import MobileLayout from "./components/MobileLayout";
 import DesktopLayout from "./components/DesktopLayout";
-import { AppProvider, useAppContext } from "./context/AppContext";
+import { AppProvider, DefinitionProvider, useAppContext } from "./context/AppContext";
 
 function AppContent() {
   console.log("version 0.9");
@@ -21,13 +21,10 @@ function AppContent() {
     setSearchTerm,
     zoomRadius,
     setZoomRadius,
-    shownDefinition,
-    setShownDefinition,
     currentGPSLocation,
     onSelectCareType,
     onSearchInputChange,
     onSearchSubmit,
-    definitionInfoPopUp,
     isMobile,
     showComparisonModal,
     setShowComparisonModal,
@@ -50,10 +47,17 @@ function AppContent() {
 }
 
 function App() {
+  // Get dataDictionary from DOM for DefinitionProvider
+  const dataDictionary = JSON.parse(
+    document.getElementById("data_dictionary").textContent
+  );
+
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <DefinitionProvider dataDictionary={dataDictionary}>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </DefinitionProvider>
   );
 }
 

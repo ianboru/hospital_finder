@@ -2,6 +2,7 @@ import React from "react";
 import "./LocationRow.css";
 import CompareButton from "./CompareButton";
 import { SORT_FIELD_MAP } from "../constants/sortConstants";
+import { useDefinitionContext } from "../context/AppContext";
 
 const ratingStars = (rating) => {
   return (
@@ -58,8 +59,8 @@ const LocationRow = ({
   onRemoveComparison,
   disableCompare,
   dataDictionary,
-  setShownDefinition,
 }) => {
+  const { setShownDefinition } = useDefinitionContext();
   // Determine which metric to display based on sortBy
   const displayMetric = sortBy && sortBy.id && sortBy.id !== 'distance'
     ? SORT_FIELD_MAP[sortBy.id]
@@ -198,4 +199,4 @@ const LocationRow = ({
   );
 };
 
-export default LocationRow;
+export default React.memo(LocationRow);

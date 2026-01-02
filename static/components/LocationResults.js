@@ -16,7 +16,9 @@ const getInfectionStatus = (rating) => {
 const LocationResults = ({
   results = [],
   title = "Hospitals",
-  onRemoveComparison = (_i) => {},
+  onRemoveComparison = (_i) => { },
+  setShownDefinition,
+  dataDictionary,
 }) => {
   const {
     setSelectedPlace,
@@ -150,7 +152,7 @@ const LocationResults = ({
         // Get the value for the current sort metric
         const sortConfig = sortBy && sortBy.id ? SORT_FIELD_MAP[sortBy.id] : null;
         const sortMetricValue = sortConfig ? place[sortConfig.field] : place["Summary star rating"];
-        
+
         return (
           <LocationRow
             disableCompare={
@@ -178,6 +180,8 @@ const LocationResults = ({
             }
             onCompare={() => handleCompare(place)}
             onRemoveComparison={(index) => onRemoveComparison(index)}
+            dataDictionary={dataDictionary}
+            setShownDefinition={setShownDefinition}
           />
         );
       })}

@@ -200,6 +200,8 @@ const DesktopLayout = () => {
             onCompare={(place) => handleCompare(place)}
             title="Hospitals"
             onRemoveComparison={handleRemoveComparison}
+            setShownDefinition={setShownDefinition}
+            dataDictionary={dataDictionary}
           />
         </div>
 

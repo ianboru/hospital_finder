@@ -33,9 +33,9 @@ export const AppProvider = ({ children }) => {
     : [];
   const initialLocation = initialLocationSplit
     ? {
-        lng: parseFloat(initialLocationSplit[0]),
-        lat: parseFloat(initialLocationSplit[1]),
-      }
+      lng: parseFloat(initialLocationSplit[0]),
+      lat: parseFloat(initialLocationSplit[1]),
+    }
     : {};
   const initialZoomRadius = url.searchParams.get("radius");
   const initialCareTypeParam = url.searchParams.get("careType");
@@ -56,7 +56,7 @@ export const AppProvider = ({ children }) => {
   }, []);
   const [sortBy, setSortBy] = useState({ id: 'distance', name: 'Distance' }); // Default to distance
   const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc' - distance defaults to ascending
-  
+
   const [selectedPlace, _setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState(
     initialSearchParam ? initialSearchParam : ""
@@ -130,7 +130,31 @@ export const AppProvider = ({ children }) => {
     setSearchTerm(e.target.value);
   };
 
- 
+  const handleOutsideClickOrTouch = useCallback((event) => {
+    const target = event.target;
+
+    // Check if click/touch is inside the popup or on an info icon
+    const isInsidePopup = target.closest('.definition-info-popup');
+    const isInfoIcon = target.closest('.lr-info-icon') ||
+      target.classList.contains('lr-info-icon') ||
+      target.textContent === 'ℹ' ||
+      target.textContent === 'ⓘ';
+
+    console.log('Click/Touch detected:', {
+      eventType: event.type,
+      target: target,
+      classList: target.classList,
+      isInsidePopup: !!isInsidePopup,
+      isInfoIcon: isInfoIcon,
+      textContent: target.textContent
+    });
+
+    // Only clear if clicking/touching outside both the popup and info icons
+    if (!isInsidePopup && !isInfoIcon) {
+      setShownDefinition(null);
+    }
+  }, []);
+
   const handleWindowSizeChange = () => {
     setWidth(window.innerWidth);
   };
@@ -159,14 +183,15 @@ export const AppProvider = ({ children }) => {
       });
     });
 
-    //hide definition modal
-    window.addEventListener("mousedown", function (element) {
-      console.log(element.target.classList);
-      if (element.target.classList[0] != "definition-info-popup") {
-        setShownDefinition(null);
-      }
-    });
-  }, []);
+    //hide definition modal when clicking/touching outside
+    window.addEventListener("mousedown", handleOutsideClickOrTouch);
+    window.addEventListener("touchstart", handleOutsideClickOrTouch);
+
+    return () => {
+      window.removeEventListener("mousedown", handleOutsideClickOrTouch);
+      window.removeEventListener("touchstart", handleOutsideClickOrTouch);
+    };
+  }, [handleOutsideClickOrTouch]);
 
   useEffect(() => {
     window.addEventListener("resize", handleWindowSizeChange);
@@ -177,7 +202,7 @@ export const AppProvider = ({ children }) => {
 
   // Computed values
   const isMobile = width < 768;
-  
+
   const definitionInfoPopUp =
     shownDefinition && dataDictionary[shownDefinition] ? (
       <div className="definition-info-popup">
@@ -196,7 +221,7 @@ export const AppProvider = ({ children }) => {
     initialLocation,
     initialCareType,
     initialCareTypeParam,
-    
+
     // State
     selectedPlace,
     searchTerm,

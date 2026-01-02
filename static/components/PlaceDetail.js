@@ -100,6 +100,12 @@ const PlaceDetail = (props) => {
         return ":)";
     }
   };
+
+  const onClickInfo = (e, metricName) => {
+    e.stopPropagation();
+    e.preventDefault();
+    props.setShownDefinition(metricName.toLowerCase())
+  }
   // Map infection rating metrics to their respective labels
   const detailedInfectionMetricsMap = {
     "Central Line Associated Bloodstream Infection": "CLABSI",
@@ -110,6 +116,21 @@ const PlaceDetail = (props) => {
     "Clostridium Difficile (C.Diff)": "C.Diff",
   };
 
+  const renderInfoIcon = (metricName, dataDictionaryEntry) => {
+    return (
+      <span
+        style={{ cursor: "pointer", flexShrink: 0 }}
+        onMouseDown={(e) => {
+          onClickInfo(e, metricName);
+        }}
+        onTouchStart={(e) => {
+          onClickInfo(e, metricName);
+        }}
+      >
+        {dataDictionaryEntry ? "\u24D8" : " "}
+      </span>
+    )
+  };
   const detailedInfectionMetricStars = Object.keys(
     detailedInfectionMetricsMap
   ).map((metricName, index) => {
@@ -121,15 +142,7 @@ const PlaceDetail = (props) => {
         className="place-detail-metric-row"
         key={`${metricName}-${index}-metric-stars`}
       >
-        <span
-          style={{ cursor: "pointer", flexShrink: 0 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.setShownDefinition(metricName.toLowerCase());
-          }}
-        >
-          ⓘ
-        </span>
+        {renderInfoIcon(metricName, dataDictionaryEntry)}
         <span className="place-detail-metric-label">
           <b>{metricLabel}</b>
         </span>
@@ -248,15 +261,7 @@ const PlaceDetail = (props) => {
         metricValue != "No Data";
       return (
         <div key={`${key}-${index}-detail-metric`} className="place-detail-metric-row">
-          <span
-            style={{ cursor: "pointer", flexShrink: 0 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              props.setShownDefinition(key.toLowerCase());
-            }}
-          >
-            {dataDictionaryEntry ? "\u24D8" : ""}
-          </span>
+          {renderInfoIcon(key, dataDictionaryEntry)}
           <span className="place-detail-metric-label">
             <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b>
           </span>

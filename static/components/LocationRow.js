@@ -1,5 +1,4 @@
 import React from "react";
-import ReactTooltip from "react-tooltip";
 import "./LocationRow.css";
 import CompareButton from "./CompareButton";
 import { SORT_FIELD_MAP } from "../constants/sortConstants";
@@ -59,6 +58,7 @@ const LocationRow = ({
   onRemoveComparison,
   disableCompare,
   dataDictionary,
+  setShownDefinition,
 }) => {
   // Determine which metric to display based on sortBy
   const displayMetric = sortBy && sortBy.id && sortBy.id !== 'distance'
@@ -120,15 +120,33 @@ const LocationRow = ({
           >
             <span
               className="lr-info-icon"
-              data-tip={dataDictionary && displayMetric.key && dataDictionary[displayMetric.key] ? dataDictionary[displayMetric.key].definition : ""}
-              data-for={`tooltip-rating-${name}`}
-              style={{ cursor: "help" }}
+              style={{ cursor: "pointer" }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (setShownDefinition && displayMetric.key) {
+                  setShownDefinition(displayMetric.key.toLowerCase());
+                }
+                console.log('Rating info icon clicked:', {
+                  metric: displayMetric.name,
+                  key: displayMetric.key,
+                  definition: dataDictionary && displayMetric.key && dataDictionary[displayMetric.key] ? dataDictionary[displayMetric.key].definition : 'No definition found'
+                });
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (setShownDefinition && displayMetric.key) {
+                  setShownDefinition(displayMetric.key.toLowerCase());
+                }
+                console.log('Rating info icon touched:', {
+                  metric: displayMetric.name,
+                  key: displayMetric.key,
+                });
+              }}
             >
               ℹ
             </span>
-            {dataDictionary && displayMetric.key && dataDictionary[displayMetric.key] && (
-              <ReactTooltip id={`tooltip-rating-${name}`} place="top" effect="solid" />
-            )}
             <span className="lr-metric-label">{displayMetric.name}</span>
           </div>
           {ratingStars(displayValue || 0)}
@@ -143,15 +161,33 @@ const LocationRow = ({
           >
             <span
               className="lr-info-icon"
-              data-tip={dataDictionary && dataDictionary["infection rating"] ? dataDictionary["infection rating"].definition : ""}
-              data-for={`tooltip-infection-${name}`}
-              style={{ cursor: "help" }}
+              style={{ cursor: "pointer" }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (setShownDefinition) {
+                  setShownDefinition("infection rating");
+                }
+                console.log('Infection info icon clicked:', {
+                  metric: 'Infections',
+                  key: 'infection rating',
+                  definition: dataDictionary && dataDictionary["infection rating"] ? dataDictionary["infection rating"].definition : 'No definition found'
+                });
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (setShownDefinition) {
+                  setShownDefinition("infection rating");
+                }
+                console.log('Infection info icon touched:', {
+                  metric: 'Infections',
+                  key: 'infection rating',
+                });
+              }}
             >
               ℹ
             </span>
-            {dataDictionary && dataDictionary["infection rating"] && (
-              <ReactTooltip id={`tooltip-infection-${name}`} place="top" effect="solid" />
-            )}
             <span className="lr-metric-label">{infectionLabelText}</span>
           </div>
           {infectionIcon(infectionStatus)}

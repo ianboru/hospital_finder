@@ -157,35 +157,6 @@ export const AppProvider = ({ children }) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleOutsideClickOrTouch = useCallback((event) => {
-    const target = event.target;
-
-    // Check if click/touch is inside the popup or on an info icon
-    const isInsidePopup = target.closest('.definition-info-popup');
-    const isInfoIcon = target.closest('.lr-info-icon') ||
-      target.classList.contains('lr-info-icon') ||
-      target.textContent === 'ℹ' ||
-      target.textContent === 'ⓘ';
-
-    console.log('Click/Touch detected:', {
-      eventType: event.type,
-      target: target,
-      classList: target.classList,
-      isInsidePopup: !!isInsidePopup,
-      isInfoIcon: isInfoIcon,
-      textContent: target.textContent
-    });
-
-    // Only clear if clicking/touching outside both the popup and info icons
-    if (!isInsidePopup && !isInfoIcon) {
-      setShownDefinition(null);
-    }
-  }, []);
-
-  const handleWindowSizeChange = () => {
-    setWidth(window.innerWidth);
-  };
-
   // Effects
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -209,16 +180,11 @@ export const AppProvider = ({ children }) => {
         lng: position.coords.longitude,
       });
     });
+  }, []);
 
-    //hide definition modal when clicking/touching outside
-    window.addEventListener("mousedown", handleOutsideClickOrTouch);
-    window.addEventListener("touchstart", handleOutsideClickOrTouch);
-
-    return () => {
-      window.removeEventListener("mousedown", handleOutsideClickOrTouch);
-      window.removeEventListener("touchstart", handleOutsideClickOrTouch);
-    };
-  }, [handleOutsideClickOrTouch]);
+  const handleWindowSizeChange = () => {
+    setWidth(window.innerWidth);
+  };
 
   useEffect(() => {
     window.addEventListener("resize", handleWindowSizeChange);

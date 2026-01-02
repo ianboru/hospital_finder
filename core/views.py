@@ -197,7 +197,7 @@ def add_metrics_to_providers(filtered_provider_json):
     return providers_with_metrics
          
 def find_providers_in_radius(search_location, radius, care_type):
-    search_location_tuple = (search_location[0], search_location[1])
+    search_location_tuple = (search_location[1], search_location[0])
     print("Search Location with care type: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0

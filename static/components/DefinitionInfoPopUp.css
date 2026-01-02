@@ -1,0 +1,111 @@
+/* Modal backdrop - covers entire screen */
+.definition-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+/* The popup itself */
+.definition-info-popup {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideIn 0.2s ease-out;
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header with title and close button */
+.definition-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.definition-popup-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Close button */
+.definition-close-button {
+    background: none;
+    border: none;
+    font-size: 32px;
+    line-height: 1;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.definition-close-button:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+/* Content area */
+.definition-popup-content {
+    padding: 20px 24px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .definition-modal-backdrop {
+        padding: 16px;
+    }
+
+    .definition-info-popup {
+        max-width: 100%;
+        border-radius: 8px;
+    }
+
+    .definition-popup-header {
+        padding: 16px;
+    }
+
+    .definition-popup-header h3 {
+        font-size: 18px;
+    }
+
+    .definition-popup-content {
+        padding: 16px;
+        font-size: 14px;
+    }
+}

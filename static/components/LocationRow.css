@@ -35,7 +35,6 @@
   font-size: 0.95rem;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   align-items: flex-start;
   margin-bottom: 2px;
 }
@@ -46,6 +45,7 @@
   flex-direction: column;
   gap: 10px;
   min-width: 0;
+  align-items: flex-start;
 }
 
 .lr-metric-row {
@@ -54,6 +54,10 @@
   align-items: center;
   gap: 7px;
   font-size: 1rem;
+}
+
+.lr-metric-row>div:first-child {
+  align-self: flex-start;
 }
 
 .lr-info-icon {
@@ -67,12 +71,25 @@
   font-size: 0.95rem;
   color: #888;
   border: 1px solid #e0e0e0;
-  margin-right: 2px;
+  margin-right: 6px;
+  flex-shrink: 0;
 }
 
 .lr-metric-label {
   font-weight: 500;
   margin-right: 4px;
+  line-height: 18px;
+}
+
+.lr-metric-value {
+  font-weight: 600;
+  color: #6c4eb6;
+}
+
+.lr-metric-na {
+  font-weight: 500;
+  color: #999;
+  font-style: italic;
 }
 
 .lr-stars {

@@ -26,6 +26,7 @@ const LocationResults = ({
     isMobile,
     sortBy,
     sortDirection,
+    initialCareTypeParam,
   } = useAppContext();
 
   const handleCompare = useCallback(
@@ -169,11 +170,8 @@ const LocationResults = ({
             phone={formatPhoneNumber(place.phone_number || "")}
             distance={place.distance}
             travelTime={place.time}
-            patientRating={place["Summary star rating"] || 0}
-            sortBy={sortBy}
-            sortMetricValue={sortMetricValue}
-            infectionLabelText={place["Infection Label"] || "Infections"}
-            infectionStatus={getInfectionStatus(place["Infection Rating"])}
+            place={place}
+            careType={initialCareTypeParam}
             onGoogleMaps={() =>
               window.open(addressToUrl(place.address), "_blank")
             }

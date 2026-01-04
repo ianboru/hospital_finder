@@ -7,6 +7,8 @@ const SearchScreen = () => {
   const {
     placesData,
     setSelectedPlace,
+    setShownDefinition,
+    dataDictionary,
   } = useAppContext();
   return (
     <div className="search-screen">
@@ -15,6 +17,8 @@ const SearchScreen = () => {
         onClose={() => setSelectedPlace(null)}
         onCompare={() => setSelectedPlace(null)}
         title="Hospitals"
+        setShownDefinition={setShownDefinition}
+        dataDictionary={dataDictionary}
       />
     </div>
   );

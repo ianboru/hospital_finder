@@ -10,6 +10,7 @@ import CompareSelector from "./CompareSelector";
 import ComparisonModal from "./ComparisonModal";
 import InfoModal from "./InfoModal";
 import AboutUsContent from "./AboutUsContent";
+import DefinitionInfoPopUp from "./DefinitionInfoPopUp";
 
 const MobileLayout = () => {
   const {
@@ -20,8 +21,6 @@ const MobileLayout = () => {
     dataDictionary,
     metricQuantiles,
     onSearchSubmit,
-    setShownDefinition,
-    shownDefinition,
     initialLocation,
     setZoomRadius,
     currentGPSLocation,
@@ -29,12 +28,15 @@ const MobileLayout = () => {
     setComparisonPlaces,
     showComparisonModal,
     setShowComparisonModal,
-    definitionInfoPopUp,
     showAboutUsModal,
     setShowAboutUsModal,
     showAboutDataModal,
     setShowAboutDataModal,
   } = useAppContext();
+
+  console.log('[MobileLayout] RENDERING', {
+    selectedPlace: selectedPlace ? selectedPlace.name : null,
+  });
 
   const bottomSheetRef = useRef(null);
 
@@ -54,6 +56,15 @@ const MobileLayout = () => {
     [comparisonPlaces]
   );
 
+  const handleCompare = useCallback(
+    (place) => {
+      if (comparisonPlaces.length >= 3) {
+        return;
+      }
+      setComparisonPlaces([...comparisonPlaces, place]);
+    },
+    [comparisonPlaces, setComparisonPlaces]
+  );
 
   const BottomSheetContent = () => {
     if (selectedPlace) {
@@ -61,14 +72,13 @@ const MobileLayout = () => {
         <PlaceDetail
           selectedPlace={selectedPlace}
           setSelectedPlace={setSelectedPlace}
-          setShownDefinition={setShownDefinition}
-          shownDefinition={shownDefinition}
           selectedCareType={initialCareTypeParam}
           dataDictionary={dataDictionary}
           metricQuantiles={metricQuantiles}
         />
       );
     }
+
     return (
       <>
         {comparisonPlaces.length > 0 && (
@@ -79,16 +89,68 @@ const MobileLayout = () => {
           />
         )}
 
-
         <LocationResults
           results={placesData}
           onCompare={(place) => handleCompare(place)}
           title="Hospitals"
           onRemoveComparison={handleRemoveComparison}
+          dataDictionary={dataDictionary}
         />
       </>
     );
   };
+
+  const aboutTheDataModal = <InfoModal
+    isOpen={showAboutDataModal}
+    onClose={() => setShowAboutDataModal(false)}
+    title="About the Data"
+  >
+    <p>
+      The data displayed on this website comes from the Centers for Medicare
+      and Medicaid Services (CMS) standardized patient experience surveys
+      called Consumer Assessment of Healthcare Providers and Systems
+      (CAHPS). CMS sends these surveys to people covered by Medicare or
+      Medicaid after they receive healthcare. Some of their responses are
+      scored as a star rating to help compare quality.
+    </p>
+
+    <br />
+    <p>HAI</p>
+    <p>
+      This data is <b>standardized</b> meaning the surveys use the same
+      questions, format, timing, and collection methods across all hospitals
+      and providers nationwide. Everyone is measured using the same process,
+      so the results can be fairly compared from one place to another.
+    </p>
+
+    <p>
+      The data is <b>validated</b> meaning the survey questions and methods
+      have been scientifically tested to make sure they accurately measure
+      what they're supposed to measure. Validation ensures the results
+      are reliable, unbiased, and based on real-world evidence, not just
+      opinions or inconsistent data.
+    </p>
+  </InfoModal>
+
+  const mobileHeader = <div className="mobile-header">
+    <div className="mobile-header-content">
+      <h1 className="mobile-header-title">CareFinder.com</h1>
+      <div className="mobile-header-buttons">
+        <button
+          className="mobile-header-button"
+          onClick={() => setShowAboutUsModal(true)}
+        >
+          About Us
+        </button>
+        <button
+          className="mobile-header-button"
+          onClick={() => setShowAboutDataModal(true)}
+        >
+          About Data
+        </button>
+      </div>
+    </div>
+  </div>
 
   return (
     <div className="app">
@@ -109,58 +171,10 @@ const MobileLayout = () => {
         <AboutUsContent />
       </InfoModal>
 
-      <InfoModal
-        isOpen={showAboutDataModal}
-        onClose={() => setShowAboutDataModal(false)}
-        title="About the Data"
-      >
-        <p>
-          The data displayed on this website comes from the Centers for Medicare
-          and Medicaid Services (CMS) standardized patient experience surveys
-          called Consumer Assessment of Healthcare Providers and Systems
-          (CAHPS). CMS sends these surveys to people covered by Medicare or
-          Medicaid after they receive healthcare. Some of their responses are
-          scored as a star rating to help compare quality.
-        </p>
-
-        <br />
-        <p>HAI</p>
-        <p>
-          This data is <b>standardized</b> meaning the surveys use the same
-          questions, format, timing, and collection methods across all hospitals
-          and providers nationwide. Everyone is measured using the same process,
-          so the results can be fairly compared from one place to another.
-        </p>
-
-        <p>
-          The data is <b>validated</b> meaning the survey questions and methods
-          have been scientifically tested to make sure they accurately measure
-          what they're supposed to measure. Validation ensures the results
-          are reliable, unbiased, and based on real-world evidence, not just
-          opinions or inconsistent data.
-        </p>
-      </InfoModal>
+      {aboutTheDataModal}
 
       {/* Compact Mobile Header */}
-      <div className="mobile-header">
-        <div className="mobile-header-content">
-          <h1 className="mobile-header-title">CareFinder.com</h1>
-          <div className="mobile-header-buttons">
-            <button
-              className="mobile-header-button"
-              onClick={() => setShowAboutUsModal(true)}
-            >
-              About Us
-            </button>
-            <button
-              className="mobile-header-button"
-              onClick={() => setShowAboutDataModal(true)}
-            >
-              About Data
-            </button>
-          </div>
-        </div>
-      </div>
+      {mobileHeader}
 
       <SearchBox />
       <div className="map-container">
@@ -178,7 +192,7 @@ const MobileLayout = () => {
       <BottomSheet ref={bottomSheetRef}>
         <BottomSheetContent />
       </BottomSheet>
-      {definitionInfoPopUp}
+      <DefinitionInfoPopUp />
     </div>
   );
 };

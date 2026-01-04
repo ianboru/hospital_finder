@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useCallback, useState } fr
 import { SORT_FIELD_MAP } from "../constants/sortConstants";
 
 const AppContext = createContext();
+const DefinitionContext = createContext();
 
 export const useAppContext = () => {
   const context = useContext(AppContext);
@@ -9,6 +10,33 @@ export const useAppContext = () => {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
+};
+
+export const useDefinitionContext = () => {
+  const context = useContext(DefinitionContext);
+  if (!context) {
+    throw new Error('useDefinitionContext must be used within an AppProvider');
+  }
+  return context;
+};
+
+// Separate provider for definition popup state - completely independent
+export const DefinitionProvider = ({ children, dataDictionary }) => {
+  const [shownDefinition, setShownDefinition] = useState(null);
+
+  const value = React.useMemo(() => ({
+    shownDefinition,
+    setShownDefinition,
+    dataDictionary,
+  }), [shownDefinition, setShownDefinition, dataDictionary]);
+
+  console.log('[DefinitionProvider] RENDERING', { shownDefinition });
+
+  return (
+    <DefinitionContext.Provider value={value}>
+      {children}
+    </DefinitionContext.Provider>
+  );
 };
 
 export const AppProvider = ({ children }) => {
@@ -33,9 +61,9 @@ export const AppProvider = ({ children }) => {
     : [];
   const initialLocation = initialLocationSplit
     ? {
-        lng: parseFloat(initialLocationSplit[0]),
-        lat: parseFloat(initialLocationSplit[1]),
-      }
+      lng: parseFloat(initialLocationSplit[0]),
+      lat: parseFloat(initialLocationSplit[1]),
+    }
     : {};
   const initialZoomRadius = url.searchParams.get("radius");
   const initialCareTypeParam = url.searchParams.get("careType");
@@ -56,13 +84,12 @@ export const AppProvider = ({ children }) => {
   }, []);
   const [sortBy, setSortBy] = useState({ id: 'distance', name: 'Distance' }); // Default to distance
   const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc' - distance defaults to ascending
-  
+
   const [selectedPlace, _setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState(
     initialSearchParam ? initialSearchParam : ""
   );
   const [zoomRadius, setZoomRadius] = useState(initialZoomRadius);
-  const [shownDefinition, setShownDefinition] = useState(null);
   const [currentGPSLocation, setCurrentGPSLocation] = useState(null);
   const [width, setWidth] = useState(window.innerWidth);
   const [activeTab, setActiveTab] = useState('map');
@@ -130,11 +157,6 @@ export const AppProvider = ({ children }) => {
     setSearchTerm(e.target.value);
   };
 
- 
-  const handleWindowSizeChange = () => {
-    setWidth(window.innerWidth);
-  };
-
   // Effects
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -158,15 +180,11 @@ export const AppProvider = ({ children }) => {
         lng: position.coords.longitude,
       });
     });
-
-    //hide definition modal
-    window.addEventListener("mousedown", function (element) {
-      console.log(element.target.classList);
-      if (element.target.classList[0] != "definition-info-popup") {
-        setShownDefinition(null);
-      }
-    });
   }, []);
+
+  const handleWindowSizeChange = () => {
+    setWidth(window.innerWidth);
+  };
 
   useEffect(() => {
     window.addEventListener("resize", handleWindowSizeChange);
@@ -177,18 +195,14 @@ export const AppProvider = ({ children }) => {
 
   // Computed values
   const isMobile = width < 768;
-  
-  const definitionInfoPopUp =
-    shownDefinition && dataDictionary[shownDefinition] ? (
-      <div className="definition-info-popup">
-        <h3>{dataDictionary[shownDefinition].term}</h3>
-        <div>{dataDictionary[shownDefinition].definition}</div>
-      </div>
-    ) : (
-      <></>
-    );
 
-  const value = {
+  console.log('[AppProvider] RENDERING', {
+    selectedPlace: selectedPlace ? selectedPlace.name : null,
+    width,
+    sortBy: sortBy ? sortBy.id : null,
+  });
+
+  const value = React.useMemo(() => ({
     // Data
     placesData,
     metricQuantiles,
@@ -196,12 +210,11 @@ export const AppProvider = ({ children }) => {
     initialLocation,
     initialCareType,
     initialCareTypeParam,
-    
+
     // State
     selectedPlace,
     searchTerm,
     zoomRadius,
-    shownDefinition,
     currentGPSLocation,
     width,
     activeTab,
@@ -219,7 +232,6 @@ export const AppProvider = ({ children }) => {
     setSelectedPlace,
     setSearchTerm,
     setZoomRadius,
-    setShownDefinition,
     setCurrentGPSLocation,
     setActiveTab,
     onSelectCareType,
@@ -235,9 +247,51 @@ export const AppProvider = ({ children }) => {
     setShowAboutUsModal,
     setShowAboutDataModal,
     setShowWebsiteGuideModal,
-    // Computed
-    definitionInfoPopUp,
-  };
+  }), [
+    // Data (these never change)
+    placesData,
+    metricQuantiles,
+    dataDictionary,
+    initialLocation,
+    initialCareType,
+    initialCareTypeParam,
+    // State
+    selectedPlace,
+    searchTerm,
+    zoomRadius,
+    currentGPSLocation,
+    width,
+    activeTab,
+    isSearchActive,
+    isMobile,
+    careType,
+    sortBy,
+    sortDirection,
+    comparisonPlaces,
+    showComparisonModal,
+    showAboutUsModal,
+    showAboutDataModal,
+    showWebsiteGuideModal,
+    // Functions (these are stable due to useCallback/useState)
+    setSelectedPlace,
+    setSearchTerm,
+    setZoomRadius,
+    setCurrentGPSLocation,
+    setActiveTab,
+    onSelectCareType,
+    onSelectSortBy,
+    toggleSortDirection,
+    onSearchInputChange,
+    onSearchSubmit,
+    setIsSearchActive,
+    setCareType,
+    setSortBy,
+    setComparisonPlaces,
+    setShowComparisonModal,
+    setShowAboutUsModal,
+    setShowAboutDataModal,
+    setShowWebsiteGuideModal,
+  ]);
 
   return (
     <AppContext.Provider value={value}>

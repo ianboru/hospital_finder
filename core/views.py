@@ -197,7 +197,7 @@ def add_metrics_to_providers(filtered_provider_json):
     return providers_with_metrics
          
 def find_providers_in_radius(search_location, radius, care_type):
-    search_location_tuple = (search_location[0], search_location[1])
+    search_location_tuple = (search_location[1], search_location[0])
     print("Search Location with care type: ", search_location, radius, care_type)
     filtered_provider_list = []
     nan_lat_long_count = 0
@@ -213,7 +213,7 @@ def find_providers_in_radius(search_location, radius, care_type):
     else:
         provider_list = Facility.objects.filter(care_types__contains = [care_type]).prefetch_related("address")
 
-    print("iterating through hits")
+    print("iterating through hits", provider_list), care_type
     for facility in provider_list:
         address = facility.address
         if not address:
@@ -225,10 +225,11 @@ def find_providers_in_radius(search_location, radius, care_type):
         if provider_location_tuple[0] is None or provider_location_tuple[1] is None or math.isnan(provider_location_tuple[0]) or math.isnan(provider_location_tuple[1]):
             nan_lat_long_count += 1
             continue
+        print("provider location tuple", provider_location_tuple, search_location_tuple)
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
-        except:
-            print(f"Error calculating distance for facility: {facility.facility_name}")
+        except Exception as e:
+            print(f"Error calculating distance for facility: {facility.facility_name}", e)
             continue
         if "scripps" in facility.facility_name.lower():
             print(facility.facility_name, provider_distance.km )
@@ -273,7 +274,7 @@ def index(request, path=None):
     if not radius:
         radius = 150
     split_location_string = location_string.strip().split(",")
-    search_location = (float(split_location_string[0]), float(split_location_string[1]))
+    search_location = (float(split_location_string[1]), float(split_location_string[0]))
     print('Parsed Location: ', split_location_string)
     search_match_threshold = 70
     #replace the pandas dataframe here

@@ -8,10 +8,15 @@ import {
 } from "../utils";
 import ViewOnGoogleMapsButton from "./ViewOnGoogleMapsButton";
 import CompareButton from "./CompareButton";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext, useDefinitionContext } from "../context/AppContext";
 import "../styles/placedetails.css";
 
 const PlaceDetail = (props) => {
+  console.log('[PlaceDetail] RENDERING', {
+    selectedPlaceName: props.selectedPlace ? props.selectedPlace.name : null,
+    propsKeys: Object.keys(props),
+  });
+
   const {
     setSelectedPlace,
     comparisonPlaces,
@@ -22,6 +27,8 @@ const PlaceDetail = (props) => {
     handleRemoveComparison,
     handleCompare,
   } = useAppContext();
+
+  const { setShownDefinition } = useDefinitionContext();
 
   // Helper to check if a value is invalid (NaN, null, undefined, or string "NaN")
   const isInvalidValue = (value) => {
@@ -100,6 +107,12 @@ const PlaceDetail = (props) => {
         return ":)";
     }
   };
+
+  const onClickInfo = (e, metricName) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setShownDefinition(metricName.toLowerCase())
+  }
   // Map infection rating metrics to their respective labels
   const detailedInfectionMetricsMap = {
     "Central Line Associated Bloodstream Infection": "CLABSI",
@@ -110,6 +123,21 @@ const PlaceDetail = (props) => {
     "Clostridium Difficile (C.Diff)": "C.Diff",
   };
 
+  const renderInfoIcon = (metricName, dataDictionaryEntry) => {
+    return (
+      <span
+        style={{ cursor: "pointer", flexShrink: 0 }}
+        onMouseDown={(e) => {
+          onClickInfo(e, metricName);
+        }}
+        onTouchStart={(e) => {
+          onClickInfo(e, metricName);
+        }}
+      >
+        {dataDictionaryEntry ? "\u24D8" : " "}
+      </span>
+    )
+  };
   const detailedInfectionMetricStars = Object.keys(
     detailedInfectionMetricsMap
   ).map((metricName, index) => {
@@ -121,15 +149,7 @@ const PlaceDetail = (props) => {
         className="place-detail-metric-row"
         key={`${metricName}-${index}-metric-stars`}
       >
-        <span
-          style={{ cursor: "pointer", flexShrink: 0 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.setShownDefinition(metricName.toLowerCase());
-          }}
-        >
-          ⓘ
-        </span>
+        {renderInfoIcon(metricName, dataDictionaryEntry)}
         <span className="place-detail-metric-label">
           <b>{metricLabel}</b>
         </span>
@@ -248,15 +268,7 @@ const PlaceDetail = (props) => {
         metricValue != "No Data";
       return (
         <div key={`${key}-${index}-detail-metric`} className="place-detail-metric-row">
-          <span
-            style={{ cursor: "pointer", flexShrink: 0 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              props.setShownDefinition(key.toLowerCase());
-            }}
-          >
-            {dataDictionaryEntry ? "\u24D8" : ""}
-          </span>
+          {renderInfoIcon(key, dataDictionaryEntry)}
           <span className="place-detail-metric-label">
             <b>{dataDictionaryEntry ? dataDictionaryEntry.term : key}</b>
           </span>
@@ -360,4 +372,21 @@ const PlaceDetail = (props) => {
   );
 };
 
-export default PlaceDetail;
+// Custom comparison function - only re-render if selectedPlace changes
+const arePropsEqual = (prevProps, nextProps) => {
+  // Compare selectedPlace by ID
+  const prevId = prevProps.selectedPlace ? prevProps.selectedPlace['Facility ID'] : null;
+  const nextId = nextProps.selectedPlace ? nextProps.selectedPlace['Facility ID'] : null;
+
+  console.log('[PlaceDetail] arePropsEqual check', {
+    prevId,
+    nextId,
+    areEqual: prevId === nextId,
+  });
+
+  return prevId === nextId &&
+    prevProps.dataDictionary === nextProps.dataDictionary &&
+    prevProps.metricQuantiles === nextProps.metricQuantiles;
+};
+
+export default React.memo(PlaceDetail, arePropsEqual);

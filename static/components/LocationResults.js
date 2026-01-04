@@ -16,7 +16,8 @@ const getInfectionStatus = (rating) => {
 const LocationResults = ({
   results = [],
   title = "Hospitals",
-  onRemoveComparison = (_i) => {},
+  onRemoveComparison = (_i) => { },
+  dataDictionary,
 }) => {
   const {
     setSelectedPlace,
@@ -25,6 +26,7 @@ const LocationResults = ({
     isMobile,
     sortBy,
     sortDirection,
+    initialCareTypeParam,
   } = useAppContext();
 
   const handleCompare = useCallback(
@@ -150,7 +152,7 @@ const LocationResults = ({
         // Get the value for the current sort metric
         const sortConfig = sortBy && sortBy.id ? SORT_FIELD_MAP[sortBy.id] : null;
         const sortMetricValue = sortConfig ? place[sortConfig.field] : place["Summary star rating"];
-        
+
         return (
           <LocationRow
             disableCompare={
@@ -168,16 +170,14 @@ const LocationResults = ({
             phone={formatPhoneNumber(place.phone_number || "")}
             distance={place.distance}
             travelTime={place.time}
-            patientRating={place["Summary star rating"] || 0}
-            sortBy={sortBy}
-            sortMetricValue={sortMetricValue}
-            infectionLabelText={place["Infection Label"] || "Infections"}
-            infectionStatus={getInfectionStatus(place["Infection Rating"])}
+            place={place}
+            careType={initialCareTypeParam}
             onGoogleMaps={() =>
               window.open(addressToUrl(place.address), "_blank")
             }
             onCompare={() => handleCompare(place)}
             onRemoveComparison={(index) => onRemoveComparison(index)}
+            dataDictionary={dataDictionary}
           />
         );
       })}

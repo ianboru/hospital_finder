@@ -1,11 +1,13 @@
 {% load static %}
-<link href="{% static "/css/index.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static " /css/index.css" %}" rel="stylesheet" type="text/css">
 
 <!--scripts for google maps!-->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o&callback=Function.prototype"></script>
-<title>Find Good Care</title>
-<meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2Rq696ITlGYFmB7mny9EhH2Z86Xekw4o&callback=Function.prototype"></script>
+<title>Find Quality Care</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</meta>
 
 <!--passing places data to be available in react-->
 {{ google_places_data | json_script:'google_places_data' }}
@@ -13,5 +15,5 @@
 {{ data_dictionary | json_script:'data_dictionary' }}
 
 <script type="module" src="{% static "App.js" %}"></script>
-<div id="root"></div>  
+<div id="root"></div>
 {{ request.user.id|json_script:"user_id" }}

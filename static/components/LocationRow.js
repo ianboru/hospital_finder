@@ -58,7 +58,7 @@ const InfoIcon = ({ metricKey }) => {
       onMouseDown={handleClick}
       onTouchStart={handleClick}
     >
-      ℹ
+      i
     </span>
   );
 };
@@ -120,7 +120,7 @@ const LocationRow = ({
       }}
       className="lr-row"
     >
-      <div>
+      <div className="lr-left-content">
         <div className="lr-main-info">
           <div className="lr-title">{name}</div>
           <div className="lr-address">{address}</div>

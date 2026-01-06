@@ -6,10 +6,18 @@
   border-bottom: 1px solid #e0e0e0;
   padding: 20px 16px;
   background: #fff;
-  gap: 16px;
+  gap: 8px;
   box-sizing: border-box;
   width: 100%;
   overflow-x: hidden;
+}
+
+.lr-left-content {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .lr-main-info {
@@ -22,12 +30,16 @@
   font-weight: bold;
   font-size: 1.15rem;
   margin-bottom: 2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .lr-address {
   color: #444;
   font-size: 0.98rem;
   margin-bottom: 2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .lr-details {
@@ -68,11 +80,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
+  font-weight: bold;
   color: #888;
   border: 1px solid #e0e0e0;
   margin-right: 6px;
   flex-shrink: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .lr-metric-label {
@@ -187,9 +204,72 @@
   .lr-row {
     gap: 10px;
     padding: 16px 12px;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  .lr-main-info {
+    max-width: calc(100vw - 200px);
+  }
+
+  .lr-title {
+    font-size: 1rem;
+  }
+
+  .lr-address {
+    font-size: 0.85rem;
+  }
+
+  .lr-details {
+    font-size: 0.85rem;
+  }
+
+  .lr-metric-row {
+    font-size: 0.9rem;
+  }
+
+  .lr-metric-label {
+    font-size: 0.85rem;
   }
 
   .lr-actions {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 500px) {
+  .lr-row {
+    gap: 8px;
+    padding: 14px 10px;
+  }
+
+  .lr-main-info {
+    max-width: calc(100vw - 180px);
+  }
+
+  .lr-title {
+    font-size: 0.95rem;
+  }
+
+  .lr-address {
+    font-size: 0.8rem;
+  }
+
+  .lr-details {
+    font-size: 0.8rem;
+  }
+
+  .lr-metric-row {
+    font-size: 0.85rem;
+  }
+
+  .lr-metric-label {
+    font-size: 0.8rem;
+  }
+
+  .lr-info-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
   }
 }

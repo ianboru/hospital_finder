@@ -203,7 +203,7 @@ def find_providers_in_radius(search_location, radius, care_type):
     nan_lat_long_count = 0
     if not care_type:
         care_type = ["Hospital"]
-
+    print("pre query care type: ", care_type)
     if care_type == "ED":
         #currently these are not consistently loading in pipeline 
         #so we keep both till its fixed
@@ -225,7 +225,7 @@ def find_providers_in_radius(search_location, radius, care_type):
         if provider_location_tuple[0] is None or provider_location_tuple[1] is None or math.isnan(provider_location_tuple[0]) or math.isnan(provider_location_tuple[1]):
             nan_lat_long_count += 1
             continue
-        print("provider location tuple", provider_location_tuple, search_location_tuple)
+        #print("provider location tuple", provider_location_tuple, search_location_tuple)
         try:
             provider_distance = distance.distance(search_location_tuple, provider_location_tuple)
         except Exception as e:
@@ -274,15 +274,18 @@ def index(request, path=None):
     if not radius:
         radius = 150
     split_location_string = location_string.strip().split(",")
-    search_location = (float(split_location_string[1]), float(split_location_string[0]))
-    print('Parsed Location: ', split_location_string)
+    if abs(float(split_location_string[0])) > 90:
+        split_location_string.reverse()
+    search_location = (float(split_location_string[1].strip()), float(split_location_string[0].strip()))
+    print('Parsed Location: ', split_location_string, search_location)
     search_match_threshold = 70
     #replace the pandas dataframe here
     #provider_list = provider_list[provider_list["Facility Type"] == care_type] #facilities = facilities.filter(care_types__contains=[care_type])
+    
     filtered_providers, provider_list = find_providers_in_radius(search_location, radius, care_type)
     filtered_providers = add_metrics_to_providers(filtered_providers)
     print("Search String: ", search_string)
-    
+
     providers_after_name_filter = []
     if search_string:
         # filter base on fuzzy match on facility name base on search string

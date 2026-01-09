@@ -103,6 +103,7 @@ export const AppProvider = ({ children }) => {
   const [showAboutUsModal, setShowAboutUsModal] = useState(false);
   const [showAboutDataModal, setShowAboutDataModal] = useState(false);
   const [showWebsiteGuideModal, setShowWebsiteGuideModal] = useState(false);
+  const [showLocationPermissionModal, setShowLocationPermissionModal] = useState(false);
 
 
   const onSearchSubmit = useCallback((
@@ -157,29 +158,72 @@ export const AppProvider = ({ children }) => {
     setSearchTerm(e.target.value);
   };
 
+  // Function to request geolocation
+  const requestGeolocation = useCallback(() => {
+    console.log("=== requestGeolocation called ===");
+
+    if (!navigator.geolocation) {
+      console.error("Geolocation is not supported by this browser");
+      alert("Your browser doesn't support geolocation");
+      return;
+    }
+
+    console.log("navigator.geolocation is available, calling getCurrentPosition...");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log(
+          "✅ SUCCESS: Got position",
+          position.coords,
+          initialLocation
+        );
+        // Hide modal on success
+        setShowLocationPermissionModal(false);
+
+        if (!initialLocation.lat) {
+          console.log("updating url");
+          let url = new URL(window.location.origin + window.location.pathname);
+          url.searchParams.set(
+            "location",
+            `${position.coords.latitude},${position.coords.longitude}`
+          );
+          window.location.href = url;
+        }
+
+        setCurrentGPSLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => {
+        // Error callback is required for Safari to prompt for location
+        console.error("❌ ERROR: Geolocation error:", error);
+        console.log("Error code:", error.code);
+        console.log("Error message:", error.message);
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            console.log("User denied the request for Geolocation.");
+            setShowLocationPermissionModal(true);
+            break;
+          case error.POSITION_UNAVAILABLE:
+            console.log("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            console.log("The request to get user location timed out.");
+            break;
+          case error.UNKNOWN_ERROR:
+            console.log("An unknown error occurred.");
+            break;
+        }
+      }
+    );
+  }, [initialLocation]);
+
   // Effects
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      console.log(
-        "updating current position",
-        position.coords,
-        initialLocation
-      );
-      if (!initialLocation.lat) {
-        console.log("updating url");
-        let url = new URL(window.location.origin + window.location.pathname);
-        url.searchParams.set(
-          "location",
-          `${position.coords.latitude},${position.coords.longitude}`
-        );
-        window.location.href = url;
-      }
-
-      setCurrentGPSLocation({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      });
-    });
+    console.log("starting initial location")
+    requestGeolocation();
   }, []);
 
   const handleWindowSizeChange = () => {
@@ -228,6 +272,7 @@ export const AppProvider = ({ children }) => {
     showAboutUsModal,
     showAboutDataModal,
     showWebsiteGuideModal,
+    showLocationPermissionModal,
     // Functions
     setSelectedPlace,
     setSearchTerm,
@@ -247,6 +292,8 @@ export const AppProvider = ({ children }) => {
     setShowAboutUsModal,
     setShowAboutDataModal,
     setShowWebsiteGuideModal,
+    setShowLocationPermissionModal,
+    requestGeolocation,
   }), [
     // Data (these never change)
     placesData,
@@ -272,6 +319,7 @@ export const AppProvider = ({ children }) => {
     showAboutUsModal,
     showAboutDataModal,
     showWebsiteGuideModal,
+    showLocationPermissionModal,
     // Functions (these are stable due to useCallback/useState)
     setSelectedPlace,
     setSearchTerm,
@@ -291,6 +339,8 @@ export const AppProvider = ({ children }) => {
     setShowAboutUsModal,
     setShowAboutDataModal,
     setShowWebsiteGuideModal,
+    setShowLocationPermissionModal,
+    requestGeolocation,
   ]);
 
   return (

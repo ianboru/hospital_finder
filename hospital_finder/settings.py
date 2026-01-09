@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-*pe!k%e#(2!x%+6!z^468!^29+&zf*+ja7*kn9m(6&@ub)j$-$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["www.findqualitycare.org","findqualitycare.org","172.233.188.56", 'localhost', "https://abf7c2e40be6.ngrok.app", "abf7c2e40be6.ngrok.app"]
+ALLOWED_HOSTS = ["www.findqualitycare.org","findqualitycare.org","172.233.188.56", 'localhost', "https://11780c36f327.ngrok.app", "11780c36f327.ngrok.app"]
 
 LOGIN_REDIRECT_URL = "/"
 # Application definition

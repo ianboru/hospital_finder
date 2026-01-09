@@ -3,6 +3,7 @@ import React from "react";
 import "./App.css";
 import MobileLayout from "./components/MobileLayout";
 import DesktopLayout from "./components/DesktopLayout";
+import LocationPermissionModal from "./components/LocationPermissionModal";
 import { AppProvider, DefinitionProvider, useAppContext } from "./context/AppContext";
 
 function AppContent() {
@@ -30,6 +31,9 @@ function AppContent() {
     setShowComparisonModal,
     comparisonPlaces,
     setComparisonPlaces,
+    showLocationPermissionModal,
+    setShowLocationPermissionModal,
+    requestGeolocation,
   } = useAppContext();
 
   // console.log("initial placeresults", placesData);
@@ -40,10 +44,28 @@ function AppContent() {
   // console.log("is mobile", isMobile);
 
   if (isMobile) {
-    return <MobileLayout />;
+    return (
+      <>
+        <LocationPermissionModal
+          isOpen={showLocationPermissionModal}
+          onClose={() => setShowLocationPermissionModal(false)}
+          onRetry={requestGeolocation}
+        />
+        <MobileLayout />
+      </>
+    );
   }
 
-  return <DesktopLayout />;
+  return (
+    <>
+      <LocationPermissionModal
+        isOpen={showLocationPermissionModal}
+        onClose={() => setShowLocationPermissionModal(false)}
+        onRetry={requestGeolocation}
+      />
+      <DesktopLayout />
+    </>
+  );
 }
 
 function App() {

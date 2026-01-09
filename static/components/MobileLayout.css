@@ -50,8 +50,10 @@
 @media (max-width: 768px) {
   .search-container {
     position: sticky;
-    top: 10px;
-    z-index: 1;
+    top: 50px;
+    /* Position below the mobile header */
+    z-index: 19;
+    /* Just below the header's z-index of 20 */
     background: transparent;
     padding-right: 15px;
     padding-left: 10px;

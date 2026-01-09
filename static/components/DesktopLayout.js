@@ -155,7 +155,7 @@ const DesktopLayout = () => {
       <div className="desktop-header">
         <div className="header-content">
           <h1 className="header-title">
-            CareFinder.com provides healthcare safety and quality information
+            Find Quality Care
           </h1>
           <p className="header-subtitle">
             Our data comes from national standardized public reporting from CMS

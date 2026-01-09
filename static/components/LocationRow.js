@@ -131,7 +131,10 @@ const LocationRow = ({
           </div>
         </div>
         <div className="lr-actions">
-          <button className="lr-btn lr-maps" onClick={onGoogleMaps}>
+          <button className="lr-btn lr-maps" onClick={(e) => {
+            e.stopPropagation();
+            onGoogleMaps();
+          }}>
             <span role="img" aria-label="maps">
               📍
             </span>{" "}

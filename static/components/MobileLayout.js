@@ -134,7 +134,7 @@ const MobileLayout = () => {
 
   const mobileHeader = <div className="mobile-header">
     <div className="mobile-header-content">
-      <h1 className="mobile-header-title">CareFinder.com</h1>
+      <h1 className="mobile-header-title">Find Quality Care</h1>
       <div className="mobile-header-buttons">
         <button
           className="mobile-header-button"
@@ -176,8 +176,8 @@ const MobileLayout = () => {
       {/* Compact Mobile Header */}
       {mobileHeader}
 
-      <SearchBox />
       <div className="map-container">
+        <SearchBox />
         <Map
           placesData={placesData}
           initialLocation={initialLocation}

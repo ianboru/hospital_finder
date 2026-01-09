@@ -2,7 +2,10 @@ import React from 'react';
 const filledStarUnicode = "\u2605"
 
 const addressToUrl = (address) => {
-    const urlAddress = address.replace(/\,/g, '');
+    // Handle array addresses by taking the first element
+    const addressString = Array.isArray(address) ? address[0] : address;
+    if (!addressString) return '';
+    const urlAddress = addressString.replace(/\,/g, '');
     const url = urlAddress.replace(/\ /g, '%20');
     return `http://maps.google.com/maps?q=${url}`
 }

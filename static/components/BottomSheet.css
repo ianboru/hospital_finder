@@ -230,7 +230,11 @@ body {
     border-top-left-radius: 1.5rem;
     border-top-right-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    min-height: 100vh;
+    /* Changed from height to min-height */
     height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    /* Add safe area for devices with notches */
     will-change: transform;
 }
 

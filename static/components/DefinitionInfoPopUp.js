@@ -8,7 +8,11 @@ const DefinitionInfoPopUp = React.memo(() => {
 
     console.log('[DefinitionInfoPopUp] RENDERING', { shownDefinition });
 
-    if (!shownDefinition || !dataDictionary[shownDefinition]) {
+    // Normalize the key to lowercase for case-insensitive lookup
+    const normalizedKey = shownDefinition ? shownDefinition.toLowerCase() : null;
+    const dictionaryEntry = normalizedKey ? dataDictionary[normalizedKey] : null;
+
+    if (!shownDefinition || !dictionaryEntry) {
         return null;
     }
 
@@ -22,7 +26,7 @@ const DefinitionInfoPopUp = React.memo(() => {
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="definition-popup-header">
-                    <h3>{dataDictionary[shownDefinition].term}</h3>
+                    <h3>{dictionaryEntry.term}</h3>
                     <button
                         className="definition-close-button"
                         onClick={() => setShownDefinition(null)}
@@ -31,7 +35,7 @@ const DefinitionInfoPopUp = React.memo(() => {
                     </button>
                 </div>
                 <div className="definition-popup-content">
-                    {dataDictionary[shownDefinition].definition}
+                    {dictionaryEntry.definition}
                 </div>
             </div>
         </div>

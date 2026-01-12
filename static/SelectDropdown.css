@@ -4,6 +4,13 @@
     width: 100%;
 }
 
+/* Dropdowns that should size to content */
+.care-type-dropdown.select-dropdown-container,
+.sort-by-dropdown.select-dropdown-container {
+    width: auto;
+    display: inline-block;
+}
+
 .select-dropdown-label {
     font-size: 12px;
     color: #333;
@@ -11,175 +18,63 @@
     display: inline-block;
 }
 
-/* Mobile styles (default) */
-.react-select-container {
+/* Native select styling */
+.native-select {
     font-family: Arial, sans-serif;
-}
-
-.react-select__control {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid #ddd;
-    border-radius: 30px;
-    min-height: 36px;
-    box-shadow: none;
+    border-radius: 20px;
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
     cursor: pointer;
     transition: border-color 0.2s ease;
+    outline: none;
+    width: auto;
+    min-width: auto;
 }
 
-/* Mobile styles when inside floating dropdown */
-@media (max-width: 768px) {
-    .floating-dropdown-content .react-select__control {
-        min-height: 48px;
-        border-radius: 12px;
-        font-size: 16px;
-    }
-
-    .floating-dropdown-content .react-select__value-container {
-        padding: 8px 12px;
-    }
-
-    .floating-dropdown-content .react-select__single-value {
-        font-size: 16px;
-        font-weight: 500;
-    }
-
-    .floating-dropdown-content .react-select__placeholder {
-        font-size: 16px;
-    }
-
-    .floating-dropdown-content .react-select__menu {
-        position: static;
-        box-shadow: none;
-        border: none;
-        margin-top: 12px;
-        background-color: #f8f8f8;
-    }
-
-    .floating-dropdown-content .react-select__option {
-        padding: 14px 16px;
-        font-size: 16px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .floating-dropdown-content .react-select__option:last-child {
-        border-bottom: none;
-    }
-}
-
-.react-select__control:hover {
+.native-select:hover {
     border-color: #999;
 }
 
-.react-select__control--is-focused {
+.native-select:focus {
     border-color: #666;
     box-shadow: 0 0 0 1px #666;
 }
 
-.react-select__value-container {
-    padding: 2px 8px;
+/* Make the select fit its content */
+.care-type-dropdown .native-select,
+.sort-by-dropdown .native-select {
+    width: auto;
 }
 
-.react-select__single-value {
-    color: #333;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.react-select__placeholder {
-    color: #999;
-    font-size: 12px;
-}
-
-.react-select__indicator-separator {
-    display: none;
-}
-
-.react-select__dropdown-indicator {
-    padding: 4px 8px;
-    color: #333;
-}
-
-.react-select__clear-indicator {
-    padding: 4px 8px;
-    color: #666;
-}
-
-.react-select__menu {
-    margin-top: 4px;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ddd;
-}
-
-.react-select__menu-list {
-    padding: 4px 0;
-}
-
-.react-select__option {
-    padding: 8px 12px;
+/* Hidden span for measuring text width */
+.select-measure {
+    position: absolute;
+    visibility: hidden;
+    white-space: nowrap;
+    font-family: Arial, sans-serif;
     font-size: 14px;
-    cursor: pointer;
+    font-weight: 500;
+    padding: 8px 12px;
 }
 
-.react-select__option--is-focused {
-    background-color: #f0f0f0;
-}
-
-.react-select__option--is-selected {
-    background-color: #e0e0e0;
-    color: #333;
-}
-
-/* Desktop styles */
-@media (min-width: 769px) {
+/* Mobile adjustments */
+@media (max-width: 768px) {
     .select-dropdown-label {
         display: none;
     }
-    
-    .react-select__control {
-        border-radius: 8px;
-        min-height: 44px;
-        border: 1px solid #ddd;
-    }
-    
-    .react-select__control:hover {
-        border-color: #999;
-    }
-    
-    .react-select__control--is-focused {
-        border-color: #666;
-        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
-    }
-    
-    .react-select__value-container {
-        padding: 8px 16px;
-    }
-    
-    .react-select__single-value {
-        font-size: 16px;
-        font-weight: normal;
-    }
-    
-    .react-select__placeholder {
-        font-size: 16px;
-    }
-    
-    .react-select__dropdown-indicator {
-        padding: 8px;
-    }
-    
-    .react-select__clear-indicator {
-        padding: 8px;
-    }
-    
-    .react-select__option {
-        padding: 12px 16px;
-        font-size: 16px;
-    }
-}
 
-/* Specific styles for care type and sort dropdowns */
-.care-type-dropdown .react-select__control,
-.sort-by-dropdown .react-select__control {
-    background: rgba(255, 255, 255, 0.95);
+    .care-type-dropdown.select-dropdown-container,
+    .sort-by-dropdown.select-dropdown-container {
+        width: 100%;
+    }
+
+    .care-type-dropdown .native-select,
+    .sort-by-dropdown .native-select {
+        width: 100%;
+    }
 }

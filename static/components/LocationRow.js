@@ -42,12 +42,21 @@ const infectionLabel = (status) => {
 
 // Reusable Info Icon component
 const InfoIcon = ({ metricKey }) => {
-  const { setShownDefinition } = useDefinitionContext();
+  const { setShownDefinition, dataDictionary } = useDefinitionContext();
 
   const handleClick = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    setShownDefinition(metricKey.toLowerCase());
+    const normalizedKey = metricKey.toLowerCase();
+    const dictionaryEntry = dataDictionary[normalizedKey];
+
+    console.log('[LocationRow InfoIcon] Clicked metric:', {
+      metricKey,
+      normalizedKey,
+      dictionaryEntry
+    });
+
+    setShownDefinition(normalizedKey);
   };
 
   return (
@@ -152,17 +161,17 @@ const LocationRow = ({
         {/* Hospital metrics */}
         {careType && careType.includes('Hospital') && (
           <>
-            <MetricRow label="Patient Rating" metricKey="summary star rating">
+            <MetricRow label="Patient Rating" metricKey="Overall Rating">
               {isValidValue(place['Summary star rating'])
                 ? ratingStars(place['Summary star rating'])
                 : <span className="lr-metric-na">N/A</span>
               }
             </MetricRow>
-            <MetricRow label="Infections" metricKey="infection rating">
-              {isValidValue(place['Infection Rating']) ? (
+            <MetricRow label="Infection Risk" metricKey="Infection Risk">
+              {isValidValue(place['Infection Risk']) ? (
                 <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  {infectionIcon(getInfectionStatus(place['Infection Rating']))}
-                  {infectionLabel(getInfectionStatus(place['Infection Rating']))}
+                  {infectionIcon(getInfectionStatus(place['Infection Risk']))}
+                  {infectionLabel(getInfectionStatus(place['Infection Risk']))}
                 </div>
               ) : (
                 <span className="lr-metric-na">N/A</span>

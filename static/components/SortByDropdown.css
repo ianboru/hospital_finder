@@ -1,19 +1,42 @@
 .sort-by-dropdown-container {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: stretch;
+  gap: 0;
+  width: fit-content;
+}
+
+/* Remove any margin from the dropdown wrapper */
+.sort-by-dropdown-container .select-dropdown-container {
+  margin: 0;
+  display: flex;
+  width: auto;
 }
 
 .sort-direction-toggle {
-  padding: 8px;
-  background-color: #f0f0f0;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  border-left: none;
+  border-radius: 0 20px 20px 0;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  margin-left: -1px;
+  flex-shrink: 0;
 }
 
 .sort-direction-toggle:hover {
-  background-color: #e0e0e0;
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+/* Adjust the dropdown to connect with the toggle */
+.sort-by-dropdown-container .native-select {
+  border-radius: 20px 0 0 20px;
+  margin: 0;
 }

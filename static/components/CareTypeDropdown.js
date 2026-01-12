@@ -2,7 +2,6 @@ import React from 'react';
 import SelectDropdown from './SelectDropdown';
 
 const careTypes = [
-  { id: 1, name: 'All' },
   { id: 2, name: 'Hospital' },
   { id: 3, name: 'ED' },
   { id: 4, name: 'Outpatient' },

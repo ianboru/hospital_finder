@@ -181,13 +181,15 @@ export const AppProvider = ({ children }) => {
         setShowLocationPermissionModal(false);
 
         if (!initialLocation.lat) {
-          console.log("updating url");
-          let url = new URL(window.location.origin + window.location.pathname);
+          console.log("updating url without reload");
+          let url = new URL(window.location);
           url.searchParams.set(
             "location",
             `${position.coords.latitude},${position.coords.longitude}`
           );
-          window.location.href = url;
+          window.history.replaceState({}, '', url);
+          // Don't reload - let user see current results
+          // They can manually search if they want results for their location
         }
 
         setCurrentGPSLocation({

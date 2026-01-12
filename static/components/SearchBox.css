@@ -107,7 +107,59 @@
   }
 }
 
-/* Removed old tile-specific CSS - now handled by FloatingDropdownButton */
+/* Care type filter wrapper */
+.care-type-filter-wrapper {
+  flex: 0 1 auto;
+  min-width: fit-content;
+}
+
+.care-type-filter-wrapper .select-dropdown-container {
+  width: auto;
+}
+
+.care-type-filter-wrapper .react-select-container {
+  width: auto;
+}
+
+.care-type-filter-wrapper .react-select__control {
+  width: auto;
+  min-width: auto;
+}
+
+@media (max-width: 768px) {
+  .care-type-filter-wrapper {
+    flex: 1;
+  }
+
+  .care-type-filter-wrapper .select-dropdown-container {
+    width: 100%;
+  }
+
+  .care-type-filter-wrapper .react-select-container,
+  .care-type-filter-wrapper .react-select__control {
+    width: 100%;
+  }
+}
+
+/* Sort by filter wrapper */
+.sort-by-filter-wrapper {
+  flex: 0 1 auto;
+  min-width: fit-content;
+}
+
+.sort-by-filter-wrapper .sort-by-dropdown-container {
+  width: fit-content;
+}
+
+@media (max-width: 768px) {
+  .sort-by-filter-wrapper {
+    flex: 1;
+  }
+
+  .sort-by-filter-wrapper .sort-by-dropdown-container {
+    width: 100%;
+  }
+}
 
 /* Animation for dropdown appearance */
 @keyframes slideDown {
@@ -129,8 +181,6 @@
   box-shadow: none;
   background: transparent;
 }
-
-/* Removed old override styles - now handled by FloatingDropdownButton */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

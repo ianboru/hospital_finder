@@ -1,6 +1,5 @@
 import React from "react";
 import SearchBar from "./SearchBar";
-import FloatingDropdownButton from "./FloatingDropdownButton";
 import CareTypeDropdown from "./CareTypeDropdown";
 import SortByDropdown from "./SortByDropdown";
 import "./SearchBox.css";
@@ -21,25 +20,19 @@ const SearchBox = ({ placeholder = "Search facilities or locations here" }) => {
       </div>
 
       <div className="filter-buttons-container">
-        <FloatingDropdownButton
-          label={careType || "Care Type"}
-          icon="▼"
-        >
+        <div className="care-type-filter-wrapper">
           <CareTypeDropdown
             selectedCareType={careType}
             onSelectCareType={onSelectCareType}
           />
-        </FloatingDropdownButton>
+        </div>
 
-        <FloatingDropdownButton
-          label={sortBy && sortBy.name ? sortBy.name : "Sort By"}
-          icon="≡"
-        >
+        <div className="sort-by-filter-wrapper">
           <SortByDropdown
             selectedSort={sortBy}
             onSelectSort={onSelectSortBy}
           />
-        </FloatingDropdownButton>
+        </div>
       </div>
     </div>
   );
